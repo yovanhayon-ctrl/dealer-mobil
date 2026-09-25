@@ -276,6 +276,38 @@ main {
     min-width: 0;
 }
 
+.admin-search {
+    max-width: 420px;
+    width: 100%;
+}
+
+.admin-form-card {
+    max-width: 720px;
+}
+
+.admin-thumb {
+    width: 40px;
+    height: 40px;
+    object-fit: contain;
+    border-radius: .5rem;
+    background-color: #fff;
+    border: 1px solid #e9ecef;
+}
+
+.admin-thumb-lg {
+    width: 80px;
+    height: 80px;
+    flex: 0 0 80px;
+}
+
+.admin-thumb-empty {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+    background-color: var(--dm-bg);
+}
+
 /* ---------- Komponen: stat-card ---------- */
 
 .stat-card {
