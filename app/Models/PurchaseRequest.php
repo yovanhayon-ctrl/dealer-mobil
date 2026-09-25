@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Database\Factories\PurchaseRequestFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -13,6 +15,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class PurchaseRequest extends Model
 {
+    /** @use HasFactory<PurchaseRequestFactory> */
+    use HasFactory;
+
     public const STATUSES = ['pending', 'processing', 'approved', 'rejected', 'completed', 'cancelled'];
 
     public const PAYMENT_METHODS = ['cash', 'credit'];

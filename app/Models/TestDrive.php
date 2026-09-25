@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
+use Database\Factories\TestDriveFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
@@ -12,6 +14,9 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 ])]
 class TestDrive extends Model
 {
+    /** @use HasFactory<TestDriveFactory> */
+    use HasFactory;
+
     public const STATUSES = ['pending', 'confirmed', 'completed', 'cancelled'];
 
     protected function casts(): array
