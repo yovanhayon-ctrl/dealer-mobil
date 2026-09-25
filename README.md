@@ -471,3 +471,136 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | `promos`            | Promo umum atau per mobil                         |
 | `test_drives`       | Booking test drive                                |
 | `purchase_requests` | Pengajuan pembelian cash/kredit                   |
+
+## Alur Kerja Git (Kerja Tim)
+
+Repository ini memakai **2 branch**:
+
+| Branch    | Fungsi                                      | Siapa yang boleh push          |
+| --------- | ------------------------------------------- | ------------------------------ |
+| `main`    | Versi **stabil** yang sudah dicek dan dites | **Hanya admin (pemilik repo)** |
+| `testing` | Tempat **semua anggota tim bekerja**        | Semua anggota tim              |
+
+```text
+anggota tim ──push──▶ testing ──(dicek & dites admin)──▶ main
+```
+
+> ⚠️ Branch `main` dikunci dengan GitHub Ruleset. Push ke `main` oleh selain admin akan **ditolak otomatis**.
+
+### 1. Pertama kali (setelah menerima undangan collaborator)
+
+```bat
+cd C:\laragon\www
+git clone https://github.com/yovanhayon-ctrl/dealer-mobil.git
+cd dealer-mobil
+git checkout testing
+```
+
+Lanjutkan langkah instalasi di bagian atas README (composer install, `.env`, database, migrate).
+
+> Default branch repo ini adalah `main`. **Setelah clone, wajib pindah ke `testing`.**
+
+### 2. Setiap kali mulai coding
+
+```bat
+git checkout testing
+git pull origin testing
+composer install
+php artisan migrate
+```
+
+- `git pull` mengambil perubahan terbaru dari anggota tim lain.
+- `composer install` dan `php artisan migrate` diperlukan kalau ada package atau migration baru.
+
+### 3. Setelah selesai coding
+
+```bat
+git status
+git add .
+git commit -m "feat: deskripsi singkat perubahan"
+git push origin testing
+```
+
+Sebelum commit, pastikan:
+
+- prompt terminal menunjukkan **`(testing)`**, bukan `(main)`,
+- `.env`, `vendor/`, `node_modules/`, dan `.claude/` **tidak** muncul di `git status`,
+- `php artisan test` lulus.
+
+### 4. Kalau push ditolak karena ada perubahan baru dari teman
+
+Pesan error: `rejected ... (fetch first)` atau `non-fast-forward`.
+
+```bat
+git pull origin testing
+```
+
+- Kalau tidak ada konflik, lanjutkan dengan `git push origin testing`.
+- Kalau ada **konflik**: buka file yang ditandai di VS Code, pilih kode yang benar, simpan, lalu:
+
+```bat
+git add .
+git commit -m "fix: resolve merge conflict"
+git push origin testing
+```
+
+Kalau ragu cara menyelesaikan konflik, **tanyakan dulu ke admin** sebelum commit.
+
+### 5. Kalau terlanjur commit di `main`
+
+Push ke `main` akan ditolak. Pindahkan commit ke `testing`:
+
+```bat
+git checkout testing
+git merge main
+git push origin testing
+git checkout main
+git reset --hard origin/main
+git checkout testing
+```
+
+> ⚠️ `git reset --hard origin/main` mengembalikan `main` lokal agar sama dengan GitHub. Jalankan **hanya setelah** commit sudah berhasil di-push ke `testing`.
+
+### 6. Khusus admin: memindahkan `testing` ke `main`
+
+Setelah perubahan di `testing` dicek:
+
+```bat
+git checkout testing
+git pull origin testing
+composer install
+php artisan migrate
+php artisan test
+```
+
+Cek juga secara manual di browser. Kalau semua lancar:
+
+```bat
+git checkout main
+git pull origin main
+git merge testing
+git push origin main
+git checkout testing
+```
+
+### Format pesan commit
+
+| Awalan      | Dipakai untuk                        |
+| ----------- | ------------------------------------ |
+| `feat:`     | Fitur baru                           |
+| `fix:`      | Perbaikan bug                        |
+| `style:`    | Perubahan tampilan/CSS               |
+| `refactor:` | Merapikan kode tanpa mengubah fungsi |
+| `docs:`     | Dokumentasi                          |
+| `test:`     | Menambah atau mengubah test          |
+| `chore:`    | Setup, konfigurasi, dependency       |
+
+### Aturan penting
+
+- **Jangan** push ke `main`. Semua pekerjaan masuk ke `testing`.
+- **Jangan** menjalankan `git push --force`.
+- **Jangan** mengedit migration yang sudah di-push. Buat migration baru kalau perlu mengubah struktur tabel.
+- **Jangan** menjalankan `php artisan migrate:fresh` di database orang lain, dan tanyakan dulu sebelum menjalankannya di laptop sendiri.
+- Selalu `git pull` **sebelum** mulai coding.
+- Sepakati pembagian fitur supaya tidak mengedit file yang sama bersamaan.
+- Kalau memakai Claude Code, tambahkan instruksi: _"Kita bekerja di branch testing. Jangan pindah branch, jangan merge, dan jangan push ke main."_
