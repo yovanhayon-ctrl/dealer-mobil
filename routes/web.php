@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -40,4 +42,14 @@ Route::post('/logout', [LoginController::class, 'destroy'])
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::redirect('/', '/admin/dashboard')->name('home');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+    Route::resource('merek', BrandController::class)
+        ->except('show')
+        ->parameters(['merek' => 'brand'])
+        ->names('brands');
+
+    Route::resource('kategori', CategoryController::class)
+        ->except('show')
+        ->parameters(['kategori' => 'category'])
+        ->names('categories');
 });

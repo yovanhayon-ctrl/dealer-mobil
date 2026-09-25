@@ -60,5 +60,6 @@ Status: disepakati (25 Sep 2026). Acuan untuk semua anggota tim.
 - Phase 1 (setup) dan Phase 2 (migration + model, enum `cancelled`, timezone Asia/Jakarta) selesai.
 - Phase 3 (auth + role + layout dasar) selesai.
 - Phase 4 (layout admin + dashboard) selesai: sidebar offcanvas-lg, breadcrumb, komponen stat-card/status-badge/empty-state, factory model, `preventLazyLoading` di non-production.
+- Phase 5 (CRUD merek & kategori) selesai: URL `/tambah` & `/ubah` (Route::resourceVerbs), slug unik otomatis (trait `HasUniqueSlug`, ikut berubah saat nama diubah), nama unik tanpa beda huruf besar/kecil, logo merek jpg/jpeg/png/webp maks 1 MB di disk public (perlu `php artisan storage:link`), hapus ditolak jika masih dipakai mobil, seeder merek & kategori (firstOrCreate).
 - Urutan berikutnya: seluruh halaman admin dulu (merek & kategori → mobil → gambar → promo → pengguna → test drive & pengajuan → laporan), baru halaman publik.
 - Konvensi nama route admin (menu sidebar muncul otomatis bila route ada): `admin.cars.*`, `admin.brands.*`, `admin.categories.*`, `admin.promos.*`, `admin.test-drives.*`, `admin.purchase-requests.*`, `admin.users.*`, `admin.reports.*`.

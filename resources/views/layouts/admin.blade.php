@@ -48,5 +48,6 @@
     </div>
 
     @include('partials.scripts')
+    <script src="{{ asset('js/admin.js') }}"></script>
 </body>
 </html>

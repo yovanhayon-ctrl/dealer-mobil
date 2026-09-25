@@ -1,0 +1,40 @@
+/*
+ * Dealer Mobil — script kecil untuk halaman admin.
+ */
+document.addEventListener('DOMContentLoaded', function () {
+    // Modal konfirmasi hapus: isi action form & nama item dari tombol pemicu.
+    var deleteModal = document.getElementById('deleteModal');
+
+    if (deleteModal) {
+        deleteModal.addEventListener('show.bs.modal', function (event) {
+            var trigger = event.relatedTarget;
+
+            if (!trigger) {
+                return;
+            }
+
+            deleteModal.querySelector('[data-delete-form]').action = trigger.getAttribute('data-delete-url');
+            deleteModal.querySelector('[data-delete-name]').textContent = trigger.getAttribute('data-delete-name');
+        });
+    }
+
+    // Pratinjau gambar sebelum upload: <input type="file" data-preview-target="#idGambar">.
+    document.querySelectorAll('input[type="file"][data-preview-target]').forEach(function (input) {
+        input.addEventListener('change', function () {
+            var preview = document.querySelector(input.getAttribute('data-preview-target'));
+            var file = input.files && input.files[0];
+
+            if (!preview) {
+                return;
+            }
+
+            if (file && file.type.indexOf('image/') === 0) {
+                preview.src = URL.createObjectURL(file);
+                preview.classList.remove('d-none');
+            } else {
+                preview.removeAttribute('src');
+                preview.classList.add('d-none');
+            }
+        });
+    });
+});

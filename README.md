@@ -322,6 +322,16 @@ Semua migration harus berstatus **Ran**.
 
 > **Peringatan:** jangan menjalankan `php artisan migrate:fresh` tanpa berdiskusi dulu. Perintah itu **menghapus semua tabel dan data** di database lokal.
 
+Setelah migration, jalankan juga:
+
+```bash
+php artisan storage:link
+php artisan db:seed
+```
+
+- `storage:link` membuat folder `public/storage` yang terhubung ke `storage/app/public`, supaya logo merek dan foto mobil yang di-upload bisa tampil di browser. Cukup sekali di setiap laptop.
+- `db:seed` membuat akun admin (dari `ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env`, wajib diisi dulu) serta data merek (Toyota, Honda, Daihatsu, Mitsubishi, Suzuki, Hyundai, Wuling) dan kategori (SUV, MPV, Sedan, Hatchback, Pickup, LCGC). Aman dijalankan ulang: data yang sudah ada tidak digandakan dan tidak ditimpa.
+
 ---
 
 ## 10. Menjalankan Project
