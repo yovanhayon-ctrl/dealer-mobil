@@ -1,0 +1,215 @@
+/*
+ * Dealer Mobil — override tema Bootstrap 5.3 via CSS variables.
+ * Warna: navy #0B2545 (utama), merah #D62828 (CTA), latar section #F4F6F9.
+ */
+
+:root {
+    --dm-navy: #0b2545;
+    --dm-navy-dark: #071a31;
+    --dm-red: #d62828;
+    --dm-red-dark: #b71f1f;
+    --dm-bg: #f4f6f9;
+    --dm-font-heading: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    --dm-font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+    --bs-primary: var(--dm-navy);
+    --bs-primary-rgb: 11, 37, 69;
+    --bs-danger: var(--dm-red);
+    --bs-danger-rgb: 214, 40, 40;
+    --bs-link-color: var(--dm-navy);
+    --bs-link-color-rgb: 11, 37, 69;
+    --bs-link-hover-color: var(--dm-red);
+    --bs-link-hover-color-rgb: 214, 40, 40;
+    --bs-body-font-family: var(--dm-font-body);
+    --bs-body-color: #212529;
+    --bs-border-radius: .5rem;
+}
+
+body {
+    font-family: var(--dm-font-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+h1, h2, h3, h4, h5, h6,
+.h1, .h2, .h3, .h4, .h5, .h6,
+.navbar-brand, .btn, .font-heading {
+    font-family: var(--dm-font-heading);
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-weight: 600;
+    color: var(--dm-navy);
+}
+
+main {
+    flex: 1 0 auto;
+}
+
+.bg-section {
+    background-color: var(--dm-bg);
+}
+
+/* ---------- Tombol ---------- */
+
+.btn {
+    font-weight: 500;
+    border-radius: .5rem;
+}
+
+.btn .bi {
+    margin-right: .35rem;
+}
+
+.btn-primary {
+    --bs-btn-bg: var(--dm-navy);
+    --bs-btn-border-color: var(--dm-navy);
+    --bs-btn-hover-bg: var(--dm-navy-dark);
+    --bs-btn-hover-border-color: var(--dm-navy-dark);
+    --bs-btn-active-bg: var(--dm-navy-dark);
+    --bs-btn-active-border-color: var(--dm-navy-dark);
+    --bs-btn-disabled-bg: var(--dm-navy);
+    --bs-btn-disabled-border-color: var(--dm-navy);
+    --bs-btn-focus-shadow-rgb: 11, 37, 69;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: var(--dm-navy);
+    --bs-btn-border-color: var(--dm-navy);
+    --bs-btn-hover-bg: var(--dm-navy);
+    --bs-btn-hover-border-color: var(--dm-navy);
+    --bs-btn-active-bg: var(--dm-navy);
+    --bs-btn-active-border-color: var(--dm-navy);
+    --bs-btn-focus-shadow-rgb: 11, 37, 69;
+}
+
+.btn-accent,
+.btn-danger {
+    --bs-btn-color: #fff;
+    --bs-btn-bg: var(--dm-red);
+    --bs-btn-border-color: var(--dm-red);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: var(--dm-red-dark);
+    --bs-btn-hover-border-color: var(--dm-red-dark);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: var(--dm-red-dark);
+    --bs-btn-active-border-color: var(--dm-red-dark);
+    --bs-btn-disabled-color: #fff;
+    --bs-btn-disabled-bg: var(--dm-red);
+    --bs-btn-disabled-border-color: var(--dm-red);
+    --bs-btn-focus-shadow-rgb: 214, 40, 40;
+}
+
+.text-accent {
+    color: var(--dm-red) !important;
+}
+
+/* ---------- Form ---------- */
+
+.form-control:focus,
+.form-select:focus,
+.form-check-input:focus {
+    border-color: rgba(11, 37, 69, .5);
+    box-shadow: 0 0 0 .2rem rgba(11, 37, 69, .15);
+}
+
+.form-check-input:checked {
+    background-color: var(--dm-navy);
+    border-color: var(--dm-navy);
+}
+
+/* ---------- Kartu ---------- */
+
+.card {
+    border: 0;
+    border-radius: 1rem;
+    box-shadow: 0 .125rem .5rem rgba(11, 37, 69, .08);
+}
+
+.card-hover {
+    transition: transform .2s ease, box-shadow .2s ease;
+}
+
+.card-hover:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 .75rem 1.5rem rgba(11, 37, 69, .15);
+}
+
+/* ---------- Navbar & footer public ---------- */
+
+.navbar-dealer {
+    background-color: var(--dm-navy);
+}
+
+.navbar-dealer .navbar-brand {
+    font-weight: 700;
+    color: #fff;
+}
+
+.navbar-dealer .navbar-brand .bi {
+    color: var(--dm-red);
+}
+
+.site-footer {
+    background-color: var(--dm-navy);
+    color: rgba(255, 255, 255, .75);
+}
+
+.site-footer h5 {
+    color: #fff;
+}
+
+.site-footer a {
+    color: rgba(255, 255, 255, .85);
+    text-decoration: none;
+}
+
+.site-footer a:hover {
+    color: #fff;
+}
+
+/* ---------- Halaman auth ---------- */
+
+.auth-wrapper {
+    background-color: var(--dm-bg);
+}
+
+.auth-card {
+    width: 100%;
+    max-width: 440px;
+}
+
+/* ---------- Admin ---------- */
+
+.admin-body {
+    background-color: var(--dm-bg);
+}
+
+.admin-sidebar {
+    width: 240px;
+    min-height: 100vh;
+    background-color: var(--dm-navy-dark);
+}
+
+.admin-sidebar .nav-link {
+    color: rgba(255, 255, 255, .75);
+    border-radius: .5rem;
+}
+
+.admin-sidebar .nav-link:hover,
+.admin-sidebar .nav-link.active {
+    color: #fff;
+    background-color: rgba(255, 255, 255, .1);
+}
+
+.admin-sidebar .nav-link .bi {
+    margin-right: .5rem;
+}
+
+@media (max-width: 991.98px) {
+    .admin-sidebar {
+        width: 100%;
+        min-height: auto;
+    }
+}
