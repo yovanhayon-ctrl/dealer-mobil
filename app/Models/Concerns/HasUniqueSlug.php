@@ -10,9 +10,17 @@ use Illuminate\Support\Str;
  */
 trait HasUniqueSlug
 {
+    /**
+     * Slug dasar. Titik dijadikan pemisah agar "1.5" menjadi "1-5", bukan "15".
+     */
+    public static function slugify(string $name): string
+    {
+        return Str::slug(str_replace('.', ' ', $name));
+    }
+
     public static function uniqueSlug(string $name, ?int $ignoreId = null): string
     {
-        $base = Str::slug($name) ?: 'item';
+        $base = static::slugify($name) ?: 'item';
         $slug = $base;
         $suffix = 2;
 

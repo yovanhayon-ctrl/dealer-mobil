@@ -62,7 +62,7 @@
                                         'editUrl' => route('admin.brands.edit', $brand),
                                         'deleteUrl' => route('admin.brands.destroy', $brand),
                                         'name' => $brand->name,
-                                        'usedCount' => $brand->cars_count,
+                                        'disabledReason' => $brand->cars_count > 0 ? "Masih dipakai {$brand->cars_count} mobil" : null,
                                     ])
                                 </td>
                             </tr>

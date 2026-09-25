@@ -81,7 +81,9 @@ class BrandManagementTest extends TestCase
         Brand::factory()->count(12)->create();
 
         $this->actingAs($this->admin)->get(route('admin.brands.index'))
-            ->assertViewHas('brands', fn ($brands) => $brands->count() === 10 && $brands->total() === 12);
+            ->assertViewHas('brands', fn ($brands) => $brands->count() === 10 && $brands->total() === 12)
+            ->assertSeeText('Menampilkan 1 sampai 10 dari 12 data')
+            ->assertSee('aria-label="Halaman 2"', false);
 
         $this->actingAs($this->admin)->get(route('admin.brands.index', ['page' => 2]))
             ->assertViewHas('brands', fn ($brands) => $brands->count() === 2);

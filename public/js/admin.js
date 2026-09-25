@@ -18,6 +18,22 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
+    // Form mobil: field kilometer hanya tampil untuk kondisi "bekas".
+    var mileageField = document.querySelector('[data-mileage-field]');
+    var conditionRadios = document.querySelectorAll('[data-condition-toggle]');
+
+    if (mileageField && conditionRadios.length) {
+        var syncMileage = function () {
+            var checked = document.querySelector('[data-condition-toggle]:checked');
+            mileageField.classList.toggle('d-none', !checked || checked.value !== 'bekas');
+        };
+
+        conditionRadios.forEach(function (radio) {
+            radio.addEventListener('change', syncMileage);
+        });
+        syncMileage();
+    }
+
     // Pratinjau gambar sebelum upload: <input type="file" data-preview-target="#idGambar">.
     document.querySelectorAll('input[type="file"][data-preview-target]').forEach(function (input) {
         input.addEventListener('change', function () {

@@ -285,6 +285,27 @@ main {
     max-width: 720px;
 }
 
+.admin-form-card-wide {
+    max-width: 960px;
+}
+
+/* Thumbnail mobil 16:9 di tabel admin (gambar asli menyusul di Phase 7). */
+.car-thumb {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 72px;
+    aspect-ratio: 16 / 9;
+    border-radius: .5rem;
+    object-fit: cover;
+}
+
+.car-thumb-empty {
+    color: #adb5bd;
+    background-color: var(--dm-bg);
+    font-size: 1.25rem;
+}
+
 .admin-thumb {
     width: 40px;
     height: 40px;

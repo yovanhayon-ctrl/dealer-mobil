@@ -54,7 +54,7 @@
                                         'editUrl' => route('admin.categories.edit', $category),
                                         'deleteUrl' => route('admin.categories.destroy', $category),
                                         'name' => $category->name,
-                                        'usedCount' => $category->cars_count,
+                                        'disabledReason' => $category->cars_count > 0 ? "Masih dipakai {$category->cars_count} mobil" : null,
                                     ])
                                 </td>
                             </tr>
