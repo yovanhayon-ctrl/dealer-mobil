@@ -2,9 +2,11 @@
 
 namespace App\Models;
 
+use Database\Factories\CarFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -17,6 +19,9 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 ])]
 class Car extends Model
 {
+    /** @use HasFactory<CarFactory> */
+    use HasFactory;
+
     public const CONDITION_NEW = 'baru';
 
     public const CONDITION_USED = 'bekas';

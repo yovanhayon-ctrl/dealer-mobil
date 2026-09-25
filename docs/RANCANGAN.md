@@ -58,3 +58,7 @@ Status: disepakati (25 Sep 2026). Acuan untuk semua anggota tim.
 
 ## 8. Status
 - Phase 1 (setup) dan Phase 2 (migration + model, enum `cancelled`, timezone Asia/Jakarta) selesai.
+- Phase 3 (auth + role + layout dasar) selesai.
+- Phase 4 (layout admin + dashboard) selesai: sidebar offcanvas-lg, breadcrumb, komponen stat-card/status-badge/empty-state, factory model, `preventLazyLoading` di non-production.
+- Urutan berikutnya: seluruh halaman admin dulu (merek & kategori → mobil → gambar → promo → pengguna → test drive & pengajuan → laporan), baru halaman publik.
+- Konvensi nama route admin (menu sidebar muncul otomatis bila route ada): `admin.cars.*`, `admin.brands.*`, `admin.categories.*`, `admin.promos.*`, `admin.test-drives.*`, `admin.purchase-requests.*`, `admin.users.*`, `admin.reports.*`.

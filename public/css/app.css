@@ -186,30 +186,139 @@ main {
     background-color: var(--dm-bg);
 }
 
-.admin-sidebar {
-    width: 240px;
+.admin-wrapper {
+    display: flex;
+    flex: 1 0 auto;
     min-height: 100vh;
-    background-color: var(--dm-navy-dark);
 }
 
-.admin-sidebar .nav-link {
+.admin-content {
+    min-width: 0; /* agar tabel lebar tidak mendorong halaman keluar layar */
+    display: flex;
+    flex-direction: column;
+}
+
+/* Panel offcanvas (< lg) berlatar navy; di >= lg Bootstrap membuat panel transparan,
+   sehingga latar navy dipasang di pembungkus .admin-sidebar. */
+.admin-sidebar-panel {
+    --bs-offcanvas-width: 260px;
+    --bs-offcanvas-bg: var(--dm-navy);
+    --bs-offcanvas-color: #fff;
+}
+
+@media (min-width: 992px) {
+    .admin-sidebar {
+        flex: 0 0 250px;
+        width: 250px;
+        background-color: var(--dm-navy);
+    }
+
+    .admin-sidebar-panel {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        overflow-y: auto;
+    }
+}
+
+.admin-sidebar-panel .nav-link {
     color: rgba(255, 255, 255, .75);
     border-radius: .5rem;
+    border-left: 3px solid transparent;
+    padding: .55rem .75rem;
 }
 
-.admin-sidebar .nav-link:hover,
-.admin-sidebar .nav-link.active {
+.admin-sidebar-panel .nav-link:hover {
     color: #fff;
-    background-color: rgba(255, 255, 255, .1);
+    background-color: rgba(255, 255, 255, .08);
 }
 
-.admin-sidebar .nav-link .bi {
-    margin-right: .5rem;
+.admin-sidebar-panel .nav-link.active {
+    color: #fff;
+    font-weight: 600;
+    background-color: rgba(255, 255, 255, .14);
+    border-left-color: var(--dm-red);
 }
 
-@media (max-width: 991.98px) {
-    .admin-sidebar {
-        width: 100%;
-        min-height: auto;
-    }
+.admin-sidebar-panel .nav-link .bi {
+    margin-right: .6rem;
+}
+
+.admin-topbar {
+    z-index: 1020;
+}
+
+.admin-user-name {
+    max-width: 180px;
+}
+
+.admin-table thead th {
+    font-size: .75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .03em;
+    color: #6c757d;
+    background-color: var(--dm-bg);
+    white-space: nowrap;
+}
+
+.admin-table td,
+.admin-table th {
+    padding: .75rem 1rem;
+}
+
+.breadcrumb {
+    --bs-breadcrumb-divider-color: #adb5bd;
+    --bs-breadcrumb-item-active-color: #6c757d;
+}
+
+.min-w-0 {
+    min-width: 0;
+}
+
+/* ---------- Komponen: stat-card ---------- */
+
+.stat-card {
+    color: inherit;
+}
+
+.stat-card-icon {
+    flex: 0 0 48px;
+    width: 48px;
+    height: 48px;
+    border-radius: .75rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.35rem;
+}
+
+.stat-card-icon-navy   { background-color: rgba(11, 37, 69, .1);   color: var(--dm-navy); }
+.stat-card-icon-red    { background-color: rgba(214, 40, 40, .1);  color: var(--dm-red); }
+.stat-card-icon-yellow { background-color: rgba(255, 193, 7, .18); color: #9a6b00; }
+.stat-card-icon-green  { background-color: rgba(25, 135, 84, .12); color: #198754; }
+.stat-card-icon-blue   { background-color: rgba(13, 110, 253, .1); color: #0d6efd; }
+.stat-card-icon-dark   { background-color: rgba(52, 58, 64, .12);  color: #343a40; }
+
+.stat-card-value {
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--dm-navy);
+}
+
+/* ---------- Komponen: status-badge (RANCANGAN §2) ---------- */
+
+.badge-status-yellow { background-color: #ffc107; color: #3d2f00; }
+.badge-status-blue   { background-color: #0d6efd; color: #fff; }
+.badge-status-green  { background-color: #198754; color: #fff; }
+.badge-status-red    { background-color: var(--dm-red); color: #fff; }
+.badge-status-dark   { background-color: #343a40; color: #fff; }
+.badge-status-muted  { background-color: #e9ecef; color: #495057; }
+
+/* ---------- Komponen: empty-state ---------- */
+
+.empty-state-icon {
+    font-size: 2.75rem;
+    color: #adb5bd;
 }

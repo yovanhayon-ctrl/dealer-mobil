@@ -2,6 +2,7 @@
     $flashTypes = [
         'success' => ['class' => 'success', 'icon' => 'bi-check-circle-fill'],
         'status' => ['class' => 'info', 'icon' => 'bi-info-circle-fill'],
+        'warning' => ['class' => 'warning', 'icon' => 'bi-exclamation-circle-fill'],
         'error' => ['class' => 'danger', 'icon' => 'bi-exclamation-triangle-fill'],
     ];
 @endphp
