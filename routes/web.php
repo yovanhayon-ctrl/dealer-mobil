@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BrandController;
+use App\Http\Controllers\Admin\CarController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Auth\LoginController;
@@ -42,6 +43,12 @@ Route::post('/logout', [LoginController::class, 'destroy'])
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::redirect('/', '/admin/dashboard')->name('home');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+    Route::patch('mobil/{car}/status', [CarController::class, 'toggleActive'])->name('cars.toggle-active');
+    Route::resource('mobil', CarController::class)
+        ->except('show')
+        ->parameters(['mobil' => 'car'])
+        ->names('cars');
 
     Route::resource('merek', BrandController::class)
         ->except('show')

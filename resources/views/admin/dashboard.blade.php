@@ -14,10 +14,10 @@
 
     <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-5 g-3 mb-4">
         <div class="col">
-            <x-stat-card label="Mobil Aktif" :value="$stats['active_cars']" icon="bi-car-front" color="navy" :href="$routeOrNull('admin.cars.index')" />
+            <x-stat-card label="Mobil Aktif" :value="$stats['active_cars']" icon="bi-car-front" color="navy" :href="route('admin.cars.index', ['status' => 'aktif'])" />
         </div>
         <div class="col">
-            <x-stat-card label="Stok Habis" :value="$stats['out_of_stock_cars']" icon="bi-box-seam" color="dark" :href="$routeOrNull('admin.cars.index')" />
+            <x-stat-card label="Stok Habis" :value="$stats['out_of_stock_cars']" icon="bi-box-seam" color="dark" :href="route('admin.cars.index', ['status' => 'aktif', 'stok' => 'habis'])" />
         </div>
         <div class="col">
             <x-stat-card label="Test Drive Pending" :value="$stats['pending_test_drives']" icon="bi-calendar-event" color="yellow" :href="$routeOrNull('admin.test-drives.index')" />

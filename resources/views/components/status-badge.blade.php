@@ -11,6 +11,8 @@
         'rejected' => ['Ditolak', 'red'],
         'cancelled' => ['Dibatalkan', 'red'],
         'out_of_stock' => ['Stok Habis', 'dark'],
+        'active' => ['Aktif', 'green'],
+        'inactive' => ['Nonaktif', 'muted'],
     ];
 
     [$label, $color] = $map[$status] ?? [ucfirst((string) $status), 'muted'];

@@ -77,7 +77,9 @@ class CategoryManagementTest extends TestCase
         Category::factory()->count(11)->create();
 
         $this->actingAs($this->admin)->get(route('admin.categories.index'))
-            ->assertViewHas('categories', fn ($categories) => $categories->count() === 10 && $categories->total() === 11);
+            ->assertViewHas('categories', fn ($categories) => $categories->count() === 10 && $categories->total() === 11)
+            ->assertSeeText('Menampilkan 1 sampai 10 dari 11 data')
+            ->assertSee('aria-label="Halaman 2"', false);
 
         $this->actingAs($this->admin)->get(route('admin.categories.index', ['q' => 'zzz-tidak-ada']))
             ->assertSee('Kategori tidak ditemukan');
@@ -149,6 +151,9 @@ class CategoryManagementTest extends TestCase
     {
         $category = Category::factory()->create(['name' => 'MPV']);
         Car::factory()->recycle($category)->create();
+
+        $this->actingAs($this->admin)->get(route('admin.categories.index'))
+            ->assertSee('Masih dipakai 1 mobil');
 
         $this->actingAs($this->admin)->delete(route('admin.categories.destroy', $category))
             ->assertRedirect(route('admin.categories.index'))

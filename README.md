@@ -440,15 +440,15 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 
 ## Progress Project
 
-| Phase | Tahap                 | Status               |
-| ----- | --------------------- | -------------------- |
-| 1     | Project setup         | ✅ Selesai           |
-| 2     | Database & ERD        | 🔄 Sedang dikerjakan |
-| 3     | Authentication & role | ⏳                   |
-| 4     | Admin dashboard       | ⏳                   |
-| 5     | CRUD brand & kategori | ⏳                   |
-| 6     | CRUD mobil            | ⏳                   |
-| 7     | Upload & galeri mobil | ⏳                   |
+| Phase | Tahap                            | Status          |
+| ----- | -------------------------------- | --------------- |
+| 1     | Project setup                    | ✅ Selesai      |
+| 2     | Database & ERD                   | ✅ Selesai      |
+| 3     | Authentication & role            | ✅ Selesai      |
+| 4     | Layout admin & dashboard         | ✅ Selesai      |
+| 5     | CRUD merek & kategori            | ✅ Selesai      |
+| 6     | CRUD mobil                       | ✅ Selesai      |
+| 7     | Upload & galeri mobil            | ⏳ Berikutnya   |
 | 8     | Katalog publik        | ⏳                   |
 | 9     | Search & filter       | ⏳                   |
 | 10    | Detail mobil          | ⏳                   |
@@ -461,6 +461,8 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 17    | Testing               | ⏳                   |
 | 18    | Optimization          | ⏳                   |
 | 19    | Deployment            | ⏳                   |
+
+> **Urutan kerja:** semua halaman **admin** dikerjakan dulu (galeri mobil → promo → pengguna → kelola test drive & pengajuan → laporan), baru halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 
 ### Keputusan desain
 
