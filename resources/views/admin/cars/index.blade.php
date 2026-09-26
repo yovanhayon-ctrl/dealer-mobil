@@ -115,8 +115,13 @@
                             @php($blockers = $car->deletionBlockers())
                             <tr @class(['table-light text-muted' => ! $car->is_active])>
                                 <td>
-                                    {{-- Gambar utama menyusul di Phase 7. --}}
-                                    <span class="car-thumb car-thumb-empty"><i class="bi bi-car-front"></i></span>
+                                    <a href="{{ route('admin.cars.images.index', $car) }}" title="Kelola galeri">
+                                        @if ($car->primaryImage)
+                                            <img src="{{ $car->primaryImage->url }}" alt="{{ $car->name }} {{ $car->year }}" class="car-thumb" loading="lazy">
+                                        @else
+                                            <span class="car-thumb car-thumb-empty"><i class="bi bi-car-front"></i></span>
+                                        @endif
+                                    </a>
                                 </td>
                                 <td>
                                     <div class="fw-semibold">{{ $car->name }}</div>
@@ -150,6 +155,9 @@
                                     </form>
                                 </td>
                                 <td class="text-end text-nowrap">
+                                    <a href="{{ route('admin.cars.images.index', $car) }}" class="btn btn-sm btn-outline-secondary">
+                                        <i class="bi bi-images"></i>Galeri
+                                    </a>
                                     @include('admin.partials.row-actions', [
                                         'editUrl' => route('admin.cars.edit', $car),
                                         'deleteUrl' => route('admin.cars.destroy', $car),

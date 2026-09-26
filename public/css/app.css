@@ -289,7 +289,7 @@ main {
     max-width: 960px;
 }
 
-/* Thumbnail mobil 16:9 di tabel admin (gambar asli menyusul di Phase 7). */
+/* Thumbnail gambar utama mobil 16:9 di tabel admin (placeholder bila belum ada gambar). */
 .car-thumb {
     display: inline-flex;
     align-items: center;
@@ -304,6 +304,17 @@ main {
     color: #adb5bd;
     background-color: var(--dm-bg);
     font-size: 1.25rem;
+}
+
+/* Galeri gambar mobil (admin). */
+.car-image-card img {
+    background-color: var(--dm-bg);
+}
+
+.car-image-badge {
+    position: absolute;
+    top: .5rem;
+    left: .5rem;
 }
 
 .admin-thumb {

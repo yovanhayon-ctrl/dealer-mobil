@@ -6,11 +6,13 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CarRequest;
 use App\Models\Brand;
 use App\Models\Car;
+use App\Models\CarImage;
 use App\Models\Category;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\View\View;
 
 class CarController extends Controller
@@ -30,7 +32,7 @@ class CarController extends Controller
         [$sortColumn, $sortDirection] = self::SORTS[$filters['urut']];
 
         $cars = Car::query()
-            ->with(['brand:id,name', 'category:id,name'])
+            ->with(['brand:id,name', 'category:id,name', 'primaryImage:id,car_id,path'])
             ->withCount(Car::DELETION_BLOCKERS)
             ->tap(fn (Builder $query) => $this->applyFilters($query, $filters))
             ->orderBy($sortColumn, $sortDirection)
@@ -105,13 +107,15 @@ class CarController extends Controller
         }
 
         try {
-            // Phase 7: hapus juga file gambar mobil dari disk public
-            // (baris car_images sudah ikut terhapus lewat cascadeOnDelete).
+            // Baris car_images ikut terhapus lewat cascadeOnDelete.
             $car->delete();
         } catch (QueryException) {
             // Relasi ditambahkan bersamaan (FK restrict): tampilkan pesan ramah, bukan error SQL.
             return $this->cannotDelete($car, 'data terkait');
         }
+
+        // Folder file gambar dihapus hanya setelah data mobil berhasil dihapus.
+        Storage::disk(CarImage::DISK)->deleteDirectory(CarImage::directory($car->id));
 
         return redirect()->route('admin.cars.index')
             ->with('success', "Mobil \"{$car->name}\" berhasil dihapus.");
