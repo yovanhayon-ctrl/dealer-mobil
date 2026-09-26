@@ -13,6 +13,10 @@
         'out_of_stock' => ['Stok Habis', 'dark'],
         'active' => ['Aktif', 'green'],
         'inactive' => ['Nonaktif', 'muted'],
+        // Status promo (dihitung dari tanggal, lihat Promo::status).
+        'running' => ['Berjalan', 'green'],
+        'scheduled' => ['Terjadwal', 'blue'],
+        'ended' => ['Berakhir', 'dark'],
     ];
 
     [$label, $color] = $map[$status] ?? [ucfirst((string) $status), 'muted'];

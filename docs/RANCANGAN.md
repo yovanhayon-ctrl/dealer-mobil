@@ -72,6 +72,14 @@ Status: disepakati (25 Sep 2026). Acuan untuk semua anggota tim.
   - Route memakai `scopeBindings()`: gambar milik mobil lain → 404.
   - Daftar mobil menampilkan thumbnail gambar utama (eager load `primaryImage`, tanpa N+1) atau placeholder.
   - Seeder tidak menambah gambar (tidak ada foto berhak cipta di repo); foto diunggah manual lewat admin.
+- CRUD promo admin (Phase 14, bagian admin) selesai: `/admin/promo` (`admin.promos.*`, `PromoController`, tanpa show). Halaman publik `/promo` menyusul.
+  - Status dihitung otomatis (`Promo::status`, tanggal WIB): Nonaktif (is_active false, selalu menang atas tanggal) → Terjadwal (hari ini < start_date) → Berakhir (hari ini > end_date) → Berjalan. Filter status memakai scope `withStatus`; "Berjalan" = scope `active`.
+  - Promo khusus mobil (car_id terisi) **wajib** diskon ≥ Rp 1 dan < harga mobil; promo umum (car_id kosong) **tidak boleh** berdiskon (informasi saja). Diskon boleh memakai titik ribuan (trait `NormalizesDigits`, dipakai juga `CarRequest`).
+  - Dropdown mobil hanya mobil aktif ("Merek Nama Tahun"); saat edit, mobil promo tersebut tetap bisa dipilih walau kini nonaktif.
+  - Slug promo dibuat sekali saat tambah dan tidak berubah saat edit (URL publik `/promo/{slug}`).
+  - Banner opsional: jpg/jpeg/png/webp, maks. 2 MB, min. 1200×400, tanpa SVG, disk public `promos/`; file lama dihapus saat diganti/dihapus atau saat promo dihapus.
+  - Harga akhir: `Car::finalPrice()` = harga − diskon promo aktif terbesar (`bestActivePromo()`); memerlukan eager load `activePromos` (tanpa N+1). Diskon yang tidak lagi lebih kecil dari harga mobil (harga diturunkan setelah promo dibuat) diabaikan. Daftar mobil admin menampilkan badge "Promo" + harga coret.
+  - `PromoSeeder` (dipanggil `DatabaseSeeder` setelah `CarSeeder`): 5 promo tanpa gambar, firstOrCreate berdasarkan slug, tanggal relatif hari ini — 2 khusus mobil berjalan (Avanza, HR-V), 1 umum berjalan, 1 terjadwal (Xpander), 1 berakhir. Menjalankan ulang tidak menggeser tanggal promo yang sudah ada; promo mobil dilewati jika mobilnya belum ada.
 - Pagination admin: teks "Menampilkan X sampai Y dari Z data" + nomor halaman ditulis langsung di `admin/partials/pagination` (tanpa kunci terjemahan global).
-- Urutan berikutnya: seluruh halaman admin dulu (merek & kategori ✓ → mobil ✓ → gambar ✓ → promo → pengguna → test drive & pengajuan → laporan), baru halaman publik.
+- Urutan berikutnya: seluruh halaman admin dulu (merek & kategori ✓ → mobil ✓ → gambar ✓ → promo ✓ → pengguna → test drive & pengajuan → laporan), baru halaman publik.
 - Konvensi nama route admin (menu sidebar muncul otomatis bila route ada): `admin.cars.*`, `admin.brands.*`, `admin.categories.*`, `admin.promos.*`, `admin.test-drives.*`, `admin.purchase-requests.*`, `admin.users.*`, `admin.reports.*`.

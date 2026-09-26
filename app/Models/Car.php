@@ -156,4 +156,35 @@ class Car extends Model
     {
         return $this->stock > 0;
     }
+
+    /**
+     * Promo aktif dengan diskon terbesar. Memerlukan eager load `activePromos`
+     * (preventLazyLoading melempar exception bila lupa, supaya tidak terjadi N+1).
+     * Diskon yang tidak lebih kecil dari harga saat ini diabaikan (mis. harga mobil diturunkan setelah promo dibuat).
+     */
+    public function bestActivePromo(): ?Promo
+    {
+        return $this->activePromos
+            ->filter(fn (Promo $promo) => $promo->discount_amount > 0 && $promo->discount_amount < $this->price)
+            ->sortByDesc('discount_amount')
+            ->first();
+    }
+
+    public function promoDiscount(): int
+    {
+        return $this->bestActivePromo()?->discount_amount ?? 0;
+    }
+
+    /**
+     * Harga setelah diskon promo aktif terbesar (dipakai katalog & pengajuan).
+     */
+    public function finalPrice(): int
+    {
+        return $this->price - $this->promoDiscount();
+    }
+
+    public function hasPromoPrice(): bool
+    {
+        return $this->promoDiscount() > 0;
+    }
 }

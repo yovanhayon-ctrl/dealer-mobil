@@ -5,6 +5,7 @@ use App\Http\Controllers\Admin\CarController;
 use App\Http\Controllers\Admin\CarImageController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\PromoController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use Illuminate\Support\Facades\Route;
@@ -72,4 +73,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->except('show')
         ->parameters(['kategori' => 'category'])
         ->names('categories');
+
+    Route::resource('promo', PromoController::class)
+        ->except('show')
+        ->parameters(['promo' => 'promo'])
+        ->names('promos');
 });

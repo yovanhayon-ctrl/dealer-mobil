@@ -124,7 +124,12 @@
                                     </a>
                                 </td>
                                 <td>
-                                    <div class="fw-semibold">{{ $car->name }}</div>
+                                    <div class="fw-semibold">
+                                        {{ $car->name }}
+                                        @if ($car->hasPromoPrice())
+                                            <span class="badge rounded-pill badge-status-red ms-1">Promo</span>
+                                        @endif
+                                    </div>
                                     <div class="small text-muted">{{ $car->year }} · {{ $car->transmission_label }}</div>
                                 </td>
                                 <td>{{ $car->brand->name }}</td>
@@ -136,7 +141,14 @@
                                         'text-bg-light border' => ! $car->isNew(),
                                     ])>{{ $car->condition_label }}</span>
                                 </td>
-                                <td class="text-end"><x-price :amount="$car->price" /></td>
+                                <td class="text-end">
+                                    @if ($car->hasPromoPrice())
+                                        <del class="d-block small text-muted"><x-price :amount="$car->price" /></del>
+                                        <x-price :amount="$car->finalPrice()" class="fw-semibold text-accent" />
+                                    @else
+                                        <x-price :amount="$car->price" />
+                                    @endif
+                                </td>
                                 <td class="text-center">
                                     @if ($car->inStock())
                                         {{ $car->stock }}
