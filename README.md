@@ -331,7 +331,7 @@ php artisan db:seed
 
 - `storage:link` membuat folder `public/storage` yang terhubung ke `storage/app/public`, supaya logo merek dan foto mobil yang di-upload bisa tampil di browser. Cukup sekali di setiap laptop. Foto mobil disimpan di `storage/app/public/cars/{id_mobil}/`.
 - Upload galeri mobil bisa sampai 10 file × 2 MB sekaligus. Jika muncul error *Content Too Large* / *POST Content-Length exceeds the limit*, naikkan `post_max_size` (misalnya `25M`) dan `upload_max_filesize` (minimal `2M`) di `php.ini`, lalu restart Apache.
-- `db:seed` membuat akun admin (dari `ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env`, wajib diisi dulu) serta data merek (Toyota, Honda, Daihatsu, Mitsubishi, Suzuki, Hyundai, Wuling) dan kategori (SUV, MPV, Sedan, Hatchback, Pickup, LCGC). Aman dijalankan ulang: data yang sudah ada tidak digandakan dan tidak ditimpa.
+- `db:seed` membuat akun admin (dari `ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env`, wajib diisi dulu) serta data merek (Toyota, Honda, Daihatsu, Mitsubishi, Suzuki, Hyundai, Wuling), kategori (SUV, MPV, Sedan, Hatchback, Pickup, LCGC), 15 mobil contoh, dan 5 promo contoh (tanggal relatif terhadap hari seeder dijalankan). Aman dijalankan ulang: data yang sudah ada tidak digandakan dan tidak ditimpa.
 
 ---
 
@@ -456,14 +456,14 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 11    | Test drive            | ⏳                   |
 | 12    | Pengajuan pembelian   | ⏳                   |
 | 13    | Simulasi kredit       | ⏳                   |
-| 14    | Promo                 | ⏳ Berikutnya        |
+| 14    | Promo                 | ✅ Admin (publik menyusul) |
 | 15    | Dashboard & laporan   | ⏳                   |
 | 16    | Security              | ⏳                   |
 | 17    | Testing               | ⏳                   |
 | 18    | Optimization          | ⏳                   |
 | 19    | Deployment            | ⏳                   |
 
-> **Urutan kerja:** semua halaman **admin** dikerjakan dulu (promo → pengguna → kelola test drive & pengajuan → laporan), baru halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
+> **Urutan kerja:** semua halaman **admin** dikerjakan dulu (pengguna → kelola test drive & pengajuan → laporan), baru halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 
 ### Keputusan desain
 

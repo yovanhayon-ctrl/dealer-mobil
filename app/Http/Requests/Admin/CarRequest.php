@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin;
 
+use App\Http\Requests\Concerns\NormalizesDigits;
 use App\Models\Car;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -9,6 +10,8 @@ use Illuminate\Validation\Rule;
 
 class CarRequest extends FormRequest
 {
+    use NormalizesDigits;
+
     /**
      * Akses sudah dibatasi middleware auth + admin pada grup route.
      */
@@ -111,12 +114,5 @@ class CarRequest extends FormRequest
             'mileage' => (int) $this->validated('mileage', 0),
             'is_active' => $this->boolean('is_active'),
         ];
-    }
-
-    private function digitsOnly(string $key): ?string
-    {
-        $value = preg_replace('/\D/', '', (string) $this->input($key));
-
-        return $value === '' ? null : $value;
     }
 }

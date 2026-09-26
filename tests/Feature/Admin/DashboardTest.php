@@ -119,7 +119,8 @@ class DashboardTest extends TestCase
             ->assertSee('class="nav-link active" href="'.route('admin.dashboard').'"', false)
             ->assertSee('aria-current="page"', false)
             ->assertSee('href="'.route('admin.cars.index').'"', false)
-            ->assertDontSee('href="'.url('/admin/promo').'"', false)
+            ->assertSee('href="'.route('admin.promos.index').'"', false)
+            ->assertDontSee('href="'.url('/admin/pengguna').'"', false)
             ->assertDontSee('Laporan');
     }
 

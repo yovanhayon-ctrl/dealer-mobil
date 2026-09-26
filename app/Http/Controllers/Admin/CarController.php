@@ -32,7 +32,10 @@ class CarController extends Controller
         [$sortColumn, $sortDirection] = self::SORTS[$filters['urut']];
 
         $cars = Car::query()
-            ->with(['brand:id,name', 'category:id,name', 'primaryImage:id,car_id,path'])
+            ->with([
+                'brand:id,name', 'category:id,name', 'primaryImage:id,car_id,path',
+                'activePromos:id,car_id,discount_amount',
+            ])
             ->withCount(Car::DELETION_BLOCKERS)
             ->tap(fn (Builder $query) => $this->applyFilters($query, $filters))
             ->orderBy($sortColumn, $sortDirection)

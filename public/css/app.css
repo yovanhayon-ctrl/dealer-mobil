@@ -306,6 +306,27 @@ main {
     font-size: 1.25rem;
 }
 
+/* Banner promo 3:1 (minimal 1200×400) di tabel dan form admin. */
+.promo-thumb {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 96px;
+    aspect-ratio: 3 / 1;
+    border-radius: .5rem;
+    object-fit: cover;
+}
+
+.promo-banner-preview {
+    display: block;
+    width: 100%;
+    max-width: 480px;
+    aspect-ratio: 3 / 1;
+    border-radius: .5rem;
+    object-fit: cover;
+    background-color: var(--dm-bg);
+}
+
 /* Galeri gambar mobil (admin). */
 .car-image-card img {
     background-color: var(--dm-bg);

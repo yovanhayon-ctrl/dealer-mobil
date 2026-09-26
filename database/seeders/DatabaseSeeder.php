@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             BrandSeeder::class,
             CategorySeeder::class,
             CarSeeder::class,
+            PromoSeeder::class,
         ]);
     }
 }
