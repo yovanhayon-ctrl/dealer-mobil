@@ -82,9 +82,10 @@ class PurchaseRequestController extends Controller
             return $redirect->with('success', 'Catatan admin pengajuan berhasil disimpan.');
         }
 
-        // Setelah baris dikunci ternyata status sudah sama (mis. admin lain lebih dulu menyetujui).
+        // Setelah baris dikunci ternyata status sudah sama (mis. admin lain lebih dulu menyetujui);
+        // action tidak menyimpan apa pun, termasuk catatan.
         if (! $updated->wasChanged('status')) {
-            return $redirect->with('status', "Pengajuan ini sudah berstatus {$updated->statusLabel()}. Tidak ada perubahan.");
+            return $redirect->with('status', "Pengajuan ini sudah berstatus {$updated->statusLabel()}. Tidak ada perubahan. Catatan Anda tidak disimpan.");
         }
 
         return $redirect->with('success', "Status pengajuan diubah dari {$oldLabel} menjadi {$updated->statusLabel()}.");

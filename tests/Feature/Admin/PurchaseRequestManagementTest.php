@@ -358,19 +358,38 @@ class PurchaseRequestManagementTest extends TestCase
         $purchase = $this->purchase(['status' => 'processing']);
         $this->otherAdminChangesStatusFirst($purchase, 'approved');
 
-        $this->changeStatus($purchase, ['status' => 'approved', 'admin_note' => ''])
+        $this->changeStatus($purchase, ['status' => 'approved', 'admin_note' => 'Catatan admin kedua.'])
             ->assertRedirect(route('admin.purchase-requests.show', $purchase))
             ->assertSessionHasNoErrors()
-            ->assertSessionHas('status', 'Pengajuan ini sudah berstatus Disetujui. Tidak ada perubahan.')
+            ->assertSessionHas('status', 'Pengajuan ini sudah berstatus Disetujui. Tidak ada perubahan. Catatan Anda tidak disimpan.')
             ->assertSessionMissing('success');
 
         $this->assertSame('approved', $purchase->fresh()->status);
+        $this->assertSame('Diputuskan admin lain.', $purchase->fresh()->admin_note, 'Catatan admin pertama tidak boleh tertimpa.');
         $this->assertSame(2, $this->stock(), 'Stok hanya berkurang sekali.');
 
         $this->actingAs($this->admin)->get(route('admin.purchase-requests.show', $purchase))
             ->assertSee('alert-info', false)
-            ->assertSee('Pengajuan ini sudah berstatus Disetujui. Tidak ada perubahan.')
+            ->assertSee('Pengajuan ini sudah berstatus Disetujui. Tidak ada perubahan. Catatan Anda tidak disimpan.')
             ->assertDontSee('diubah dari');
+    }
+
+    public function test_status_tetap_yang_dipilih_sengaja_tetap_menyimpan_catatan(): void
+    {
+        $purchase = $this->purchase(['status' => 'processing', 'admin_note' => 'Catatan lama.']);
+
+        foreach (['', 'processing'] as $keepStatus) {
+            $note = "Catatan baru ({$keepStatus}).";
+
+            $this->changeStatus($purchase, ['status' => $keepStatus, 'admin_note' => $note])
+                ->assertSessionHas('success', 'Catatan admin pengajuan berhasil disimpan.')
+                ->assertSessionMissing('status');
+
+            $this->assertSame($note, $purchase->fresh()->admin_note);
+        }
+
+        $this->assertSame('processing', $purchase->fresh()->status);
+        $this->assertSame(3, $this->stock());
     }
 
     public function test_perubahan_status_nyata_tetap_memakai_pesan_diubah(): void

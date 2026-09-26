@@ -69,7 +69,12 @@ class TestDriveController extends Controller
             $updated = DB::transaction(function () use ($testDrive, $status, $request) {
                 $locked = TestDrive::whereKey($testDrive->id)->lockForUpdate()->firstOrFail();
 
-                if ($status !== null && $status !== $locked->status && ! $locked->canTransitionTo($status)) {
+                // Status tujuan sudah terpasang (admin lain lebih dulu): jangan simpan catatan juga.
+                if ($status !== null && $status === $locked->status) {
+                    return $locked;
+                }
+
+                if ($status !== null && ! $locked->canTransitionTo($status)) {
                     throw new DomainException("Status test drive tidak bisa diubah dari {$locked->statusLabel()} ke ".TestDrive::STATUS_LABELS[$status].'.');
                 }
 
@@ -89,7 +94,7 @@ class TestDriveController extends Controller
         }
 
         if (! $updated->wasChanged('status')) {
-            return $redirect->with('status', "Test drive ini sudah berstatus {$updated->statusLabel()}. Tidak ada perubahan.");
+            return $redirect->with('status', "Test drive ini sudah berstatus {$updated->statusLabel()}. Tidak ada perubahan. Catatan Anda tidak disimpan.");
         }
 
         return $redirect->with('success', "Status test drive diubah dari {$oldLabel} menjadi {$updated->statusLabel()}.");
