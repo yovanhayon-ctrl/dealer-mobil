@@ -26,7 +26,8 @@
             <x-stat-card label="Pengajuan Pending" :value="$stats['pending_purchases']" icon="bi-hourglass-split" color="yellow" :href="$routeOrNull('admin.purchase-requests.index')" />
         </div>
         <div class="col">
-            <x-stat-card label="Customer" :value="$stats['customers']" icon="bi-people" color="green" :href="$routeOrNull('admin.users.index')" />
+            <x-stat-card label="Customer" :value="$stats['customers']" icon="bi-people" color="green"
+                         :href="Route::has('admin.users.index') ? route('admin.users.index', ['role' => 'customer']) : null" />
         </div>
     </div>
 

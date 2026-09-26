@@ -120,8 +120,18 @@ class DashboardTest extends TestCase
             ->assertSee('aria-current="page"', false)
             ->assertSee('href="'.route('admin.cars.index').'"', false)
             ->assertSee('href="'.route('admin.promos.index').'"', false)
-            ->assertDontSee('href="'.url('/admin/pengguna').'"', false)
+            ->assertSee('href="'.route('admin.users.index').'"', false)
+            ->assertDontSee('href="'.url('/admin/test-drive').'"', false)
             ->assertDontSee('Laporan');
+    }
+
+    public function test_kartu_customer_mengarah_ke_daftar_pengguna_customer(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)->get('/admin/dashboard')
+            ->assertOk()
+            ->assertSee('href="'.e(route('admin.users.index', ['role' => 'customer'])).'"', false);
     }
 
     private function seedDashboardData(int $count): void
