@@ -43,4 +43,18 @@ return [
         'password' => env('ADMIN_PASSWORD'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Data Dummy (hanya local/testing)
+    |--------------------------------------------------------------------------
+    |
+    | Kata sandi customer dummy dari CustomerSeeder. Jangan di-hardcode, isi di .env.
+    | Jika kosong, CustomerSeeder dilewati.
+    |
+    */
+
+    'seed' => [
+        'customer_password' => env('SEED_CUSTOMER_PASSWORD'),
+    ],
+
 ];

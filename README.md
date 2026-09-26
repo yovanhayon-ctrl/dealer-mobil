@@ -287,6 +287,18 @@ DB_USERNAME=root
 DB_PASSWORD=
 ```
 
+**Bagian akun awal & data dummy (paling bawah):**
+
+```env
+ADMIN_EMAIL=admin@dealer.test
+ADMIN_PASSWORD=isi-kata-sandi-admin
+
+SEED_CUSTOMER_PASSWORD=isi-kata-sandi-customer-dummy
+```
+
+- `ADMIN_EMAIL` & `ADMIN_PASSWORD` wajib diisi sebelum `php artisan db:seed` (akun admin pertama).
+- `SEED_CUSTOMER_PASSWORD` opsional, hanya untuk laptop masing-masing (local). Dipakai sebagai kata sandi 8 customer dummy `@example.test`. Jika kosong, customer dummy tidak dibuat. Jangan pernah diisi di server production (di production seeder ini selalu dilewati).
+
 > - Jangan ada spasi setelah tanda `=`.
 > - Jangan ada nama variabel yang dobel (misalnya dua baris `APP_URL`).
 > - Jangan mengubah `APP_KEY` secara manual.
@@ -331,7 +343,7 @@ php artisan db:seed
 
 - `storage:link` membuat folder `public/storage` yang terhubung ke `storage/app/public`, supaya logo merek dan foto mobil yang di-upload bisa tampil di browser. Cukup sekali di setiap laptop. Foto mobil disimpan di `storage/app/public/cars/{id_mobil}/`.
 - Upload galeri mobil bisa sampai 10 file × 2 MB sekaligus. Jika muncul error *Content Too Large* / *POST Content-Length exceeds the limit*, naikkan `post_max_size` (misalnya `25M`) dan `upload_max_filesize` (minimal `2M`) di `php.ini`, lalu restart Apache.
-- `db:seed` membuat akun admin (dari `ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env`, wajib diisi dulu) serta data merek (Toyota, Honda, Daihatsu, Mitsubishi, Suzuki, Hyundai, Wuling), kategori (SUV, MPV, Sedan, Hatchback, Pickup, LCGC), 15 mobil contoh, dan 5 promo contoh (tanggal relatif terhadap hari seeder dijalankan). Aman dijalankan ulang: data yang sudah ada tidak digandakan dan tidak ditimpa.
+- `db:seed` membuat akun admin (dari `ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env`, wajib diisi dulu) serta data merek (Toyota, Honda, Daihatsu, Mitsubishi, Suzuki, Hyundai, Wuling), kategori (SUV, MPV, Sedan, Hatchback, Pickup, LCGC), 15 mobil contoh, dan 5 promo contoh (tanggal relatif terhadap hari seeder dijalankan). Jika `SEED_CUSTOMER_PASSWORD` diisi dan environment `local`, juga dibuat 8 customer dummy (misalnya `budi.santoso@example.test`). Aman dijalankan ulang: data yang sudah ada tidak digandakan dan tidak ditimpa.
 
 ---
 
@@ -457,13 +469,13 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 12    | Pengajuan pembelian   | ⏳                   |
 | 13    | Simulasi kredit       | ⏳                   |
 | 14    | Promo                 | ✅ Admin (publik menyusul) |
-| 15    | Dashboard & laporan   | ⏳                   |
+| 15    | Dashboard & laporan   | 🟡 Dashboard & daftar pengguna selesai (laporan menyusul) |
 | 16    | Security              | ⏳                   |
 | 17    | Testing               | ⏳                   |
 | 18    | Optimization          | ⏳                   |
 | 19    | Deployment            | ⏳                   |
 
-> **Urutan kerja:** semua halaman **admin** dikerjakan dulu (pengguna → kelola test drive & pengajuan → laporan), baru halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
+> **Urutan kerja:** semua halaman **admin** dikerjakan dulu (kelola test drive & pengajuan → laporan), baru halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 
 ### Keputusan desain
 
