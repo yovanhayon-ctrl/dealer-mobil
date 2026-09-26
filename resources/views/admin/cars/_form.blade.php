@@ -93,8 +93,16 @@
 
 <x-form.checkbox name="is_active" label="Aktif (tampil di katalog)" :checked="$car->is_active" />
 
-<div class="alert alert-light border small mb-0">
-    <i class="bi bi-images me-1"></i>Foto mobil dapat diunggah setelah fitur galeri tersedia (Phase 7).
+<div class="alert alert-light border small mb-0 d-flex flex-wrap align-items-center gap-2">
+    <i class="bi bi-images"></i>
+    @if ($car->exists)
+        <span class="me-auto">Foto mobil dikelola di halaman galeri (maks. {{ \App\Models\CarImage::MAX_PER_CAR }} gambar).</span>
+        <a href="{{ route('admin.cars.images.index', $car) }}" class="btn btn-sm btn-outline-primary">
+            <i class="bi bi-images"></i>Kelola Galeri
+        </a>
+    @else
+        <span>Foto mobil dapat diunggah setelah mobil disimpan.</span>
+    @endif
 </div>
 
 <div class="d-flex gap-2 mt-4">
