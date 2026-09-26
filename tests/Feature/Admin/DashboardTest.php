@@ -121,8 +121,20 @@ class DashboardTest extends TestCase
             ->assertSee('href="'.route('admin.cars.index').'"', false)
             ->assertSee('href="'.route('admin.promos.index').'"', false)
             ->assertSee('href="'.route('admin.users.index').'"', false)
-            ->assertDontSee('href="'.url('/admin/test-drive').'"', false)
+            ->assertSee('href="'.route('admin.test-drives.index').'"', false)
+            ->assertSee('href="'.route('admin.purchase-requests.index').'"', false)
+            ->assertDontSee('href="'.url('/admin/laporan').'"', false)
             ->assertDontSee('Laporan');
+    }
+
+    public function test_kartu_pending_mengarah_ke_daftar_terfilter(): void
+    {
+        $admin = User::factory()->admin()->create();
+
+        $this->actingAs($admin)->get('/admin/dashboard')
+            ->assertOk()
+            ->assertSee('href="'.e(route('admin.test-drives.index', ['status' => 'pending'])).'"', false)
+            ->assertSee('href="'.e(route('admin.purchase-requests.index', ['status' => 'pending'])).'"', false);
     }
 
     public function test_kartu_customer_mengarah_ke_daftar_pengguna_customer(): void

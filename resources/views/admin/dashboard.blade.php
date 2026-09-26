@@ -20,10 +20,10 @@
             <x-stat-card label="Stok Habis" :value="$stats['out_of_stock_cars']" icon="bi-box-seam" color="dark" :href="route('admin.cars.index', ['status' => 'aktif', 'stok' => 'habis'])" />
         </div>
         <div class="col">
-            <x-stat-card label="Test Drive Pending" :value="$stats['pending_test_drives']" icon="bi-calendar-event" color="yellow" :href="$routeOrNull('admin.test-drives.index')" />
+            <x-stat-card label="Test Drive Pending" :value="$stats['pending_test_drives']" icon="bi-calendar-event" color="yellow" :href="Route::has('admin.test-drives.index') ? route('admin.test-drives.index', ['status' => 'pending']) : null" />
         </div>
         <div class="col">
-            <x-stat-card label="Pengajuan Pending" :value="$stats['pending_purchases']" icon="bi-hourglass-split" color="yellow" :href="$routeOrNull('admin.purchase-requests.index')" />
+            <x-stat-card label="Pengajuan Pending" :value="$stats['pending_purchases']" icon="bi-hourglass-split" color="yellow" :href="Route::has('admin.purchase-requests.index') ? route('admin.purchase-requests.index', ['status' => 'pending']) : null" />
         </div>
         <div class="col">
             <x-stat-card label="Customer" :value="$stats['customers']" icon="bi-people" color="green"
