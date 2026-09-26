@@ -407,3 +407,49 @@ main {
     font-size: 2.75rem;
     color: #adb5bd;
 }
+
+/* Laporan admin: progress bar tipis. */
+.report-progress {
+    height: .5rem;
+}
+
+/* Cetak laporan (dan halaman admin lain): tanpa sidebar, topbar, breadcrumb, dan tombol. */
+@media print {
+    .admin-sidebar,
+    .admin-topbar,
+    .breadcrumb,
+    .admin-content main > .alert {
+        display: none !important;
+    }
+
+    .admin-body,
+    .admin-content {
+        background: #fff !important;
+    }
+
+    .admin-content main {
+        padding: 0 !important;
+    }
+
+    .card {
+        box-shadow: none !important;
+        border: 1px solid #dee2e6 !important;
+    }
+
+    .report-card,
+    .stat-card {
+        break-inside: avoid;
+    }
+
+    .progress,
+    .progress-bar,
+    .badge {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+    }
+
+    a {
+        text-decoration: none !important;
+        color: inherit !important;
+    }
+}

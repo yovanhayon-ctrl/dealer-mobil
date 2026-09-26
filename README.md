@@ -469,13 +469,13 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 12    | Pengajuan pembelian   | 🟡 Admin selesai (publik menyusul) |
 | 13    | Simulasi kredit       | ⏳                   |
 | 14    | Promo                 | ✅ Admin (publik menyusul) |
-| 15    | Dashboard & laporan   | 🟡 Dashboard & daftar pengguna selesai (laporan menyusul) |
+| 15    | Dashboard & laporan   | ✅ Admin selesai (dashboard, daftar pengguna, laporan) |
 | 16    | Security              | ⏳                   |
 | 17    | Testing               | ⏳                   |
 | 18    | Optimization          | ⏳                   |
 | 19    | Deployment            | ⏳                   |
 
-> **Urutan kerja:** semua halaman **admin** dikerjakan dulu (tinggal laporan), baru halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
+> **Urutan kerja:** semua halaman **admin** dikerjakan dulu (sudah selesai), lalu halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 
 ### Keputusan desain
 

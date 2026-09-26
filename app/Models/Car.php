@@ -52,6 +52,9 @@ class Car extends Model
      */
     public const DELETION_BLOCKERS = ['testDrives', 'purchaseRequests', 'promos'];
 
+    /** Batas "stok menipis" di laporan admin (mobil aktif dengan stok ≤ nilai ini). */
+    public const LOW_STOCK_THRESHOLD = 1;
+
     protected function casts(): array
     {
         return [
