@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Car;
 use App\Models\PurchaseRequest;
 use App\Models\User;
+use App\Support\CreditCalculator;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -37,22 +38,21 @@ class PurchaseRequestFactory extends Factory
     }
 
     /**
-     * Pembayaran kredit: DP 20%, tenor 36 bulan, bunga flat 6%/tahun (rumus RANCANGAN §5).
+     * Pembayaran kredit: DP minimal (20%), tenor 36 bulan; bunga & cicilan dari CreditCalculator (config/credit.php).
      */
     public function credit(): static
     {
         return $this->state(function (array $attributes) {
+            $calculator = app(CreditCalculator::class);
             $price = $attributes['car_price'];
-            $downPayment = (int) ($price * 0.2);
-            $principal = $price - $downPayment;
-            $interest = $principal * 0.06 * (36 / 12);
+            $credit = $calculator->calculate($price, $calculator->minDownPayment($price), 36);
 
             return [
                 'payment_method' => 'credit',
-                'down_payment' => $downPayment,
-                'tenor_months' => 36,
-                'interest_rate' => 6,
-                'monthly_installment' => (int) (ceil(($principal + $interest) / 36 / 1_000) * 1_000),
+                'down_payment' => $credit['down_payment'],
+                'tenor_months' => $credit['tenor_months'],
+                'interest_rate' => $credit['interest_rate'],
+                'monthly_installment' => $credit['monthly_installment'],
             ];
         });
     }

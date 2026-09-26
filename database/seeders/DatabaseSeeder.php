@@ -21,6 +21,9 @@ class DatabaseSeeder extends Seeder
             CategorySeeder::class,
             CarSeeder::class,
             PromoSeeder::class,
+            // Data dummy transaksi (hanya local/testing, butuh customer dari CustomerSeeder).
+            TestDriveSeeder::class,
+            PurchaseRequestSeeder::class,
         ]);
     }
 }

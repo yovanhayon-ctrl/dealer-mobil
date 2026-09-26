@@ -6,6 +6,8 @@ use App\Http\Controllers\Admin\CarImageController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PromoController;
+use App\Http\Controllers\Admin\PurchaseRequestController;
+use App\Http\Controllers\Admin\TestDriveController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
@@ -79,6 +81,19 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->except('show')
         ->parameters(['promo' => 'promo'])
         ->names('promos');
+
+    // Test drive & pengajuan dibuat customer (halaman publik); admin hanya melihat & mengubah status.
+    Route::controller(TestDriveController::class)->prefix('test-drive')->name('test-drives.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{testDrive}', 'show')->name('show');
+        Route::patch('{testDrive}/status', 'updateStatus')->name('update-status');
+    });
+
+    Route::controller(PurchaseRequestController::class)->prefix('pengajuan')->name('purchase-requests.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{purchaseRequest}', 'show')->name('show');
+        Route::patch('{purchaseRequest}/status', 'updateStatus')->name('update-status');
+    });
 
     // Hanya baca: hapus user akan ikut menghapus riwayat test drive & pengajuan (cascade).
     Route::resource('pengguna', UserController::class)
