@@ -34,6 +34,13 @@ document.addEventListener('DOMContentLoaded', function () {
         syncMileage();
     }
 
+    // Tombol cetak halaman: <button type="button" data-print>.
+    document.querySelectorAll('[data-print]').forEach(function (button) {
+        button.addEventListener('click', function () {
+            window.print();
+        });
+    });
+
     // Pratinjau gambar sebelum upload: <input type="file" data-preview-target="#idGambar">.
     document.querySelectorAll('input[type="file"][data-preview-target]').forEach(function (input) {
         input.addEventListener('change', function () {

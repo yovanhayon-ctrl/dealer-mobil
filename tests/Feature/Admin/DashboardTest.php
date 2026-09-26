@@ -123,8 +123,8 @@ class DashboardTest extends TestCase
             ->assertSee('href="'.route('admin.users.index').'"', false)
             ->assertSee('href="'.route('admin.test-drives.index').'"', false)
             ->assertSee('href="'.route('admin.purchase-requests.index').'"', false)
-            ->assertDontSee('href="'.url('/admin/laporan').'"', false)
-            ->assertDontSee('Laporan');
+            ->assertSee('href="'.route('admin.reports.index').'"', false)
+            ->assertSeeInOrder(['Dashboard', 'Mobil', 'Merek', 'Kategori', 'Promo', 'Test Drive', 'Pengajuan', 'Pengguna', 'Laporan']);
     }
 
     public function test_kartu_pending_mengarah_ke_daftar_terfilter(): void

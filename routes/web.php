@@ -7,6 +7,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PromoController;
 use App\Http\Controllers\Admin\PurchaseRequestController;
+use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\TestDriveController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
@@ -94,6 +95,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('{purchaseRequest}', 'show')->name('show');
         Route::patch('{purchaseRequest}/status', 'updateStatus')->name('update-status');
     });
+
+    // Laporan (hanya baca) + export CSV dengan periode yang sama.
+    Route::get('laporan', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('laporan/export', [ReportController::class, 'export'])->name('reports.export');
 
     // Hanya baca: hapus user akan ikut menghapus riwayat test drive & pengajuan (cascade).
     Route::resource('pengguna', UserController::class)

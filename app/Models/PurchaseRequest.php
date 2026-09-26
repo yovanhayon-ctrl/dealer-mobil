@@ -58,6 +58,9 @@ class PurchaseRequest extends Model
     /** Status yang wajib disertai catatan admin (alasan untuk customer). */
     public const NOTE_REQUIRED_STATUSES = [self::STATUS_REJECTED, self::STATUS_CANCELLED];
 
+    /** Dihitung "terjual" di laporan: unit sudah dipotong dari stok. */
+    public const SOLD_STATUSES = [self::STATUS_APPROVED, self::STATUS_COMPLETED];
+
     public const PAYMENT_CASH = 'cash';
 
     public const PAYMENT_CREDIT = 'credit';
