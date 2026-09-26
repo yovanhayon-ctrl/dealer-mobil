@@ -18,7 +18,9 @@ use Illuminate\Support\Facades\DB;
 class ChangePurchaseRequestStatus
 {
     /**
-     * @param  string|null  $status  status baru; null = status tetap (hanya catatan yang diperbarui)
+     * @param  string|null  $status  status baru; null = status tetap (hanya catatan yang diperbarui).
+     *                               Jika status baru ternyata sudah terpasang, tidak ada yang disimpan
+     *                               (hasil ->wasChanged('status') = false).
      *
      * @throws DomainException jika transisi tidak diizinkan atau stok habis (pesan siap tampil)
      */
@@ -27,7 +29,13 @@ class ChangePurchaseRequestStatus
         return DB::transaction(function () use ($purchaseRequest, $status, $adminNote) {
             $locked = PurchaseRequest::whereKey($purchaseRequest->id)->lockForUpdate()->firstOrFail();
 
-            if ($status !== null && $status !== $locked->status) {
+            // Status tujuan ternyata sudah terpasang (admin lain lebih dulu): jangan simpan apa pun,
+            // termasuk catatan, agar catatan admin sebelumnya tidak tertimpa.
+            if ($status !== null && $status === $locked->status) {
+                return $locked;
+            }
+
+            if ($status !== null) {
                 $this->applyStatus($locked, $status);
             }
 

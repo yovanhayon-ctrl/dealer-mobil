@@ -255,18 +255,36 @@ class TestDriveManagementTest extends TestCase
         $testDrive = $this->makeTestDrive();
         $this->otherAdminChangesStatusFirst($testDrive, 'confirmed');
 
-        $this->changeStatus($testDrive, ['status' => 'confirmed', 'admin_note' => ''])
+        $this->changeStatus($testDrive, ['status' => 'confirmed', 'admin_note' => 'Catatan admin kedua.'])
             ->assertRedirect(route('admin.test-drives.show', $testDrive))
             ->assertSessionHasNoErrors()
-            ->assertSessionHas('status', 'Test drive ini sudah berstatus Dikonfirmasi. Tidak ada perubahan.')
+            ->assertSessionHas('status', 'Test drive ini sudah berstatus Dikonfirmasi. Tidak ada perubahan. Catatan Anda tidak disimpan.')
             ->assertSessionMissing('success');
 
         $this->assertSame('confirmed', $testDrive->fresh()->status);
+        $this->assertSame('Diputuskan admin lain.', $testDrive->fresh()->admin_note, 'Catatan admin pertama tidak boleh tertimpa.');
 
         $this->actingAs($this->admin)->get(route('admin.test-drives.show', $testDrive))
             ->assertSee('alert-info', false)
-            ->assertSee('Test drive ini sudah berstatus Dikonfirmasi. Tidak ada perubahan.')
+            ->assertSee('Test drive ini sudah berstatus Dikonfirmasi. Tidak ada perubahan. Catatan Anda tidak disimpan.')
             ->assertDontSee('diubah dari');
+    }
+
+    public function test_status_tetap_yang_dipilih_sengaja_tetap_menyimpan_catatan(): void
+    {
+        $testDrive = $this->makeTestDrive(['status' => 'confirmed', 'admin_note' => 'Catatan lama.']);
+
+        foreach (['', 'confirmed'] as $keepStatus) {
+            $note = "Catatan baru ({$keepStatus}).";
+
+            $this->changeStatus($testDrive, ['status' => $keepStatus, 'admin_note' => $note])
+                ->assertSessionHas('success', 'Catatan admin test drive berhasil disimpan.')
+                ->assertSessionMissing('status');
+
+            $this->assertSame($note, $testDrive->fresh()->admin_note);
+        }
+
+        $this->assertSame('confirmed', $testDrive->fresh()->status);
     }
 
     public function test_status_yang_sudah_diubah_admin_lain_ke_status_akhir_ditolak(): void
