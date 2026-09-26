@@ -233,6 +233,64 @@ class TestDriveManagementTest extends TestCase
         $this->assertNull($testDrive->fresh()->admin_note);
     }
 
+    /**
+     * Simulasikan admin lain yang mengubah status tepat setelah request ini memuat test drive,
+     * sehingga validasi memakai salinan lama.
+     */
+    private function otherAdminChangesStatusFirst(TestDrive $testDrive, string $status): void
+    {
+        $done = false;
+
+        TestDrive::retrieved(function (TestDrive $retrieved) use ($testDrive, $status, &$done) {
+            if (! $done && $retrieved->is($testDrive)) {
+                $done = true;
+                DB::table('test_drives')->where('id', $testDrive->id)
+                    ->update(['status' => $status, 'admin_note' => 'Diputuskan admin lain.']);
+            }
+        });
+    }
+
+    public function test_konfirmasi_ganda_menampilkan_info_tanpa_pesan_diubah(): void
+    {
+        $testDrive = $this->makeTestDrive();
+        $this->otherAdminChangesStatusFirst($testDrive, 'confirmed');
+
+        $this->changeStatus($testDrive, ['status' => 'confirmed', 'admin_note' => ''])
+            ->assertRedirect(route('admin.test-drives.show', $testDrive))
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('status', 'Test drive ini sudah berstatus Dikonfirmasi. Tidak ada perubahan.')
+            ->assertSessionMissing('success');
+
+        $this->assertSame('confirmed', $testDrive->fresh()->status);
+
+        $this->actingAs($this->admin)->get(route('admin.test-drives.show', $testDrive))
+            ->assertSee('alert-info', false)
+            ->assertSee('Test drive ini sudah berstatus Dikonfirmasi. Tidak ada perubahan.')
+            ->assertDontSee('diubah dari');
+    }
+
+    public function test_status_yang_sudah_diubah_admin_lain_ke_status_akhir_ditolak(): void
+    {
+        $testDrive = $this->makeTestDrive();
+        $this->otherAdminChangesStatusFirst($testDrive, 'cancelled');
+
+        $this->changeStatus($testDrive, ['status' => 'confirmed'])
+            ->assertRedirect(route('admin.test-drives.show', $testDrive))
+            ->assertSessionHas('error', 'Status test drive tidak bisa diubah dari Dibatalkan ke Dikonfirmasi.');
+
+        $this->assertSame('cancelled', $testDrive->fresh()->status);
+        $this->assertSame('Diputuskan admin lain.', $testDrive->fresh()->admin_note);
+    }
+
+    public function test_perubahan_status_nyata_tetap_memakai_pesan_diubah(): void
+    {
+        $testDrive = $this->makeTestDrive();
+
+        $this->changeStatus($testDrive, ['status' => 'confirmed'])
+            ->assertSessionHas('success', 'Status test drive diubah dari Menunggu menjadi Dikonfirmasi.')
+            ->assertSessionMissing('status');
+    }
+
     public function test_catatan_wajib_saat_membatalkan_dan_maksimal_1000(): void
     {
         $testDrive = $this->makeTestDrive();

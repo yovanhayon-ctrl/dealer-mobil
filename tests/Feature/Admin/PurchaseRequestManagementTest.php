@@ -337,6 +337,51 @@ class PurchaseRequestManagementTest extends TestCase
         $this->assertSame(2, $this->stock());
     }
 
+    /**
+     * Simulasikan admin lain yang mengubah status (lewat action) tepat setelah request ini memuat pengajuan,
+     * sehingga validasi memakai salinan lama.
+     */
+    private function otherAdminChangesStatusFirst(PurchaseRequest $purchaseRequest, string $status): void
+    {
+        $done = false;
+
+        PurchaseRequest::retrieved(function (PurchaseRequest $retrieved) use ($purchaseRequest, $status, &$done) {
+            if (! $done && $retrieved->is($purchaseRequest)) {
+                $done = true;
+                app(ChangePurchaseRequestStatus::class)->handle(PurchaseRequest::find($retrieved->id), $status, 'Diputuskan admin lain.');
+            }
+        });
+    }
+
+    public function test_persetujuan_ganda_menampilkan_info_tanpa_mengubah_stok_lagi(): void
+    {
+        $purchase = $this->purchase(['status' => 'processing']);
+        $this->otherAdminChangesStatusFirst($purchase, 'approved');
+
+        $this->changeStatus($purchase, ['status' => 'approved', 'admin_note' => ''])
+            ->assertRedirect(route('admin.purchase-requests.show', $purchase))
+            ->assertSessionHasNoErrors()
+            ->assertSessionHas('status', 'Pengajuan ini sudah berstatus Disetujui. Tidak ada perubahan.')
+            ->assertSessionMissing('success');
+
+        $this->assertSame('approved', $purchase->fresh()->status);
+        $this->assertSame(2, $this->stock(), 'Stok hanya berkurang sekali.');
+
+        $this->actingAs($this->admin)->get(route('admin.purchase-requests.show', $purchase))
+            ->assertSee('alert-info', false)
+            ->assertSee('Pengajuan ini sudah berstatus Disetujui. Tidak ada perubahan.')
+            ->assertDontSee('diubah dari');
+    }
+
+    public function test_perubahan_status_nyata_tetap_memakai_pesan_diubah(): void
+    {
+        $purchase = $this->purchase(['status' => 'processing']);
+
+        $this->changeStatus($purchase, ['status' => 'approved'])
+            ->assertSessionHas('success', 'Status pengajuan diubah dari Diproses menjadi Disetujui.')
+            ->assertSessionMissing('status');
+    }
+
     public function test_catatan_wajib_saat_menolak_atau_membatalkan(): void
     {
         $purchase = $this->purchase(['status' => 'processing']);

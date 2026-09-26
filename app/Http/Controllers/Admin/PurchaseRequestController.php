@@ -76,11 +76,18 @@ class PurchaseRequestController extends Controller
                 ->with('error', $e->getMessage());
         }
 
-        $message = $status === null
-            ? 'Catatan admin pengajuan berhasil disimpan.'
-            : "Status pengajuan diubah dari {$oldLabel} menjadi {$updated->statusLabel()}.";
+        $redirect = redirect()->route('admin.purchase-requests.show', $purchaseRequest);
 
-        return redirect()->route('admin.purchase-requests.show', $purchaseRequest)->with('success', $message);
+        if ($status === null) {
+            return $redirect->with('success', 'Catatan admin pengajuan berhasil disimpan.');
+        }
+
+        // Setelah baris dikunci ternyata status sudah sama (mis. admin lain lebih dulu menyetujui).
+        if (! $updated->wasChanged('status')) {
+            return $redirect->with('status', "Pengajuan ini sudah berstatus {$updated->statusLabel()}. Tidak ada perubahan.");
+        }
+
+        return $redirect->with('success', "Status pengajuan diubah dari {$oldLabel} menjadi {$updated->statusLabel()}.");
     }
 
     /**

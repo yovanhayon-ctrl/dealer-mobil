@@ -6,9 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\TestDriveStatusRequest;
 use App\Models\TestDrive;
 use DateTime;
+use DomainException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
 /**
@@ -60,17 +62,37 @@ class TestDriveController extends Controller
     {
         $oldLabel = $testDrive->statusLabel();
         $status = $request->validated('status');
+        $redirect = redirect()->route('admin.test-drives.show', $testDrive);
 
-        $testDrive->update([
-            'status' => $status ?? $testDrive->status,
-            'admin_note' => $request->validated('admin_note'),
-        ]);
+        try {
+            // Baca ulang baris yang dikunci: admin lain mungkin sudah mengubah status sejak halaman dibuka.
+            $updated = DB::transaction(function () use ($testDrive, $status, $request) {
+                $locked = TestDrive::whereKey($testDrive->id)->lockForUpdate()->firstOrFail();
 
-        $message = $status === null
-            ? 'Catatan admin test drive berhasil disimpan.'
-            : "Status test drive diubah dari {$oldLabel} menjadi {$testDrive->statusLabel()}.";
+                if ($status !== null && $status !== $locked->status && ! $locked->canTransitionTo($status)) {
+                    throw new DomainException("Status test drive tidak bisa diubah dari {$locked->statusLabel()} ke ".TestDrive::STATUS_LABELS[$status].'.');
+                }
 
-        return redirect()->route('admin.test-drives.show', $testDrive)->with('success', $message);
+                $locked->update([
+                    'status' => $status ?? $locked->status,
+                    'admin_note' => $request->validated('admin_note'),
+                ]);
+
+                return $locked;
+            });
+        } catch (DomainException $e) {
+            return $redirect->withInput()->with('error', $e->getMessage());
+        }
+
+        if ($status === null) {
+            return $redirect->with('success', 'Catatan admin test drive berhasil disimpan.');
+        }
+
+        if (! $updated->wasChanged('status')) {
+            return $redirect->with('status', "Test drive ini sudah berstatus {$updated->statusLabel()}. Tidak ada perubahan.");
+        }
+
+        return $redirect->with('success', "Status test drive diubah dari {$oldLabel} menjadi {$updated->statusLabel()}.");
     }
 
     /**
