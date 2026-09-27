@@ -8,7 +8,7 @@ use App\Models\TestDrive;
 
 /**
  * Menulis AdminReport sebagai CSV (UTF-8 + BOM, pemisah titik koma agar rapi di Excel berbahasa Indonesia).
- * Angka ditulis apa adanya (tanpa titik ribuan) supaya tetap bisa dihitung di spreadsheet.
+ * Angka ditulis tanpa titik ribuan supaya tetap bisa dihitung di spreadsheet; desimal memakai koma (33,3).
  */
 class AdminReportCsv
 {
@@ -39,12 +39,17 @@ class AdminReportCsv
 
     /**
      * Teks yang diawali =, +, -, @, tab, atau carriage return diberi awalan petik (')
-     * agar tidak dijalankan sebagai formula. Angka dibiarkan sebagai angka.
+     * agar tidak dijalankan sebagai formula. Bilangan bulat dibiarkan apa adanya; desimal
+     * (persentase, dibulatkan 1 angka) ditulis dengan koma karena Excel Indonesia membacanya begitu.
      */
-    public static function cell(mixed $value): int|float|string
+    public static function cell(mixed $value): int|string
     {
-        if (is_int($value) || is_float($value)) {
+        if (is_int($value)) {
             return $value;
+        }
+
+        if (is_float($value)) {
+            return number_format($value, 1, ',', '');
         }
 
         $text = (string) $value;
