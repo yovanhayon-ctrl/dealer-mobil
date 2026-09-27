@@ -113,5 +113,14 @@ Status: disepakati (25 Sep 2026). Acuan untuk semua anggota tim.
   - Select urutan: `data-auto-submit` ditangani `public/js/app.js` (dimuat layout publik, tanpa library, tanpa JS inline); tombol Urutkan tetap ada untuk tanpa JS.
   - View link pagination dipindah dari `admin/partials/pagination-links` ke `partials/pagination-links` (dipakai admin & katalog).
   - Meta description per halaman (`@section('meta_description')`, default tagline dealer).
-- Urutan berikutnya: seluruh halaman admin sudah selesai; halaman publik: layout + beranda + katalog ✓ → detail mobil → promo → simulasi kredit → test drive & pengajuan → akun customer.
+- Detail mobil selesai (Phase 10):
+  - Route `cars.show` (`GET /mobil/{car:slug}`, `CarController@show`); slug tidak ada atau mobil nonaktif → 404 (termasuk untuk admin). Link Detail di `x-car-card` otomatis aktif.
+  - Galeri: Bootstrap carousel, gambar utama dulu lalu `sort_order`; thumbnail = indikator carousel (`data-bs-slide-to`, tanpa JS tambahan, `loading="lazy"`); placeholder bila tanpa gambar.
+  - Info: breadcrumb publik (`partials/public-breadcrumb`: Beranda > Mobil > nama), badge, harga coret + harga promo (aturan sama dengan kartu), stok dalam unit, **semua** promo aktif (judul + periode + diskon) dengan label "Dipakai di harga" pada promo terbesar.
+  - Spesifikasi dari kolom `cars` (km hanya bekas; mesin/warna kosong → "–"); deskripsi di-escape lalu `nl2br`.
+  - Ringkasan cicilan: semua tenor di `config/credit.php` dengan DP minimum dan harga setelah promo, dihitung `CreditCalculator` di server; link "Hitung simulasi sendiri" (`credit.index?mobil=slug`) muncul setelah route-nya ada.
+  - Tombol: Ajukan Pembelian (`purchase-requests.create`) & Booking Test Drive (`test-drives.create?mobil=slug`) memakai `Route::has`; aturan di `Car::canBePurchased()` (aktif + stok > 0) dan `Car::canBeTestDriven()` (aktif + baru, atau bekas stok > 0); nonaktif + keterangan bila tidak boleh. WhatsApp (hanya jika `DEALER_WHATSAPP` diisi): nomor diambil digitnya, pesan berisi nama, harga, dan URL detail di-encode `rawurlencode`.
+  - Mobil serupa: maks 4 mobil aktif lain, kategori sama dulu lalu merek sama, dalam **satu query** (`CASE WHEN category_id = ?`), relasi `Car::CARD_RELATIONS`.
+  - SEO: title "Merek Nama Tahun", meta description dari deskripsi (≤ 155 karakter, cadangan dari nama/harga), `@stack('meta')` di head untuk canonical + og:title/description/url/type + og:image (gambar pertama, bila ada). Jumlah query tetap.
+- Urutan berikutnya: seluruh halaman admin sudah selesai; halaman publik: layout + beranda + katalog ✓ → detail mobil ✓ → promo → simulasi kredit → test drive & pengajuan → akun customer.
 - Konvensi nama route admin (menu sidebar muncul otomatis bila route ada): `admin.cars.*`, `admin.brands.*`, `admin.categories.*`, `admin.promos.*`, `admin.test-drives.*`, `admin.purchase-requests.*`, `admin.users.*`, `admin.reports.*`.

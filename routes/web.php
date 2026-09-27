@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', HomeController::class)->name('home');
 Route::get('/mobil', [CarController::class, 'index'])->name('cars.index');
+Route::get('/mobil/{car:slug}', [CarController::class, 'show'])->name('cars.show');
 
 /*
 |--------------------------------------------------------------------------

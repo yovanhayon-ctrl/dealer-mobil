@@ -309,6 +309,87 @@ main {
     }
 }
 
+/* ---------- Publik: detail mobil ---------- */
+
+.car-gallery-img,
+.car-gallery-empty {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    background-color: var(--dm-bg);
+}
+
+.car-gallery-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+    font-size: 4rem;
+}
+
+/* Indikator carousel Bootstrap dipakai sebagai thumbnail (bukan garis di atas gambar). */
+.car-gallery-thumbs {
+    position: static;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin: .75rem 0 0;
+}
+
+.car-gallery-thumbs [data-bs-target] {
+    flex: 0 0 auto;
+    width: 88px;
+    height: auto;
+    margin: 0;
+    padding: 0;
+    text-indent: 0;
+    background: none;
+    border: 2px solid transparent;
+    border-radius: .5rem;
+    overflow: hidden;
+    opacity: .6;
+}
+
+.car-gallery-thumbs [data-bs-target].active,
+.car-gallery-thumbs [data-bs-target]:hover,
+.car-gallery-thumbs [data-bs-target]:focus-visible {
+    opacity: 1;
+}
+
+.car-gallery-thumbs [data-bs-target].active {
+    border-color: var(--dm-red);
+}
+
+.car-gallery-thumbs img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+}
+
+.car-detail-price {
+    font-size: 1.75rem;
+}
+
+.promo-box {
+    background-color: rgba(214, 40, 40, .06);
+    border-left: 4px solid var(--dm-red);
+}
+
+.spec-table th {
+    width: 40%;
+    font-weight: 500;
+    color: #6c757d;
+}
+
+@media (min-width: 992px) {
+    .car-detail-info {
+        position: sticky;
+        top: 5rem;
+    }
+}
+
 /* ---------- Halaman auth ---------- */
 
 .auth-wrapper {

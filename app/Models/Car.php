@@ -214,6 +214,22 @@ class Car extends Model
     }
 
     /**
+     * Boleh diajukan pembelian: mobil aktif dan stok tersedia (RANCANGAN §5).
+     */
+    public function canBePurchased(): bool
+    {
+        return $this->is_active && $this->inStock();
+    }
+
+    /**
+     * Boleh test drive: mobil baru stok 0 tetap boleh (unit display), mobil bekas stok 0 tidak (sudah terjual).
+     */
+    public function canBeTestDriven(): bool
+    {
+        return $this->is_active && ($this->isNew() || $this->inStock());
+    }
+
+    /**
      * Promo aktif dengan diskon terbesar. Memerlukan eager load `activePromos`
      * (preventLazyLoading melempar exception bila lupa, supaya tidak terjadi N+1).
      * Diskon yang tidak lebih kecil dari harga saat ini diabaikan (mis. harga mobil diturunkan setelah promo dibuat).

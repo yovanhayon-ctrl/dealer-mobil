@@ -10,7 +10,6 @@ use App\Models\Promo;
 use App\Support\CreditCalculator;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Route;
 use Tests\TestCase;
 
 /**
@@ -124,14 +123,17 @@ class CarCardTest extends TestCase
             ->assertSee('aria-label="Belum ada foto Toyota Polos 2025"', false);
     }
 
-    public function test_tombol_detail_nonaktif_selama_route_detail_belum_ada(): void
+    public function test_tombol_detail_dan_judul_menaut_ke_halaman_detail(): void
     {
-        $this->assertFalse(Route::has('cars.show'));
-        $this->car();
+        $car = $this->car(['slug' => 'toyota-avanza-2025']);
+        $url = route('cars.show', $car);
+
+        $this->assertSame(url('/mobil/toyota-avanza-2025'), $url);
 
         $this->get(route('cars.index'))
             ->assertOk()
-            ->assertSee('<span class="btn btn-outline-primary btn-sm w-100 disabled" aria-disabled="true">Detail</span>', false)
-            ->assertDontSee('stretched-link', false);
+            ->assertSee('<a href="'.$url.'" class="stretched-link text-reset text-decoration-none">Avanza 2025</a>', false)
+            ->assertSee('<a href="'.$url.'" class="btn btn-outline-primary btn-sm w-100">Detail</a>', false)
+            ->assertDontSee('aria-disabled="true">Detail', false);
     }
 }
