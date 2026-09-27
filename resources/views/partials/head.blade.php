@@ -3,6 +3,7 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>@hasSection('title')@yield('title') — @endif{{ config('dealer.name') }}</title>
 <meta name="description" content="@yield('meta_description', config('dealer.tagline') ?: config('dealer.name').' — jual mobil baru dan bekas, promo, dan simulasi kredit.')">
+@stack('meta')
 
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
