@@ -371,11 +371,24 @@ class ReportTest extends TestCase
         $this->assertContains(['SUV', '1', '400000000'], $rows);
         $this->assertContains(['1', 'Toyota Avanza 2025', '2', '550000000'], $rows);
         $this->assertContains(['Selesai', '2'], $rows);
-        $this->assertContains(['Persentase selesai (%)', '50'], $rows);
+        $this->assertContains(['Persentase selesai (%)', '50,0'], $rows);
 
         $august = $this->csvRows($this->actingAs($this->admin)->get(route('admin.reports.export', ['periode' => 'bulan-lalu'])));
         $this->assertContains(['Total pengajuan', '1'], $august);
         $this->assertContains(['Nilai penjualan (Rp)', '270000000'], $august);
+    }
+
+    public function test_export_csv_persentase_memakai_koma_desimal(): void
+    {
+        $car = $this->car('Toyota', 'MPV', 'Avanza');
+        $this->makeTestDrive($car, 'completed', '2026-09-10');
+        $this->makeTestDrive($car, 'confirmed', '2026-09-11');
+        $this->makeTestDrive($car, 'cancelled', '2026-09-12');
+
+        $rows = $this->csvRows($this->actingAs($this->admin)->get(route('admin.reports.export')));
+
+        $this->assertContains(['Persentase selesai (%)', '33,3'], $rows);
+        $this->assertContains(['Total test drive', '3'], $rows);
     }
 
     public function test_export_csv_melindungi_dari_csv_injection(): void

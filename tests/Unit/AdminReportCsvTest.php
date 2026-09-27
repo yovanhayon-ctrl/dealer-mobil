@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 class AdminReportCsvTest extends TestCase
 {
     /**
-     * @return array<string, array{mixed, int|float|string}>
+     * @return array<string, array{mixed, int|string}>
      */
     public static function cellProvider(): array
     {
@@ -25,13 +25,16 @@ class AdminReportCsvTest extends TestCase
             'teks kosong' => ['', ''],
             'angka bulat negatif tetap angka' => [-5, -5],
             'angka bulat' => [250_000_000, 250_000_000],
-            'angka desimal' => [33.3, 33.3],
+            'angka desimal memakai koma' => [33.3, '33,3'],
+            'angka desimal bulat' => [50.0, '50,0'],
+            'angka desimal negatif tidak diberi petik' => [-2.5, '-2,5'],
+            'angka desimal besar tanpa pemisah ribuan' => [1234.5, '1234,5'],
             'null' => [null, ''],
         ];
     }
 
     #[DataProvider('cellProvider')]
-    public function test_sel_teks_berawalan_formula_diberi_petik(mixed $input, int|float|string $expected): void
+    public function test_sel_teks_berawalan_formula_diberi_petik(mixed $input, int|string $expected): void
     {
         $this->assertSame($expected, AdminReportCsv::cell($input));
     }
