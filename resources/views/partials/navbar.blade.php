@@ -1,17 +1,17 @@
 @php
     // Menu hanya tampil jika route-nya sudah dibuat (halaman menyusul di phase berikutnya).
     $menu = [
-        ['route' => 'home', 'label' => 'Beranda'],
-        ['route' => 'cars.index', 'label' => 'Katalog'],
-        ['route' => 'promos.index', 'label' => 'Promo'],
-        ['route' => 'credit.index', 'label' => 'Simulasi Kredit'],
-        ['route' => 'test-drives.create', 'label' => 'Test Drive'],
-        ['route' => 'about', 'label' => 'Tentang Kami'],
-        ['route' => 'contact', 'label' => 'Kontak'],
+        ['route' => 'home', 'label' => 'Beranda', 'active' => 'home'],
+        ['route' => 'cars.index', 'label' => 'Mobil', 'active' => 'cars.*'],
+        ['route' => 'promos.index', 'label' => 'Promo', 'active' => 'promos.*'],
+        ['route' => 'credit.index', 'label' => 'Simulasi Kredit', 'active' => 'credit.*'],
+        ['route' => 'test-drives.create', 'label' => 'Test Drive', 'active' => 'test-drives.*'],
+        ['route' => 'about', 'label' => 'Tentang Kami', 'active' => 'about'],
+        ['route' => 'contact', 'label' => 'Kontak', 'active' => 'contact'],
     ];
 @endphp
 
-<nav class="navbar navbar-expand-lg navbar-dark navbar-dealer sticky-top">
+<nav class="navbar navbar-expand-lg navbar-dark navbar-dealer sticky-top" aria-label="Menu utama">
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">
             <i class="bi bi-car-front-fill"></i> {{ config('dealer.name') }}
@@ -25,13 +25,20 @@
         <div class="collapse navbar-collapse" id="mainNavbar">
             <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                 @foreach ($menu as $item)
-                    @if (Route::has($item['route']))
-                        <li class="nav-item">
-                            <a class="nav-link @if (request()->routeIs($item['route'])) active @endif"
-                               href="{{ route($item['route']) }}">{{ $item['label'] }}</a>
-                        </li>
-                    @endif
+                    @continue(! Route::has($item['route']))
+
+                    @php($isActive = request()->routeIs($item['active']))
+                    <li class="nav-item">
+                        <a @class(['nav-link', 'active' => $isActive]) href="{{ route($item['route']) }}" @if ($isActive) aria-current="page" @endif>{{ $item['label'] }}</a>
+                    </li>
                 @endforeach
+                @if (auth()->user()?->isAdmin())
+                    <li class="nav-item">
+                        <a class="nav-link" href="{{ route('admin.dashboard') }}">
+                            <i class="bi bi-speedometer2 me-1"></i>Dashboard Admin
+                        </a>
+                    </li>
+                @endif
             </ul>
 
             <div class="d-flex align-items-lg-center gap-2">

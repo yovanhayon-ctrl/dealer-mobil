@@ -1,7 +1,7 @@
 <?php
 
 use App\Http\Controllers\Admin\BrandController;
-use App\Http\Controllers\Admin\CarController;
+use App\Http\Controllers\Admin\CarController as AdminCarController;
 use App\Http\Controllers\Admin\CarImageController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
@@ -12,6 +12,8 @@ use App\Http\Controllers\Admin\TestDriveController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\CarController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -20,7 +22,8 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-Route::view('/', 'pages.home')->name('home');
+Route::get('/', HomeController::class)->name('home');
+Route::get('/mobil', [CarController::class, 'index'])->name('cars.index');
 
 /*
 |--------------------------------------------------------------------------
@@ -50,7 +53,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::redirect('/', '/admin/dashboard')->name('home');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 
-    Route::patch('mobil/{car}/status', [CarController::class, 'toggleActive'])->name('cars.toggle-active');
+    Route::patch('mobil/{car}/status', [AdminCarController::class, 'toggleActive'])->name('cars.toggle-active');
 
     // Galeri gambar mobil; scopeBindings: {image} harus milik {car}, selain itu 404.
     Route::prefix('mobil/{car}/gambar')->name('cars.images.')->controller(CarImageController::class)
@@ -63,7 +66,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
             Route::delete('{image}', 'destroy')->name('destroy');
         });
 
-    Route::resource('mobil', CarController::class)
+    Route::resource('mobil', AdminCarController::class)
         ->except('show')
         ->parameters(['mobil' => 'car'])
         ->names('cars');

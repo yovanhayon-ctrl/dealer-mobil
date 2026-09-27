@@ -462,8 +462,8 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 5     | CRUD merek & kategori            | ✅ Selesai      |
 | 6     | CRUD mobil                       | ✅ Selesai      |
 | 7     | Upload & galeri mobil            | ✅ Selesai      |
-| 8     | Katalog publik        | ⏳                   |
-| 9     | Search & filter       | ⏳                   |
+| 8     | Katalog publik        | ✅ Selesai (layout publik, beranda, katalog `/mobil`) |
+| 9     | Search & filter       | ✅ Selesai (filter & urutan lengkap) |
 | 10    | Detail mobil          | ⏳                   |
 | 11    | Test drive            | 🟡 Admin selesai (publik menyusul) |
 | 12    | Pengajuan pembelian   | 🟡 Admin selesai (publik menyusul) |
@@ -474,6 +474,8 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 17    | Testing               | ⏳                   |
 | 18    | Optimization          | ⏳                   |
 | 19    | Deployment            | ⏳                   |
+
+> **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Tombol **Detail** di kartu mobil masih nonaktif sampai halaman detail mobil (Phase 10) dibuat.
 
 > **Urutan kerja:** semua halaman **admin** dikerjakan dulu (sudah selesai), lalu halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 
