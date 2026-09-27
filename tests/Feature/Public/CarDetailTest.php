@@ -35,7 +35,7 @@ class CarDetailTest extends TestCase
             'brand_id' => Brand::firstOrCreate(['name' => $brand], ['slug' => str($brand)->slug()])->id,
             'category_id' => Category::firstOrCreate(['name' => $category], ['slug' => str($category)->slug()])->id,
             'name' => $name,
-            'slug' => str("{$brand} {$name} 2025")->slug(),
+            'slug' => str("{$brand} {$name} 2025")->slug()->value(),
             'year' => 2025,
             'price' => 300_000_000,
             'transmission' => 'automatic',
@@ -244,12 +244,46 @@ class CarDetailTest extends TestCase
         $this->assertFalse($car->canBeTestDriven());
     }
 
-    public function test_tombol_ajukan_dan_test_drive_belum_tampil_selama_route_belum_ada(): void
+    public function test_tombol_ajukan_dan_simulasi_belum_tampil_selama_route_belum_ada(): void
     {
         $this->detail($this->car())
             ->assertDontSee('Ajukan Pembelian')
-            ->assertDontSee('Booking Test Drive')
             ->assertDontSee('Hitung simulasi sendiri');
+    }
+
+    public function test_tombol_booking_test_drive_menaut_ke_form(): void
+    {
+        $car = $this->car();
+        $url = route('test-drives.create', ['mobil' => 'toyota-avanza-2025']);
+
+        $this->detail($car)->assertSee('href="'.e($url).'"', false)->assertSee('Booking Test Drive');
+    }
+
+    public function test_bekas_stok_0_tombol_test_drive_nonaktif_dengan_keterangan(): void
+    {
+        $car = $this->car(attributes: ['vehicle_condition' => Car::CONDITION_USED, 'mileage' => 30_000, 'stock' => 0]);
+
+        $this->detail($car)
+            ->assertSee('Unit bekas ini sudah terjual, test drive tidak tersedia.')
+            ->assertDontSee(route('test-drives.create', ['mobil' => $car->slug]));
+    }
+
+    public function test_mobil_baru_stok_0_tetap_bisa_booking_test_drive(): void
+    {
+        $car = $this->car(attributes: ['stock' => 0]);
+
+        $this->detail($car)->assertSee(e(route('test-drives.create', ['mobil' => $car->slug])), false);
+    }
+
+    public function test_admin_melihat_keterangan_bukan_tombol_booking(): void
+    {
+        $car = $this->car();
+
+        $this->actingAs(User::factory()->admin()->create())
+            ->get(route('cars.show', $car))
+            ->assertOk()
+            ->assertSee('Booking test drive hanya untuk akun customer.')
+            ->assertDontSee(route('test-drives.create', ['mobil' => $car->slug]));
     }
 
     public function test_whatsapp_hanya_tampil_jika_nomor_diisi_dengan_pesan_ter_encode(): void

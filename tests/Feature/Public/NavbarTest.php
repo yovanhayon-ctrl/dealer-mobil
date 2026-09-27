@@ -36,7 +36,8 @@ class NavbarTest extends TestCase
         $this->assertMatchesRegularExpression('/aria-current="page"\s*>Mobil<\/a>/', $navbar);
         $this->assertStringNotContainsString('Katalog', $navbar);
         // Route belum dibuat: menu disembunyikan.
-        foreach (['Promo', 'Simulasi Kredit', 'Test Drive', 'Tentang Kami', 'Kontak', 'Dashboard Admin', 'Keluar'] as $label) {
+        $this->assertStringContainsString('href="'.route('test-drives.create').'"', $navbar);
+        foreach (['Promo', 'Simulasi Kredit', 'Tentang Kami', 'Kontak', 'Dashboard Admin', 'Keluar', 'Test Drive Saya'] as $label) {
             $this->assertStringNotContainsString($label, $navbar);
         }
     }
