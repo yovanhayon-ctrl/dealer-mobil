@@ -63,6 +63,13 @@
                                     </a>
                                 </li>
                             @endif
+                            @if (! auth()->user()->isAdmin() && Route::has('account.test-drives.index'))
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('account.test-drives.index') }}">
+                                        <i class="bi bi-calendar-check me-2"></i>Test Drive Saya
+                                    </a>
+                                </li>
+                            @endif
                             @if (Route::has('account.requests'))
                                 <li>
                                     <a class="dropdown-item" href="{{ route('account.requests') }}">

@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Database\Factories\TestDriveFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -44,11 +46,34 @@ class TestDrive extends Model
     /** Status yang wajib disertai catatan admin (alasan untuk customer). */
     public const NOTE_REQUIRED_STATUSES = [self::STATUS_CANCELLED];
 
+    /** Status yang masih "memegang" jadwal: dipakai cek booking ganda & bentrok slot. */
+    public const ACTIVE_STATUSES = [self::STATUS_PENDING, self::STATUS_CONFIRMED];
+
+    /** Customer hanya boleh membatalkan saat status ini (RANCANGAN §5). */
+    public const CUSTOMER_CANCELLABLE_STATUSES = [self::STATUS_PENDING];
+
+    /** Slot jam booking (WIB), per jam 09:00–16:00. */
+    public const TIME_SLOTS = ['09:00', '10:00', '11:00', '12:00', '13:00', '14:00', '15:00', '16:00'];
+
+    /** Rentang tanggal booking: besok s/d hari ini + 30 hari (WIB). */
+    public const MIN_DAYS_AHEAD = 1;
+
+    public const MAX_DAYS_AHEAD = 30;
+
     protected function casts(): array
     {
         return [
             'preferred_date' => 'date',
         ];
+    }
+
+    /**
+     * Test drive yang masih memegang jadwal (pending / confirmed).
+     */
+    #[Scope]
+    protected function active(Builder $query): void
+    {
+        $query->whereIn('status', self::ACTIVE_STATUSES);
     }
 
     public function user(): BelongsTo
@@ -77,6 +102,12 @@ class TestDrive extends Model
     public function canTransitionTo(string $status): bool
     {
         return in_array($status, $this->allowedTransitions(), true);
+    }
+
+    public function canBeCancelledByCustomer(): bool
+    {
+        return in_array($this->status, self::CUSTOMER_CANCELLABLE_STATUSES, true)
+            && $this->canTransitionTo(self::STATUS_CANCELLED);
     }
 
     public function isFinal(): bool

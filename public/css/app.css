@@ -390,6 +390,23 @@ main {
     }
 }
 
+/* ---------- Publik: test drive ---------- */
+
+.test-drive-car-thumb {
+    flex: 0 0 120px;
+    width: 120px;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: .5rem;
+    background-color: var(--dm-bg);
+    font-size: 1.5rem;
+}
+
+.admin-note-box {
+    background-color: rgba(13, 110, 253, .08);
+    border-left: 3px solid #0d6efd;
+}
+
 /* ---------- Halaman auth ---------- */
 
 .auth-wrapper {

@@ -465,7 +465,7 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 8     | Katalog publik        | ✅ Selesai (layout publik, beranda, katalog `/mobil`) |
 | 9     | Search & filter       | ✅ Selesai (filter & urutan lengkap) |
 | 10    | Detail mobil          | ✅ Selesai (tombol Ajukan/Test Drive/Simulasi tampil setelah route-nya dibuat) |
-| 11    | Test drive            | 🟡 Admin selesai (publik menyusul) |
+| 11    | Test drive            | ✅ Selesai (admin + booking & riwayat customer) |
 | 12    | Pengajuan pembelian   | 🟡 Admin selesai (publik menyusul) |
 | 13    | Simulasi kredit       | ⏳                   |
 | 14    | Promo                 | ✅ Admin (publik menyusul) |
@@ -475,7 +475,7 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 18    | Optimization          | ⏳                   |
 | 19    | Deployment            | ⏳                   |
 
-> **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa.
+> **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`.
 
 > **Urutan kerja:** semua halaman **admin** dikerjakan dulu (sudah selesai), lalu halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 

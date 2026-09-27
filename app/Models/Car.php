@@ -122,6 +122,19 @@ class Car extends Model
     }
 
     /**
+     * Mobil yang boleh di-test drive: aktif, dan baru (stok 0 tetap boleh) atau bekas dengan stok.
+     * Aturannya sama dengan canBeTestDriven().
+     */
+    #[Scope]
+    protected function testDrivable(Builder $query): void
+    {
+        $query->where('cars.is_active', true)
+            ->where(fn (Builder $query) => $query
+                ->where('cars.vehicle_condition', self::CONDITION_NEW)
+                ->orWhere('cars.stock', '>', 0));
+    }
+
+    /**
      * Tambah kolom `final_price` (harga setelah diskon promo aktif terbesar) yang dihitung di SQL,
      * untuk urutan harga di katalog. Aturannya sama dengan bestActivePromo().
      */

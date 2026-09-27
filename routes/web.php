@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Account\TestDriveController as AccountTestDriveController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CarController as AdminCarController;
 use App\Http\Controllers\Admin\CarImageController;
@@ -8,12 +9,13 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PromoController;
 use App\Http\Controllers\Admin\PurchaseRequestController;
 use App\Http\Controllers\Admin\ReportController;
-use App\Http\Controllers\Admin\TestDriveController;
+use App\Http\Controllers\Admin\TestDriveController as AdminTestDriveController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\TestDriveController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -43,6 +45,24 @@ Route::middleware('guest')->group(function () {
 Route::post('/logout', [LoginController::class, 'destroy'])
     ->middleware('auth')
     ->name('logout');
+
+/*
+|--------------------------------------------------------------------------
+| Customer (wajib login)
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware('auth')->group(function () {
+    Route::get('/test-drive', [TestDriveController::class, 'create'])->name('test-drives.create');
+    Route::post('/test-drive', [TestDriveController::class, 'store'])
+        ->middleware('throttle:test-drive-booking')
+        ->name('test-drives.store');
+
+    Route::prefix('akun')->name('account.')->group(function () {
+        Route::get('test-drive', [AccountTestDriveController::class, 'index'])->name('test-drives.index');
+        Route::patch('test-drive/{testDrive}/batal', [AccountTestDriveController::class, 'cancel'])->name('test-drives.cancel');
+    });
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -88,7 +108,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->names('promos');
 
     // Test drive & pengajuan dibuat customer (halaman publik); admin hanya melihat & mengubah status.
-    Route::controller(TestDriveController::class)->prefix('test-drive')->name('test-drives.')->group(function () {
+    Route::controller(AdminTestDriveController::class)->prefix('test-drive')->name('test-drives.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('{testDrive}', 'show')->name('show');
         Route::patch('{testDrive}/status', 'updateStatus')->name('update-status');

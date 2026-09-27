@@ -147,7 +147,9 @@
                         @endif
 
                         @if ($testDriveRoute)
-                            @if ($car->canBeTestDriven())
+                            @if (auth()->user()?->isAdmin())
+                                <p class="small text-muted mb-0"><i class="bi bi-info-circle me-1"></i>Booking test drive hanya untuk akun customer.</p>
+                            @elseif ($car->canBeTestDriven())
                                 <a href="{{ route('test-drives.create', ['mobil' => $car->slug]) }}" class="btn btn-outline-primary">
                                     <i class="bi bi-calendar-check"></i>Booking Test Drive
                                 </a>
