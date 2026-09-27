@@ -156,7 +156,7 @@ main {
     color: rgba(255, 255, 255, .75);
 }
 
-.site-footer h5 {
+.site-footer h2 {
     color: #fff;
 }
 
@@ -167,6 +167,146 @@ main {
 
 .site-footer a:hover {
     color: #fff;
+}
+
+/* ---------- Publik: beranda ---------- */
+
+.home-hero {
+    background: linear-gradient(135deg, var(--dm-navy) 0%, var(--dm-navy-dark) 100%);
+    color: rgba(255, 255, 255, .85);
+    padding-bottom: 6rem !important;
+}
+
+/* Kartu pencarian cepat menumpang di bawah hero. */
+.home-search {
+    margin-top: -4rem;
+    position: relative;
+}
+
+.home-cta {
+    background-color: var(--dm-navy);
+    color: rgba(255, 255, 255, .85);
+}
+
+.shortcut-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .4rem .85rem;
+    border: 1px solid #dee2e6;
+    border-radius: 2rem;
+    background-color: #fff;
+    color: var(--dm-navy);
+    font-weight: 500;
+    text-decoration: none;
+    transition: border-color .15s ease, color .15s ease;
+}
+
+.shortcut-chip:hover {
+    border-color: var(--dm-red);
+    color: var(--dm-red);
+}
+
+.shortcut-chip-count {
+    font-size: .75rem;
+    padding: .05rem .5rem;
+    border-radius: 1rem;
+    background-color: var(--dm-bg);
+    color: #6c757d;
+}
+
+/* ---------- Publik: kartu mobil & promo ---------- */
+
+.car-card {
+    overflow: hidden;
+}
+
+.car-card-media {
+    position: relative;
+}
+
+.car-card-img,
+.promo-card-img {
+    display: block;
+    width: 100%;
+    object-fit: cover;
+    background-color: var(--dm-bg);
+}
+
+.car-card-img {
+    aspect-ratio: 16 / 9;
+}
+
+.promo-card-img {
+    aspect-ratio: 3 / 1;
+}
+
+.car-card-img-empty,
+.promo-card-img-empty {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #adb5bd;
+    font-size: 2.5rem;
+}
+
+.car-card-badges {
+    position: absolute;
+    top: .75rem;
+    left: .75rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: .35rem;
+}
+
+.badge-condition-new  { background-color: var(--dm-navy); color: #fff; }
+.badge-condition-used { background-color: #fff; color: var(--dm-navy); }
+
+.car-card-specs .list-inline-item:not(:last-child) {
+    margin-right: .75rem;
+}
+
+.price-old {
+    color: #6c757d;
+}
+
+.price-final {
+    display: block;
+    font-family: var(--dm-font-heading);
+    font-size: 1.15rem;
+    font-weight: 700;
+    color: var(--dm-red);
+}
+
+/* ---------- Publik: katalog ---------- */
+
+.filter-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .3rem .75rem;
+    border-radius: 2rem;
+    background-color: rgba(11, 37, 69, .08);
+    color: var(--dm-navy);
+    font-size: .875rem;
+    text-decoration: none;
+}
+
+.filter-chip:hover {
+    background-color: rgba(214, 40, 40, .1);
+    color: var(--dm-red);
+}
+
+.filter-chip .bi {
+    font-size: .7rem;
+}
+
+@media (min-width: 992px) {
+    /* Di bawah navbar sticky (tinggi ±56px). */
+    .filter-sidebar {
+        position: sticky;
+        top: 5rem;
+    }
 }
 
 /* ---------- Halaman auth ---------- */
