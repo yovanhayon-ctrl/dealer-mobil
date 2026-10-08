@@ -407,6 +407,20 @@ main {
     border-left: 3px solid #0d6efd;
 }
 
+/* ---------- Publik: JAF Service ---------- */
+
+.service-card-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: .75rem;
+    background-color: rgba(11, 37, 69, .08);
+    color: var(--dm-navy);
+    font-size: 1.35rem;
+}
+
 /* ---------- Halaman auth ---------- */
 
 .auth-wrapper {
