@@ -350,4 +350,25 @@ class CarCatalogTest extends TestCase
 
         $this->assertSame($queriesWithOneCar, $count());
     }
+
+    public function test_filter_warna_tanpa_beda_huruf_dan_dropdown_dari_mobil_aktif(): void
+    {
+        $this->car('Nissan', 'Sport', 'Skyline GT-R', ['color' => 'Biru']);
+        $this->car('Nissan', 'SUV', 'Kicks', ['color' => 'Putih']);
+        $this->car('Nissan', 'MPV', 'Serena', ['color' => 'Hitam', 'is_active' => false]);
+        $this->car('Nissan', 'MPV', 'Livina', ['color' => null]);
+
+        $response = $this->catalog('warna=biru');
+        $this->assertSame(['Skyline GT-R'], $this->names($response));
+        $response
+            ->assertSee('<option value="Biru" selected>Biru</option>', false)
+            ->assertSee('<option value="Putih" >Putih</option>', false)
+            // Warna mobil nonaktif tidak ditawarkan.
+            ->assertDontSee('<option value="Hitam"', false)
+            ->assertSee('Warna Biru')
+            ->assertSee(route('cars.index'));
+
+        // Warna yang tidak ada diabaikan (semua mobil aktif tampil).
+        $this->assertCount(3, $this->names($this->catalog('warna=ungu')));
+    }
 }

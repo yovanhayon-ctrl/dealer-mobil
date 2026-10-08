@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Beranda')
-@section('meta_description', config('dealer.name').' — mobil baru dan bekas pilihan, promo terbaru, dan cicilan ringan. Cari mobil impian Anda di sini.')
+@section('meta_description', config('dealer.name').' — Nissan Heritage & Performance: mobil Nissan baru, koleksi klasik Jepang, promo, cicilan ringan, dan layanan servis.')
 
 @php
     $dealer = config('dealer');
@@ -13,6 +13,7 @@
         <div class="container py-lg-4">
             <div class="row">
                 <div class="col-lg-8">
+                    <p class="text-uppercase small fw-semibold mb-2 opacity-75">Nissan Heritage &amp; Performance</p>
                     <h1 id="hero-title" class="display-5 fw-bold text-white mb-3">{{ $dealer['name'] }}</h1>
                     <p class="lead mb-4">
                         {{ $dealer['tagline'] ?: 'Temukan mobil impian Anda dengan proses yang mudah dan transparan.' }}

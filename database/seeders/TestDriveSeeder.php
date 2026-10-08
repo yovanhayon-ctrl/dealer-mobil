@@ -56,33 +56,33 @@ class TestDriveSeeder extends Seeder
     }
 
     /**
-     * Mobil bekas stok 0 (Civic) hanya dipakai untuk test drive yang dibatalkan;
-     * mobil baru stok 0 (Fortuner) boleh dikonfirmasi (unit display).
+     * Mobil bekas stok 0 (Silvia S15) hanya dipakai untuk test drive yang dibatalkan;
+     * mobil baru stok 0 (Leaf) boleh dikonfirmasi (unit display).
      *
      * @return array<int, array<string, mixed>>
      */
     private function testDrives(): array
     {
         return [
-            ['email' => 'budi.santoso@example.test', 'car' => 'toyota-avanza-1-5-g-cvt-2025', 'day' => 2, 'hour' => 10,
+            ['email' => 'budi.santoso@example.test', 'car' => 'nissan-kicks-e-power-vl-2025', 'day' => 2, 'hour' => 10,
                 'status' => TestDrive::STATUS_PENDING, 'notes' => 'Ingin mencoba di jalan tol.'],
-            ['email' => 'siti.rahmawati@example.test', 'car' => 'honda-hr-v-1-5-se-cvt-2025', 'day' => 3, 'hour' => 13,
+            ['email' => 'siti.rahmawati@example.test', 'car' => 'nissan-serena-e-power-highway-star-2025', 'day' => 3, 'hour' => 13,
                 'status' => TestDrive::STATUS_PENDING],
-            ['email' => 'rizky.hidayat@example.test', 'car' => 'mitsubishi-pajero-sport-dakar-4x2-2021', 'day' => 5, 'hour' => 11,
+            ['email' => 'rizky.hidayat@example.test', 'car' => 'nissan-350z-z33-2007', 'day' => 5, 'hour' => 11,
                 'status' => TestDrive::STATUS_PENDING, 'notes' => 'Mohon cek kondisi kaki-kaki.'],
-            ['email' => 'andi.pratama@example.test', 'car' => 'toyota-fortuner-2-8-gr-sport-2025', 'day' => 4, 'hour' => 9,
+            ['email' => 'andi.pratama@example.test', 'car' => 'nissan-leaf-2025', 'day' => 4, 'hour' => 9,
                 'status' => TestDrive::STATUS_CONFIRMED, 'admin_note' => 'Memakai unit display di showroom.'],
-            ['email' => 'dewi.lestari@example.test', 'car' => 'mitsubishi-xpander-cross-premium-cvt-2025', 'day' => 1, 'hour' => 14,
+            ['email' => 'dewi.lestari@example.test', 'car' => 'nissan-livina-vl-cvt-2025', 'day' => 1, 'hour' => 14,
                 'status' => TestDrive::STATUS_CONFIRMED],
-            ['email' => 'siti.rahmawati@example.test', 'car' => 'daihatsu-xenia-1-3-r-cvt-2025', 'day' => 0, 'hour' => 16,
+            ['email' => 'siti.rahmawati@example.test', 'car' => 'nissan-x-trail-e-power-e-4orce-vl-2025', 'day' => 0, 'hour' => 16,
                 'status' => TestDrive::STATUS_CONFIRMED],
-            ['email' => 'nur.aisyah@example.test', 'car' => 'hyundai-creta-1-5-prime-ivt-2025', 'day' => -5, 'hour' => 10,
+            ['email' => 'nur.aisyah@example.test', 'car' => 'nissan-magnite-premium-cvt-2025', 'day' => -5, 'hour' => 10,
                 'status' => TestDrive::STATUS_COMPLETED, 'admin_note' => 'Customer tertarik, lanjut ke pengajuan.'],
-            ['email' => 'agus.setiawan@example.test', 'car' => 'toyota-innova-zenix-2-0-q-hv-2025', 'day' => -10, 'hour' => 15,
+            ['email' => 'agus.setiawan@example.test', 'car' => 'nissan-navara-vl-4x4-at-2024', 'day' => -10, 'hour' => 15,
                 'status' => TestDrive::STATUS_COMPLETED],
-            ['email' => 'maya.putri@example.test', 'car' => 'honda-brio-satya-e-cvt-2025', 'day' => -2, 'hour' => 9,
+            ['email' => 'maya.putri@example.test', 'car' => 'nissan-gt-r-premium-edition-2024', 'day' => -2, 'hour' => 9,
                 'status' => TestDrive::STATUS_CANCELLED, 'admin_note' => 'Customer meminta pembatalan lewat telepon.'],
-            ['email' => 'budi.santoso@example.test', 'car' => 'honda-civic-1-5-rs-turbo-2022', 'day' => 6, 'hour' => 10,
+            ['email' => 'budi.santoso@example.test', 'car' => 'nissan-silvia-spec-r-s15-2001', 'day' => 6, 'hour' => 10,
                 'status' => TestDrive::STATUS_CANCELLED, 'admin_note' => 'Unit sudah terjual, customer ditawari mobil lain.'],
         ];
     }

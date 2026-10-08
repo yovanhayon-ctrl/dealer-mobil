@@ -28,7 +28,11 @@ class CarController extends Controller
         $brands = Brand::query()->tap($hasActiveCars)->orderBy('name')->get(['id', 'name', 'slug']);
         $categories = Category::query()->tap($hasActiveCars)->orderBy('name')->get(['id', 'name', 'slug']);
 
-        $filters = CarCatalogFilters::fromRequest($request, $brands, $categories);
+        // Warna dari mobil aktif (kolom bebas diisi admin), untuk dropdown filter.
+        $colors = Car::query()->active()->whereNotNull('color')->where('color', '!=', '')
+            ->distinct()->orderBy('color')->pluck('color');
+
+        $filters = CarCatalogFilters::fromRequest($request, $brands, $categories, $colors);
 
         $cars = Car::query()
             ->active()
@@ -43,6 +47,7 @@ class CarController extends Controller
             'filters' => $filters,
             'brands' => $brands,
             'categories' => $categories,
+            'colors' => $colors,
         ]);
     }
 

@@ -168,6 +168,6 @@ class CategoryManagementTest extends TestCase
         $this->seed(CategorySeeder::class);
 
         $this->assertSame(6, Category::count());
-        $this->assertDatabaseHas('categories', ['name' => 'LCGC', 'slug' => 'lcgc']);
+        $this->assertDatabaseHas('categories', ['name' => 'Sport', 'slug' => 'sport']);
     }
 }

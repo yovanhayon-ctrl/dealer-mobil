@@ -395,12 +395,14 @@ class CarManagementTest extends TestCase
         $this->seed(CarSeeder::class);
         $this->seed(CarSeeder::class);
 
-        $this->assertSame(15, Car::count());
+        $this->assertSame(21, Car::count());
+        $this->assertGreaterThan(Car::count() / 2, Car::whereHas('brand', fn ($brand) => $brand->where('name', 'Nissan'))->count());
         $this->assertSame(2, Car::where('stock', 0)->count());
         $this->assertSame(1, Car::where('is_active', false)->count());
         $this->assertTrue(Car::where('vehicle_condition', 'bekas')->where('mileage', '<', 1)->doesntExist());
         $this->assertTrue(Car::where('vehicle_condition', 'baru')->where('mileage', '>', 0)->doesntExist());
-        $this->assertDatabaseHas('cars', ['slug' => 'toyota-avanza-1-5-g-cvt-2025', 'price' => 285_000_000]);
+        $this->assertDatabaseHas('cars', ['slug' => 'nissan-kicks-e-power-vl-2025', 'price' => 520_000_000]);
+        $this->assertDatabaseHas('cars', ['slug' => 'nissan-skyline-gt-r-v-spec-ii-r34-2000', 'vehicle_condition' => 'bekas']);
     }
 
     private function countIndexQueries(): int

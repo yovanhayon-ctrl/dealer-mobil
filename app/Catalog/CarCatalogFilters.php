@@ -48,6 +48,7 @@ final class CarCatalogFilters
         public readonly ?string $condition,
         public readonly ?string $transmission,
         public readonly ?string $fuelType,
+        public readonly ?string $color,
         public readonly ?int $minPrice,
         public readonly ?int $maxPrice,
         public readonly ?int $minYear,
@@ -60,8 +61,9 @@ final class CarCatalogFilters
     /**
      * @param  Collection<int, Brand>  $brands  merek yang boleh dipilih (dicocokkan lewat slug)
      * @param  Collection<int, Category>  $categories  kategori yang boleh dipilih (dicocokkan lewat slug)
+     * @param  Collection<int, string>  $colors  warna yang boleh dipilih (tanpa beda huruf besar/kecil)
      */
-    public static function fromRequest(Request $request, Collection $brands, Collection $categories): self
+    public static function fromRequest(Request $request, Collection $brands, Collection $categories, ?Collection $colors = null): self
     {
         // Nilai array (mis. ?merek[]=x) dan string kosong dianggap tidak diisi.
         $text = function (string $key) use ($request): ?string {
@@ -88,6 +90,10 @@ final class CarCatalogFilters
             return $digits !== '' && strlen($digits) <= 13 && (int) $digits <= self::MAX_PRICE ? (int) $digits : null;
         };
 
+        // Warna dicocokkan dengan daftar warna mobil aktif; nilai yang tersimpan yang dipakai.
+        $color = $text('warna') === null ? null : ($colors ?? collect())
+            ->first(fn (string $value) => mb_strtolower($value) === mb_strtolower($text('warna')));
+
         $maxYear = (int) now()->year + 1;
         [$minPrice, $maxPrice] = self::ordered($price('harga_min'), $price('harga_max'));
         [$minYear, $maxYear] = self::ordered(
@@ -102,6 +108,7 @@ final class CarCatalogFilters
             condition: $pick('kondisi', array_keys(Car::CONDITIONS)),
             transmission: $pick('transmisi', array_keys(Car::TRANSMISSIONS)),
             fuelType: $pick('bbm', array_keys(Car::FUEL_TYPES)),
+            color: $color,
             minPrice: $minPrice,
             maxPrice: $maxPrice,
             minYear: $minYear,
@@ -128,6 +135,7 @@ final class CarCatalogFilters
             ->when($this->condition, fn (Builder $query, string $condition) => $query->where('cars.vehicle_condition', $condition))
             ->when($this->transmission, fn (Builder $query, string $transmission) => $query->where('cars.transmission', $transmission))
             ->when($this->fuelType, fn (Builder $query, string $fuelType) => $query->where('cars.fuel_type', $fuelType))
+            ->when($this->color, fn (Builder $query, string $color) => $query->where('cars.color', $color))
             ->when($this->minPrice, fn (Builder $query, int $price) => $query->whereFinalPrice('>=', $price))
             ->when($this->maxPrice, fn (Builder $query, int $price) => $query->whereFinalPrice('<=', $price))
             ->when($this->minYear, fn (Builder $query, int $year) => $query->where('cars.year', '>=', $year))
@@ -155,6 +163,7 @@ final class CarCatalogFilters
             'kondisi' => $this->condition,
             'transmisi' => $this->transmission,
             'bbm' => $this->fuelType,
+            'warna' => $this->color,
             'harga_min' => $this->minPrice,
             'harga_max' => $this->maxPrice,
             'tahun_min' => $this->minYear,
@@ -186,6 +195,7 @@ final class CarCatalogFilters
             [Car::CONDITIONS[$this->condition] ?? null, ['kondisi']],
             [Car::TRANSMISSIONS[$this->transmission] ?? null, ['transmisi']],
             [Car::FUEL_TYPES[$this->fuelType] ?? null, ['bbm']],
+            [$this->color !== null ? "Warna {$this->color}" : null, ['warna']],
             [self::rangeLabel('Harga', $this->minPrice, $this->maxPrice, $rupiah), ['harga_min', 'harga_max']],
             [self::rangeLabel('Tahun', $this->minYear, $this->maxYear, fn (int $year) => (string) $year), ['tahun_min', 'tahun_max']],
             [$this->seats !== null ? "{$this->seats} kursi" : null, ['kursi']],
