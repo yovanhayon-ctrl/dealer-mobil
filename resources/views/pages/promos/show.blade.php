@@ -71,7 +71,12 @@
                         @unless ($isEnded)
                             <div class="d-flex flex-wrap gap-2 mt-4">
                                 @if ($car)
-                                    <a href="{{ route('cars.show', $car) }}" class="btn btn-accent">
+                                    @if ($car->canBePurchased() && Route::has('purchase-requests.create'))
+                                        <a href="{{ route('purchase-requests.create', $car) }}" class="btn btn-accent">
+                                            <i class="bi bi-cart-check"></i>Ajukan Pembelian
+                                        </a>
+                                    @endif
+                                    <a href="{{ route('cars.show', $car) }}" class="btn btn-outline-primary">
                                         <i class="bi bi-car-front"></i>Lihat Detail Mobil
                                     </a>
                                     @if ($car->canBeTestDriven() && Route::has('test-drives.create'))

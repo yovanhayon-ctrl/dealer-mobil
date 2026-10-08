@@ -132,6 +132,12 @@
 
                             @if ($car)
                                 <div class="d-flex flex-wrap gap-2 mt-4" data-credit-car-actions>
+                                    @if ($result && $car->canBePurchased() && Route::has('purchase-requests.create'))
+                                        <a href="{{ route('purchase-requests.create', ['car' => $car, 'metode' => 'kredit', 'dp' => $result['down_payment'], 'tenor' => $result['tenor_months']]) }}"
+                                           class="btn btn-accent btn-sm" data-credit-apply>
+                                            <i class="bi bi-cart-check"></i>Ajukan dengan Simulasi Ini
+                                        </a>
+                                    @endif
                                     <a href="{{ route('cars.show', $car) }}" class="btn btn-outline-primary btn-sm">
                                         <i class="bi bi-car-front"></i>Lihat Detail Mobil
                                     </a>
