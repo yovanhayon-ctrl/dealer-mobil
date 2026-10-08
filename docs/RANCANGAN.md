@@ -17,8 +17,8 @@ Status: disepakati (25 Sep 2026). Acuan untuk semua anggota tim.
 - Badge: pending kuning · confirmed/processing biru · approved/completed hijau · rejected/cancelled merah · Stok Habis abu gelap.
 
 ## 3. Halaman
-- Public: Beranda, Katalog, Detail Mobil, Promo (daftar & detail), Test Drive, Simulasi Kredit, Tentang Kami, Kontak (info + WhatsApp + Maps, tanpa form/tabel), Login, Register, Pengajuan Saya, Profil.
-- Admin: Dashboard, Mobil (+gambar), Merek, Kategori, Promo, Test Drive, Pengajuan, Pengguna, Laporan (Phase 15).
+- Public: Beranda, Katalog, Detail Mobil, Promo (daftar & detail), Test Drive, Simulasi Kredit, Tentang Kami, Kontak (info + WhatsApp + Maps, tanpa form/tabel), Servis (JAF Service), Login, Register, Pengajuan Saya, Servis Saya, Profil.
+- Admin: Dashboard, Mobil (+gambar), Merek, Kategori, Promo, Test Drive, Pengajuan, Booking Servis, Layanan Servis, Pengguna, Laporan (Phase 15).
 
 ## 4. Kartu Mobil & Filter
 - Kartu: gambar utama; badge Baru/Bekas, Promo, Stok Habis; merek · kategori, nama, tahun; transmisi, BBM, km (bekas); harga coret + harga promo; "Cicilan mulai Rp x/bln"; tombol Detail.
@@ -44,11 +44,20 @@ Status: disepakati (25 Sep 2026). Acuan untuk semua anggota tim.
 - Contoh: Rp 300 jt, DP Rp 60 jt, 36 bln → Rp 7.867.000/bln.
 - Satu class `CreditCalculator` (baca config/credit.php) + versi JS untuk hitung live.
 
+### JAF Service (booking servis, tambahan atas permintaan dosen)
+- Tabel `services` (master layanan: nama, slug, deskripsi, `price_from` nullable = "Hubungi dealer", `duration_minutes`, `is_active`) dan `service_bookings` (user, layanan, `vehicle_model`, `plate_number`, tahun, km, jadwal, nomor WA, keluhan, status, `admin_note`). Kendaraan diketik customer, tidak terhubung ke `cars`.
+- FK: `service_bookings.service_id` restrict (layanan yang sudah dipakai tidak bisa dihapus, cukup dinonaktifkan); `user_id` cascade.
+- Wajib login (admin tidak bisa booking). Tanggal besok s/d +30 hari, slot 08:00–15:00 WIB per jam.
+- Kapasitas bengkel: maksimal `config('dealer.service_slot_capacity')` = 3 booking aktif per slot; satu plat nomor hanya satu booking aktif. Aktif = pending/confirmed/in_progress.
+- Status: pending → confirmed/cancelled → in_progress (mulai tanggal jadwal) → completed. Customer batal hanya saat pending; admin wajib catatan saat membatalkan.
+- Aturan dicek di `ServiceBookingRequest`, lalu dicek ulang di `App\Actions\BookService` dalam transaksi + `lockForUpdate`. Rate limit `service-booking` 5/menit per user.
+- Tidak termasuk (tahap lanjutan sesuai proposal): pengingat servis, notifikasi, jadwal mekanik.
+
 ## 6. Struktur Blade & Route
 - Layouts: app, admin, auth (CDN hanya di layout). Partials: navbar, footer, flash, admin-sidebar, breadcrumb. Components: car-card, status-badge, price, promo-card, filter-sidebar, credit-summary, stat-card, form/*, empty-state.
-- Public: /, /mobil, /mobil/{slug}, /promo, /promo/{slug}, /simulasi-kredit, /tentang-kami, /kontak, /login, /register, /logout.
-- Customer (auth): /test-drive, /mobil/{slug}/ajukan, /akun/test-drive (riwayat), /akun/pengajuan, PATCH /akun/test-drive/{id}/batal, PATCH /akun/pengajuan/{id}/batal, /akun/profil.
-- Admin (auth + admin, prefix /admin), URL berbahasa Indonesia, controller berbahasa Inggris: dashboard, mobil, merek, kategori, promo, test-drive, pengajuan, pengguna, laporan; hapus gambar & jadikan gambar utama.
+- Public: /, /mobil, /mobil/{slug}, /promo, /promo/{slug}, /simulasi-kredit, /servis, /tentang-kami, /kontak, /login, /register, /logout.
+- Customer (auth): /test-drive, /servis/booking, /mobil/{slug}/ajukan, /akun/test-drive (riwayat), /akun/servis (riwayat servis), /akun/pengajuan, PATCH /akun/test-drive/{id}/batal, PATCH /akun/servis/{id}/batal, PATCH /akun/pengajuan/{id}/batal, /akun/profil.
+- Admin (auth + admin, prefix /admin), URL berbahasa Indonesia, controller berbahasa Inggris: dashboard, mobil, merek, kategori, promo, test-drive, pengajuan, servis (booking), layanan (master), pengguna, laporan; hapus gambar & jadikan gambar utama.
 - Login diberi rate limit (throttle). Upload gambar di disk public (`php artisan storage:link`).
 
 ## 7. Prioritas
@@ -130,5 +139,6 @@ Status: disepakati (25 Sep 2026). Acuan untuk semua anggota tim.
   - Riwayat: hanya milik user login, 10 per halaman, eager load mobil + merek + gambar utama (jumlah query tetap); status badge, catatan customer, catatan dealer (`admin_note`). Batalkan hanya saat pending (`canBeCancelledByCustomer()`), transaksi + `lockForUpdate`; klik ganda → pesan "sudah dibatalkan"; milik orang lain → 404; `admin_note` tidak diubah.
   - `public/js/app.js`: `form[data-confirm]` (konfirmasi batal) dan `form[data-disable-on-submit]` (cegah kirim ganda, tombol dipulihkan saat kembali lewat bfcache).
   - Navbar: menu Test Drive tampil; dropdown customer "Test Drive Saya".
+- JAF Service (permintaan dosen, 8 Okt 2026) selesai dalam 4 tahap: S1 migration `services` & `service_bookings` + model + seeder (6 layanan sesuai proposal; booking dummy hanya local/testing); S2 admin `/admin/layanan` (`admin.services.*`) & `/admin/servis` (`admin.service-bookings.*`); S3 publik `/servis` (`services.index`), `/servis/booking` (`service-bookings.*`), `/akun/servis` (`account.service-bookings.*`), menu navbar Servis & dropdown "Servis Saya"; S4 kartu "Servis Pending" + "Booking Servis Terdekat" di dashboard, kolom & riwayat servis di halaman pengguna, bagian "Booking Servis per Status" & "Layanan Servis Terpopuler" di laporan + CSV (menurut tanggal jadwal). Badge status `in_progress` = "Dikerjakan".
 - Urutan berikutnya: seluruh halaman admin sudah selesai; halaman publik: layout + beranda + katalog ✓ → detail mobil ✓ → test drive ✓ → promo → simulasi kredit → pengajuan pembelian → akun customer (pengajuan saya, profil).
-- Konvensi nama route admin (menu sidebar muncul otomatis bila route ada): `admin.cars.*`, `admin.brands.*`, `admin.categories.*`, `admin.promos.*`, `admin.test-drives.*`, `admin.purchase-requests.*`, `admin.users.*`, `admin.reports.*`.
+- Konvensi nama route admin (menu sidebar muncul otomatis bila route ada): `admin.cars.*`, `admin.brands.*`, `admin.categories.*`, `admin.promos.*`, `admin.test-drives.*`, `admin.purchase-requests.*`, `admin.service-bookings.*`, `admin.services.*`, `admin.users.*`, `admin.reports.*`.

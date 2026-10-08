@@ -12,7 +12,7 @@
         <p class="text-muted mb-0">{{ now()->translatedFormat('l, d F Y') }}</p>
     </div>
 
-    <div class="row row-cols-1 row-cols-sm-2 row-cols-xl-5 g-3 mb-4">
+    <div class="row row-cols-1 row-cols-sm-2 row-cols-lg-3 row-cols-xxl-6 g-3 mb-4">
         <div class="col">
             <x-stat-card label="Mobil Aktif" :value="$stats['active_cars']" icon="bi-car-front" color="navy" :href="route('admin.cars.index', ['status' => 'aktif'])" />
         </div>
@@ -24,6 +24,9 @@
         </div>
         <div class="col">
             <x-stat-card label="Pengajuan Pending" :value="$stats['pending_purchases']" icon="bi-hourglass-split" color="yellow" :href="Route::has('admin.purchase-requests.index') ? route('admin.purchase-requests.index', ['status' => 'pending']) : null" />
+        </div>
+        <div class="col">
+            <x-stat-card label="Servis Pending" :value="$stats['pending_service_bookings']" icon="bi-wrench-adjustable" color="yellow" :href="Route::has('admin.service-bookings.index') ? route('admin.service-bookings.index', ['status' => 'pending']) : null" />
         </div>
         <div class="col">
             <x-stat-card label="Customer" :value="$stats['customers']" icon="bi-people" color="green"
@@ -121,6 +124,51 @@
                     @endif
                 </div>
             </div>
+        </div>
+    </div>
+
+    <div class="card mt-4">
+        <div class="card-header bg-transparent border-0 d-flex align-items-center justify-content-between pt-3 px-3">
+            <h3 class="h6 mb-0">Booking Servis Terdekat</h3>
+            @if ($url = $routeOrNull('admin.service-bookings.index'))
+                <a href="{{ $url }}" class="small">Lihat semua</a>
+            @endif
+        </div>
+        <div class="card-body p-0">
+            @if ($upcomingServiceBookings->isEmpty())
+                <x-empty-state icon="bi-wrench-adjustable" title="Belum ada jadwal servis" message="Booking servis mendatang akan muncul di sini." />
+            @else
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0 admin-table">
+                        <thead>
+                            <tr>
+                                <th>Jadwal</th>
+                                <th>Customer</th>
+                                <th>Kendaraan</th>
+                                <th>Layanan</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($upcomingServiceBookings as $booking)
+                                <tr>
+                                    <td class="text-nowrap">
+                                        {{ $booking->preferred_date->translatedFormat('d M Y') }}
+                                        <div class="small text-muted">{{ $booking->timeLabel() }} WIB</div>
+                                    </td>
+                                    <td>{{ $booking->user->name }}</td>
+                                    <td>
+                                        {{ $booking->vehicle_model }}
+                                        <div class="small text-muted">{{ $booking->plate_number }}</div>
+                                    </td>
+                                    <td>{{ $booking->service->name }}</td>
+                                    <td><x-status-badge :status="$booking->status" /></td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
+            @endif
         </div>
     </div>
 @endsection
