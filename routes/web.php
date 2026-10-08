@@ -17,6 +17,7 @@ use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\CreditSimulationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\ServiceBookingController;
@@ -35,6 +36,7 @@ Route::get('/mobil', [CarController::class, 'index'])->name('cars.index');
 Route::get('/mobil/{car:slug}', [CarController::class, 'show'])->name('cars.show');
 Route::get('/promo', [PromoController::class, 'index'])->name('promos.index');
 Route::get('/promo/{promo:slug}', [PromoController::class, 'show'])->name('promos.show');
+Route::get('/simulasi-kredit', [CreditSimulationController::class, 'index'])->name('credit.index');
 Route::get('/servis', [ServiceController::class, 'index'])->name('services.index');
 
 /*

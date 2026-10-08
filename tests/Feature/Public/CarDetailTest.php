@@ -244,11 +244,15 @@ class CarDetailTest extends TestCase
         $this->assertFalse($car->canBeTestDriven());
     }
 
-    public function test_tombol_ajukan_dan_simulasi_belum_tampil_selama_route_belum_ada(): void
+    public function test_tombol_simulasi_menaut_ke_halaman_simulasi_dan_ajukan_belum_tampil(): void
     {
-        $this->detail($this->car())
-            ->assertDontSee('Ajukan Pembelian')
-            ->assertDontSee('Hitung simulasi sendiri');
+        $car = $this->car();
+
+        $this->detail($car)
+            ->assertSee('Hitung simulasi sendiri')
+            ->assertSee('href="'.route('credit.index', ['mobil' => $car->slug]).'"', false)
+            // Route pengajuan pembelian belum dibuat.
+            ->assertDontSee('Ajukan Pembelian');
     }
 
     public function test_tombol_booking_test_drive_menaut_ke_form(): void
