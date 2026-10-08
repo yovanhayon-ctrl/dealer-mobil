@@ -16,8 +16,10 @@ use App\Http\Controllers\Admin\ServiceBookingController as AdminServiceBookingCo
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\TestDriveController as AdminTestDriveController;
 use App\Http\Controllers\Admin\UserController;
+use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
+use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\CreditSimulationController;
 use App\Http\Controllers\HomeController;
@@ -56,7 +58,19 @@ Route::middleware('guest')->group(function () {
     Route::post('/login', [LoginController::class, 'store'])->name('login.store');
 
     Route::get('/register', [RegisterController::class, 'create'])->name('register');
-    Route::post('/register', [RegisterController::class, 'store'])->name('register.store');
+    Route::post('/register', [RegisterController::class, 'store'])
+        ->middleware('throttle:register')
+        ->name('register.store');
+
+    // Lupa / reset kata sandi (nama route password.reset dipakai notifikasi ResetPassword bawaan Laravel).
+    Route::get('/lupa-kata-sandi', [ForgotPasswordController::class, 'create'])->name('password.request');
+    Route::post('/lupa-kata-sandi', [ForgotPasswordController::class, 'store'])
+        ->middleware('throttle:password-reset')
+        ->name('password.email');
+    Route::get('/reset-kata-sandi/{token}', [ResetPasswordController::class, 'create'])->name('password.reset');
+    Route::post('/reset-kata-sandi', [ResetPasswordController::class, 'store'])
+        ->middleware('throttle:password-reset')
+        ->name('password.update');
 });
 
 Route::post('/logout', [LoginController::class, 'destroy'])

@@ -451,6 +451,24 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 
 ---
 
+## Keamanan
+
+Sudah diterapkan (Phase 16):
+
+- Hak akses: semua route `/admin/*` memakai middleware `auth` + `admin`; data milik customer lain → 404.
+- CSRF di semua form, output Blade di-escape (`{{ }}`), query memakai parameter binding, `$fillable` (kolom `role` tidak bisa diisi dari form).
+- Upload hanya jpg/jpeg/png/webp (tanpa SVG), ukuran & dimensi dibatasi, nama file acak.
+- Rate limit: login (5/menit per email+IP), registrasi & lupa/reset kata sandi (5/menit per IP), booking test drive/servis, pengajuan, ganti kata sandi.
+- Redirect setelah login/daftar hanya ke URL di dalam aplikasi (mencegah *open redirect*).
+- Lupa kata sandi di `/lupa-kata-sandi` (pesan selalu sama agar email terdaftar tidak bisa ditebak; token sekali pakai, kedaluwarsa 60 menit). Di lokal `MAIL_MAILER=log`, tautan reset ada di `storage/logs/laravel.log`.
+- Header keamanan di semua response (`App\Http\Middleware\SecurityHeaders`): Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, HSTS (khusus HTTPS); header `X-Powered-By` dihapus.
+  Jika menambah CDN/script baru, tambahkan domainnya ke `SecurityHeaders::CONTENT_SECURITY_POLICY`. Jangan memakai `<script>` inline atau atribut `onclick`; taruh JavaScript di `public/js`.
+
+Wajib saat production (Phase 19):
+
+- `.env`: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `LOG_LEVEL=warning`, `SESSION_SECURE_COOKIE=true`, dan `MAIL_MAILER` ke SMTP sungguhan.
+- Server: `expose_php = Off` di `php.ini`, `ServerTokens Prod` dan `ServerSignature Off` di Apache (menyembunyikan versi PHP/Apache), serta HTTPS.
+
 ## Progress Project
 
 | Phase | Tahap                            | Status          |
@@ -470,7 +488,7 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 13    | Simulasi kredit       | ✅ Selesai (`/simulasi-kredit`, hitung live + tabel tenor) |
 | 14    | Promo                 | ✅ Selesai (admin + halaman publik `/promo` & detail) |
 | 15    | Dashboard & laporan   | ✅ Admin selesai (dashboard, daftar pengguna, laporan) |
-| 16    | Security              | ⏳                   |
+| 16    | Security              | ✅ Selesai (audit + perbaikan, lihat bagian Keamanan) |
 | 17    | Testing               | ⏳                   |
 | 18    | Optimization          | ⏳                   |
 | 19    | Deployment            | ⏳                   |
