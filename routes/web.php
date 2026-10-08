@@ -9,6 +9,8 @@ use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PromoController;
 use App\Http\Controllers\Admin\PurchaseRequestController;
 use App\Http\Controllers\Admin\ReportController;
+use App\Http\Controllers\Admin\ServiceBookingController as AdminServiceBookingController;
+use App\Http\Controllers\Admin\ServiceController;
 use App\Http\Controllers\Admin\TestDriveController as AdminTestDriveController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\LoginController;
@@ -118,6 +120,18 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/', 'index')->name('index');
         Route::get('{purchaseRequest}', 'show')->name('show');
         Route::patch('{purchaseRequest}/status', 'updateStatus')->name('update-status');
+    });
+
+    // JAF Service: master layanan (CRUD) + booking servis dari customer (lihat & ubah status).
+    Route::resource('layanan', ServiceController::class)
+        ->except('show')
+        ->parameters(['layanan' => 'service'])
+        ->names('services');
+
+    Route::controller(AdminServiceBookingController::class)->prefix('servis')->name('service-bookings.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{serviceBooking}', 'show')->name('show');
+        Route::patch('{serviceBooking}/status', 'updateStatus')->name('update-status');
     });
 
     // Laporan (hanya baca) + export CSV dengan periode yang sama.
