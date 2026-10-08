@@ -29,10 +29,13 @@
             @enderror
         </div>
 
-        <div class="form-check mb-4">
-            <input type="checkbox" id="remember" name="remember" value="1" class="form-check-input"
-                   @checked(old('remember'))>
-            <label for="remember" class="form-check-label">Ingat saya</label>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div class="form-check mb-0">
+                <input type="checkbox" id="remember" name="remember" value="1" class="form-check-input"
+                       @checked(old('remember'))>
+                <label for="remember" class="form-check-label">Ingat saya</label>
+            </div>
+            <a href="{{ route('password.request') }}" class="small">Lupa kata sandi?</a>
         </div>
 
         <button type="submit" class="btn btn-primary w-100">

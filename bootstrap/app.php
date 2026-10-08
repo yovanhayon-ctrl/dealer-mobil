@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureUserIsAdmin;
+use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -16,6 +17,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
         ]);
+
+        // Header keamanan (CSP, X-Frame-Options, dll.) untuk semua response, termasuk 404
+        // (URL tanpa route tidak melewati grup middleware "web").
+        $middleware->append(SecurityHeaders::class);
 
         // User yang sudah login dan membuka /login atau /register.
         $middleware->redirectUsersTo(
