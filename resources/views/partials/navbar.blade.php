@@ -6,6 +6,7 @@
         ['route' => 'promos.index', 'label' => 'Promo', 'active' => 'promos.*'],
         ['route' => 'credit.index', 'label' => 'Simulasi Kredit', 'active' => 'credit.*'],
         ['route' => 'test-drives.create', 'label' => 'Test Drive', 'active' => 'test-drives.*'],
+        ['route' => 'services.index', 'label' => 'Servis', 'active' => ['services.*', 'service-bookings.*']],
         ['route' => 'about', 'label' => 'Tentang Kami', 'active' => 'about'],
         ['route' => 'contact', 'label' => 'Kontak', 'active' => 'contact'],
     ];
@@ -67,6 +68,13 @@
                                 <li>
                                     <a class="dropdown-item" href="{{ route('account.test-drives.index') }}">
                                         <i class="bi bi-calendar-check me-2"></i>Test Drive Saya
+                                    </a>
+                                </li>
+                            @endif
+                            @if (! auth()->user()->isAdmin() && Route::has('account.service-bookings.index'))
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('account.service-bookings.index') }}">
+                                        <i class="bi bi-wrench-adjustable me-2"></i>Servis Saya
                                     </a>
                                 </li>
                             @endif

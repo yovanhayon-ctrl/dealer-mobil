@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\ServiceBookingController;
 use App\Http\Controllers\TestDriveController;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
@@ -43,5 +44,11 @@ class AppServiceProvider extends ServiceProvider
             ->response(fn () => redirect()->back(fallback: route('test-drives.create'))
                 ->withInput()
                 ->with('error', 'Terlalu banyak percobaan booking. Coba lagi dalam 1 menit.')));
+
+        RateLimiter::for('service-booking', fn (Request $request) => Limit::perMinute(ServiceBookingController::MAX_BOOKINGS_PER_MINUTE)
+            ->by('service-booking:'.$request->user()?->id)
+            ->response(fn () => redirect()->back(fallback: route('service-bookings.create'))
+                ->withInput()
+                ->with('error', 'Terlalu banyak percobaan booking servis. Coba lagi dalam 1 menit.')));
     }
 }
