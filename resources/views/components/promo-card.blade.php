@@ -1,8 +1,9 @@
 {{--
     Kartu promo publik: <x-promo-card :promo="$promo" />
     Promo khusus mobil memerlukan eager load `car.brand`.
+    :show-remaining="true" menampilkan sisa waktu promo (mis. "Berakhir dalam 3 hari").
 --}}
-@props(['promo'])
+@props(['promo', 'showRemaining' => false])
 
 @php
     $detailUrl = Route::has('promos.show') ? route('promos.show', $promo) : null;
@@ -29,6 +30,9 @@
             <i class="bi bi-calendar-event"></i>
             {{ $promo->start_date->translatedFormat('d M Y') }} – {{ $promo->end_date->translatedFormat('d M Y') }}
         </p>
+        @if ($showRemaining && ($remaining = $promo->remainingLabel()))
+            <p class="small fw-semibold text-accent mb-2"><i class="bi bi-hourglass-split"></i> {{ $remaining }}</p>
+        @endif
 
         @if ($promo->isGeneral())
             <span class="badge rounded-pill badge-status-muted">Promo umum</span>
