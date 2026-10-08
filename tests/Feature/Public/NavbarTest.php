@@ -38,7 +38,8 @@ class NavbarTest extends TestCase
         // Route belum dibuat: menu disembunyikan.
         $this->assertStringContainsString('href="'.route('test-drives.create').'"', $navbar);
         $this->assertStringContainsString('href="'.route('promos.index').'"', $navbar);
-        foreach (['Simulasi Kredit', 'Tentang Kami', 'Kontak', 'Dashboard Admin', 'Keluar', 'Test Drive Saya'] as $label) {
+        $this->assertStringContainsString('href="'.route('credit.index').'"', $navbar);
+        foreach (['Tentang Kami', 'Kontak', 'Dashboard Admin', 'Keluar', 'Test Drive Saya'] as $label) {
             $this->assertStringNotContainsString($label, $navbar);
         }
     }
