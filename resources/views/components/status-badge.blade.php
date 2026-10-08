@@ -6,6 +6,7 @@
         'pending' => ['Menunggu', 'yellow'],
         'confirmed' => ['Dikonfirmasi', 'blue'],
         'processing' => ['Diproses', 'blue'],
+        'in_progress' => ['Dikerjakan', 'blue'],
         'approved' => ['Disetujui', 'green'],
         'completed' => ['Selesai', 'green'],
         'rejected' => ['Ditolak', 'red'],
