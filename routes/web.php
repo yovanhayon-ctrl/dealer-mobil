@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\PurchaseRequestController as AccountPurchaseRequestController;
 use App\Http\Controllers\Account\ServiceBookingController as AccountServiceBookingController;
 use App\Http\Controllers\Account\TestDriveController as AccountTestDriveController;
@@ -85,6 +86,12 @@ Route::middleware('auth')->group(function () {
         ->name('service-bookings.store');
 
     Route::prefix('akun')->name('account.')->group(function () {
+        Route::get('profil', [ProfileController::class, 'edit'])->name('profile');
+        Route::patch('profil', [ProfileController::class, 'update'])->name('profile.update');
+        Route::put('profil/password', [ProfileController::class, 'updatePassword'])
+            ->middleware('throttle:6,1')
+            ->name('profile.password');
+
         Route::get('test-drive', [AccountTestDriveController::class, 'index'])->name('test-drives.index');
         Route::patch('test-drive/{testDrive}/batal', [AccountTestDriveController::class, 'cancel'])->name('test-drives.cancel');
 
