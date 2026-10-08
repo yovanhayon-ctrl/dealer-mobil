@@ -78,9 +78,9 @@
                                     </a>
                                 </li>
                             @endif
-                            @if (Route::has('account.requests'))
+                            @if (! auth()->user()->isAdmin() && Route::has('account.purchase-requests.index'))
                                 <li>
-                                    <a class="dropdown-item" href="{{ route('account.requests') }}">
+                                    <a class="dropdown-item" href="{{ route('account.purchase-requests.index') }}">
                                         <i class="bi bi-card-checklist me-2"></i>Pengajuan Saya
                                     </a>
                                 </li>

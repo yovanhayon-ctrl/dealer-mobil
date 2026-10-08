@@ -4,7 +4,45 @@
  *   Pokok = Harga − DP; Bunga = Pokok × rate% × (tenor/12);
  *   Cicilan = (Pokok + Bunga) / tenor, dibulatkan ke atas per `rounding`.
  * Tanpa JavaScript form tetap bekerja (GET, dihitung server).
+ *
+ * window.DealerCredit.create(element) membaca data-rates, data-dp-min, data-dp-max, data-rounding
+ * dari elemen dan juga dipakai form pengajuan pembelian (public/js/purchase-request.js).
  */
+window.DealerCredit = {
+    create: function (element) {
+        var rates = JSON.parse(element.getAttribute('data-rates'));
+        var dpMin = BigInt(element.getAttribute('data-dp-min'));
+        var dpMax = BigInt(element.getAttribute('data-dp-max'));
+        var rounding = BigInt(element.getAttribute('data-rounding'));
+
+        return {
+            rates: rates,
+            minDownPayment: function (price) { return (price * dpMin + 99n) / 100n; },
+            maxDownPayment: function (price) { return (price * dpMax) / 100n; },
+            calculate: function (price, downPayment, tenor) {
+                var rate = rates[tenor];
+                var rateBasisPoints = BigInt(Math.round(rate * 100));
+                var months = BigInt(tenor);
+                var principal = price - downPayment;
+                var totalScaled = principal * 120000n + principal * rateBasisPoints * months;
+                var divisor = 120000n * months * rounding;
+                var monthly = ((totalScaled + divisor - 1n) / divisor) * rounding;
+
+                return {
+                    price: price,
+                    down_payment: downPayment,
+                    principal: principal,
+                    tenor_months: tenor,
+                    interest_rate: rate,
+                    interest_total: (principal * rateBasisPoints * months + 60000n) / 120000n,
+                    monthly_installment: monthly,
+                    total_payment: downPayment + monthly * months
+                };
+            }
+        };
+    }
+};
+
 document.addEventListener('DOMContentLoaded', function () {
     var form = document.querySelector('[data-credit-form]');
 
@@ -12,10 +50,8 @@ document.addEventListener('DOMContentLoaded', function () {
         return;
     }
 
-    var rates = JSON.parse(form.getAttribute('data-rates'));
-    var dpMin = BigInt(form.getAttribute('data-dp-min'));
-    var dpMax = BigInt(form.getAttribute('data-dp-max'));
-    var rounding = BigInt(form.getAttribute('data-rounding'));
+    var credit = window.DealerCredit.create(form);
+    var rates = credit.rates;
     var minPrice = BigInt(form.getAttribute('data-min-price'));
     var maxPrice = BigInt(form.getAttribute('data-max-price'));
 
@@ -51,29 +87,10 @@ document.addEventListener('DOMContentLoaded', function () {
         return carSelect.value !== '' && option ? BigInt(option.getAttribute('data-price')) : digits(priceInput);
     };
 
-    var minDownPayment = function (price) { return (price * dpMin + 99n) / 100n; };
-    var maxDownPayment = function (price) { return (price * dpMax) / 100n; };
-
-    var calculate = function (price, downPayment, tenor) {
-        var rate = rates[tenor];
-        var rateBasisPoints = BigInt(Math.round(rate * 100));
-        var months = BigInt(tenor);
-        var principal = price - downPayment;
-        var totalScaled = principal * 120000n + principal * rateBasisPoints * months;
-        var divisor = 120000n * months * rounding;
-        var monthly = ((totalScaled + divisor - 1n) / divisor) * rounding;
-
-        return {
-            price: price,
-            down_payment: downPayment,
-            principal: principal,
-            tenor_months: tenor,
-            interest_rate: rate,
-            interest_total: (principal * rateBasisPoints * months + 60000n) / 120000n,
-            monthly_installment: monthly,
-            total_payment: downPayment + monthly * months
-        };
-    };
+    var minDownPayment = credit.minDownPayment;
+    var maxDownPayment = credit.maxDownPayment;
+    var calculate = credit.calculate;
+    var applyLink = document.querySelector('[data-credit-apply]');
 
     var showResult = function (visible) {
         resultBox.classList.toggle('d-none', !visible);
@@ -119,6 +136,14 @@ document.addEventListener('DOMContentLoaded', function () {
             row.classList.toggle('table-active', months === tenor);
             row.classList.toggle('fw-semibold', months === tenor);
         });
+
+        // Tombol "Ajukan dengan simulasi ini" membawa DP & tenor terbaru.
+        if (applyLink) {
+            var url = new URL(applyLink.href);
+            url.searchParams.set('dp', downPayment.toString());
+            url.searchParams.set('tenor', String(tenor));
+            applyLink.href = url.toString();
+        }
 
         showResult(true);
     };

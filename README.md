@@ -466,7 +466,7 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 9     | Search & filter       | ✅ Selesai (filter & urutan lengkap) |
 | 10    | Detail mobil          | ✅ Selesai (tombol Ajukan/Test Drive/Simulasi tampil setelah route-nya dibuat) |
 | 11    | Test drive            | ✅ Selesai (admin + booking & riwayat customer) |
-| 12    | Pengajuan pembelian   | 🟡 Admin selesai (publik menyusul) |
+| 12    | Pengajuan pembelian   | ✅ Selesai (admin + form `/mobil/{slug}/ajukan` & Pengajuan Saya) |
 | 13    | Simulasi kredit       | ✅ Selesai (`/simulasi-kredit`, hitung live + tabel tenor) |
 | 14    | Promo                 | ✅ Selesai (admin + halaman publik `/promo` & detail) |
 | 15    | Dashboard & laporan   | ✅ Admin selesai (dashboard, daftar pengguna, laporan) |
@@ -477,7 +477,7 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | +     | Branding JAF Dealer            | ✅ Selesai (nama & tagline, warna hitam + merah Nissan, data contoh Nissan & klasik Jepang, filter warna) |
 | +     | JAF Service (permintaan dosen) | ✅ Selesai (layanan servis, booking, riwayat, admin, dashboard, laporan) |
 
-> **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`. Promo berjalan tampil di `/promo` (filter Semua/Khusus Mobil/Promo Umum) dan detailnya di `/promo/{slug}`. Simulasi kredit bunga flat di `/simulasi-kredit` (tanpa login; pilih mobil atau isi harga, DP, tenor).
+> **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`. Promo berjalan tampil di `/promo` (filter Semua/Khusus Mobil/Promo Umum) dan detailnya di `/promo/{slug}`. Simulasi kredit bunga flat di `/simulasi-kredit` (tanpa login; pilih mobil atau isi harga, DP, tenor). Customer mengajukan pembelian cash/kredit di `/mobil/{slug}/ajukan` (hasil simulasi bisa ikut terbawa) dan memantau/membatalkan di `/akun/pengajuan`.
 
 > **JAF Service:** daftar layanan servis di `/servis`, booking servis di `/servis/booking` (wajib login), riwayat & pembatalan di `/akun/servis`. Admin mengelola layanan di `/admin/layanan` dan booking di `/admin/servis`; ringkasan servis tampil di dashboard, detail pengguna, laporan, dan export CSV. Setelah pull, jalankan `php artisan migrate` lalu `php artisan db:seed --class=ServiceSeeder`.
 

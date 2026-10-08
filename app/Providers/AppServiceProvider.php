@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\ServiceBookingController;
 use App\Http\Controllers\TestDriveController;
 use Illuminate\Cache\RateLimiting\Limit;
@@ -44,6 +45,12 @@ class AppServiceProvider extends ServiceProvider
             ->response(fn () => redirect()->back(fallback: route('test-drives.create'))
                 ->withInput()
                 ->with('error', 'Terlalu banyak percobaan booking. Coba lagi dalam 1 menit.')));
+
+        RateLimiter::for('purchase-request', fn (Request $request) => Limit::perMinute(PurchaseRequestController::MAX_SUBMISSIONS_PER_MINUTE)
+            ->by('purchase-request:'.$request->user()?->id)
+            ->response(fn () => redirect()->back(fallback: route('cars.index'))
+                ->withInput()
+                ->with('error', 'Terlalu banyak percobaan pengajuan. Coba lagi dalam 1 menit.')));
 
         RateLimiter::for('service-booking', fn (Request $request) => Limit::perMinute(ServiceBookingController::MAX_BOOKINGS_PER_MINUTE)
             ->by('service-booking:'.$request->user()?->id)

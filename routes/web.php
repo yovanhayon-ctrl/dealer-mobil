@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Account\PurchaseRequestController as AccountPurchaseRequestController;
 use App\Http\Controllers\Account\ServiceBookingController as AccountServiceBookingController;
 use App\Http\Controllers\Account\TestDriveController as AccountTestDriveController;
 use App\Http\Controllers\Admin\BrandController;
@@ -8,7 +9,7 @@ use App\Http\Controllers\Admin\CarImageController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\PromoController as AdminPromoController;
-use App\Http\Controllers\Admin\PurchaseRequestController;
+use App\Http\Controllers\Admin\PurchaseRequestController as AdminPurchaseRequestController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ServiceBookingController as AdminServiceBookingController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
@@ -20,6 +21,7 @@ use App\Http\Controllers\CarController;
 use App\Http\Controllers\CreditSimulationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PromoController;
+use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\ServiceBookingController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TestDriveController;
@@ -69,6 +71,11 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:test-drive-booking')
         ->name('test-drives.store');
 
+    Route::get('/mobil/{car:slug}/ajukan', [PurchaseRequestController::class, 'create'])->name('purchase-requests.create');
+    Route::post('/mobil/{car:slug}/ajukan', [PurchaseRequestController::class, 'store'])
+        ->middleware('throttle:purchase-request')
+        ->name('purchase-requests.store');
+
     Route::get('/servis/booking', [ServiceBookingController::class, 'create'])->name('service-bookings.create');
     Route::post('/servis/booking', [ServiceBookingController::class, 'store'])
         ->middleware('throttle:service-booking')
@@ -77,6 +84,9 @@ Route::middleware('auth')->group(function () {
     Route::prefix('akun')->name('account.')->group(function () {
         Route::get('test-drive', [AccountTestDriveController::class, 'index'])->name('test-drives.index');
         Route::patch('test-drive/{testDrive}/batal', [AccountTestDriveController::class, 'cancel'])->name('test-drives.cancel');
+
+        Route::get('pengajuan', [AccountPurchaseRequestController::class, 'index'])->name('purchase-requests.index');
+        Route::patch('pengajuan/{purchaseRequest}/batal', [AccountPurchaseRequestController::class, 'cancel'])->name('purchase-requests.cancel');
 
         Route::get('servis', [AccountServiceBookingController::class, 'index'])->name('service-bookings.index');
         Route::patch('servis/{serviceBooking}/batal', [AccountServiceBookingController::class, 'cancel'])->name('service-bookings.cancel');
@@ -133,7 +143,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::patch('{testDrive}/status', 'updateStatus')->name('update-status');
     });
 
-    Route::controller(PurchaseRequestController::class)->prefix('pengajuan')->name('purchase-requests.')->group(function () {
+    Route::controller(AdminPurchaseRequestController::class)->prefix('pengajuan')->name('purchase-requests.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('{purchaseRequest}', 'show')->name('show');
         Route::patch('{purchaseRequest}/status', 'updateStatus')->name('update-status');
