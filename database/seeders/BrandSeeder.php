@@ -9,11 +9,12 @@ use Illuminate\Support\Str;
 class BrandSeeder extends Seeder
 {
     /**
-     * Merek dummy (tanpa logo). Aman dijalankan ulang: merek yang sudah ada tidak diubah.
+     * Merek dummy (tanpa logo): Nissan sebagai fokus JAF Dealer + merek mobil klasik Jepang.
+     * Aman dijalankan ulang: merek yang sudah ada tidak diubah.
      */
     public function run(): void
     {
-        foreach (['Toyota', 'Honda', 'Daihatsu', 'Mitsubishi', 'Suzuki', 'Hyundai', 'Wuling'] as $name) {
+        foreach (['Nissan', 'Toyota', 'Honda', 'Mazda', 'Mitsubishi', 'Subaru'] as $name) {
             Brand::firstOrCreate(['name' => $name], ['slug' => Str::slug($name)]);
         }
     }

@@ -1,9 +1,9 @@
 {{--
     Form filter katalog (GET /mobil). Dipakai dua kali (sidebar desktop + offcanvas HP),
     jadi id input diberi awalan $idPrefix agar pasangan label/id tidak bentrok.
-    <x-filter-sidebar :filters="$filters" :brands="$brands" :categories="$categories" id-prefix="d_" />
+    <x-filter-sidebar :filters="$filters" :brands="$brands" :categories="$categories" :colors="$colors" id-prefix="d_" />
 --}}
-@props(['filters', 'brands', 'categories', 'idPrefix' => ''])
+@props(['filters', 'brands', 'categories', 'colors' => collect(), 'idPrefix' => ''])
 
 @php
     $id = fn (string $name) => "{$idPrefix}filter_{$name}";
@@ -14,6 +14,7 @@
         'kondisi' => ['Kondisi', \App\Models\Car::CONDITIONS, $filters->condition],
         'transmisi' => ['Transmisi', \App\Models\Car::TRANSMISSIONS, $filters->transmission],
         'bbm' => ['Bahan bakar', \App\Models\Car::FUEL_TYPES, $filters->fuelType],
+        'warna' => ['Warna', $colors->mapWithKeys(fn (string $color) => [$color => $color])->all(), $filters->color],
         'kursi' => [
             'Jumlah kursi',
             collect(\App\Catalog\CarCatalogFilters::SEAT_OPTIONS)->mapWithKeys(fn (int $seats) => [$seats => "{$seats} kursi"])->all(),

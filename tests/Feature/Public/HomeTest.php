@@ -138,7 +138,8 @@ class HomeTest extends TestCase
         $this->get(route('home'))
             ->assertOk()
             ->assertSee('<title>Beranda — Dealer Maju</title>', false)
-            ->assertSee('<meta name="description" content="Dealer Maju — mobil baru dan bekas pilihan', false);
+            ->assertSee('<meta name="description" content="Dealer Maju — Nissan Heritage &amp; Performance', false)
+            ->assertSee('Nissan Heritage &amp; Performance</p>', false);
     }
 
     public function test_jumlah_query_tetap_walau_data_bertambah(): void

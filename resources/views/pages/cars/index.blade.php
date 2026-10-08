@@ -55,7 +55,7 @@
             <aside class="col-lg-3 d-none d-lg-block" aria-label="Filter">
                 <div class="card filter-sidebar">
                     <div class="card-body p-3">
-                        <x-filter-sidebar :filters="$filters" :brands="$brands" :categories="$categories" id-prefix="d_" />
+                        <x-filter-sidebar :filters="$filters" :brands="$brands" :categories="$categories" :colors="$colors" id-prefix="d_" />
                     </div>
                 </div>
             </aside>
@@ -97,7 +97,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Tutup"></button>
         </div>
         <div class="offcanvas-body">
-            <x-filter-sidebar :filters="$filters" :brands="$brands" :categories="$categories" id-prefix="m_" />
+            <x-filter-sidebar :filters="$filters" :brands="$brands" :categories="$categories" :colors="$colors" id-prefix="m_" />
         </div>
     </div>
 @endsection

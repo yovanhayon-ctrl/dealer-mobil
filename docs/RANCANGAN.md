@@ -10,7 +10,8 @@ Status: disepakati (25 Sep 2026). Acuan untuk semua anggota tim.
 - `config/dealer.php` (dari .env, key juga di .env.example): DEALER_NAME, DEALER_TAGLINE, DEALER_ADDRESS, DEALER_PHONE, DEALER_WHATSAPP (62…), DEALER_EMAIL, DEALER_HOURS, DEALER_MAPS_EMBED_URL.
 
 ## 2. Identitas Visual
-- Warna: navy #0B2545 (utama), merah #D62828 (CTA), latar section #F4F6F9.
+- Identitas: **JAF Dealer — Nissan Heritage & Performance**, tagline "Dream the Legacy. Drive the Future." (DEALER_NAME / DEALER_TAGLINE di .env).
+- Warna: hitam #1C1C1E (utama, variabel `--dm-navy`), merah Nissan #C3002F (CTA, `--dm-red`), latar section #F4F6F9.
 - Font: Poppins (judul), Inter (isi). Override Bootstrap via CSS variables di `public/css/app.css`.
 - Tombol: navy (umum), merah (CTA), outline (sekunder), ikon di kiri.
 - Kartu: tanpa border, shadow tipis, rounded-4, gambar 16:9, efek angkat saat hover.
@@ -23,7 +24,7 @@ Status: disepakati (25 Sep 2026). Acuan untuk semua anggota tim.
 ## 4. Kartu Mobil & Filter
 - Kartu: gambar utama; badge Baru/Bekas, Promo, Stok Habis; merek · kategori, nama, tahun; transmisi, BBM, km (bekas); harga coret + harga promo; "Cicilan mulai Rp x/bln"; tombol Detail.
 - Stok 0 tetap tampil; tombol Ajukan dinonaktifkan + ditolak di server.
-- Filter: kata kunci, merek, kategori, kondisi, harga min–max, tahun min–max, transmisi, BBM, kursi, hanya promo.
+- Filter: kata kunci, merek, kategori, kondisi, harga min–max, tahun min–max, transmisi, BBM, warna (dari mobil aktif), kursi, hanya promo.
 - Urutan: terbaru, harga termurah/termahal, tahun, km. 12 per halaman.
 
 ## 5. Alur Bisnis
@@ -140,5 +141,6 @@ Status: disepakati (25 Sep 2026). Acuan untuk semua anggota tim.
   - `public/js/app.js`: `form[data-confirm]` (konfirmasi batal) dan `form[data-disable-on-submit]` (cegah kirim ganda, tombol dipulihkan saat kembali lewat bfcache).
   - Navbar: menu Test Drive tampil; dropdown customer "Test Drive Saya".
 - JAF Service (permintaan dosen, 8 Okt 2026) selesai dalam 4 tahap: S1 migration `services` & `service_bookings` + model + seeder (6 layanan sesuai proposal; booking dummy hanya local/testing); S2 admin `/admin/layanan` (`admin.services.*`) & `/admin/servis` (`admin.service-bookings.*`); S3 publik `/servis` (`services.index`), `/servis/booking` (`service-bookings.*`), `/akun/servis` (`account.service-bookings.*`), menu navbar Servis & dropdown "Servis Saya"; S4 kartu "Servis Pending" + "Booking Servis Terdekat" di dashboard, kolom & riwayat servis di halaman pengguna, bagian "Booking Servis per Status" & "Layanan Servis Terpopuler" di laporan + CSV (menurut tanggal jadwal). Badge status `in_progress` = "Dikerjakan".
+- Branding JAF Dealer (8 Okt 2026): nama & tagline proposal, palet hitam + merah Nissan, filter warna di katalog (`?warna=`), data contoh fokus Nissan (baru + heritage) ditambah mobil klasik Jepang lain (Toyota, Honda, Mazda, Mitsubishi, Subaru); kategori LCGC diganti Sport. Database lokal di-reset (`migrate:fresh --seed`).
 - Urutan berikutnya: seluruh halaman admin sudah selesai; halaman publik: layout + beranda + katalog ✓ → detail mobil ✓ → test drive ✓ → promo → simulasi kredit → pengajuan pembelian → akun customer (pengajuan saya, profil).
 - Konvensi nama route admin (menu sidebar muncul otomatis bila route ada): `admin.cars.*`, `admin.brands.*`, `admin.categories.*`, `admin.promos.*`, `admin.test-drives.*`, `admin.purchase-requests.*`, `admin.service-bookings.*`, `admin.services.*`, `admin.users.*`, `admin.reports.*`.

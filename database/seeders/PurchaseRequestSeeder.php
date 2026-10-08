@@ -122,7 +122,7 @@ class PurchaseRequestSeeder extends Seeder
     }
 
     /**
-     * Mobil untuk status approved/completed dipilih yang stoknya cukup; Fortuner (stok 0)
+     * Mobil untuk status approved/completed dipilih yang stoknya cukup; Leaf (stok 0)
      * dibiarkan pending untuk menampilkan peringatan stok habis di admin.
      *
      * @return array<int, array<string, mixed>>
@@ -133,26 +133,26 @@ class PurchaseRequestSeeder extends Seeder
         $approved = PurchaseRequest::STATUS_APPROVED;
 
         return [
-            ['email' => 'budi.santoso@example.test', 'car' => 'toyota-avanza-1-5-g-cvt-2025', 'method' => 'credit', 'dp' => 20, 'tenor' => 36,
+            ['email' => 'budi.santoso@example.test', 'car' => 'nissan-kicks-e-power-vl-2025', 'method' => 'credit', 'dp' => 20, 'tenor' => 36,
                 'path' => [], 'address' => 'Jl. Merdeka No. 10, Bandung', 'notes' => 'Mohon info promo terbaru.'],
-            ['email' => 'dewi.lestari@example.test', 'car' => 'mitsubishi-xpander-cross-premium-cvt-2025', 'method' => 'cash',
+            ['email' => 'dewi.lestari@example.test', 'car' => 'nissan-livina-vl-cvt-2025', 'method' => 'cash',
                 'path' => [], 'address' => 'Jl. Diponegoro No. 5, Semarang'],
-            ['email' => 'andi.pratama@example.test', 'car' => 'toyota-fortuner-2-8-gr-sport-2025', 'method' => 'cash',
+            ['email' => 'andi.pratama@example.test', 'car' => 'nissan-leaf-2025', 'method' => 'cash',
                 'path' => [], 'address' => 'Jl. Sudirman No. 21, Jakarta Pusat', 'notes' => 'Siap inden bila stok kosong.'],
-            ['email' => 'rizky.hidayat@example.test', 'car' => 'honda-hr-v-1-5-se-cvt-2025', 'method' => 'credit', 'dp' => 30, 'tenor' => 48,
+            ['email' => 'rizky.hidayat@example.test', 'car' => 'nissan-serena-e-power-highway-star-2025', 'method' => 'credit', 'dp' => 30, 'tenor' => 48,
                 'path' => [$processing], 'address' => 'Jl. Pemuda No. 8, Surabaya'],
-            ['email' => 'andi.pratama@example.test', 'car' => 'daihatsu-xenia-1-3-r-cvt-2025', 'method' => 'credit', 'dp' => 25, 'tenor' => 24,
+            ['email' => 'andi.pratama@example.test', 'car' => 'nissan-magnite-premium-cvt-2025', 'method' => 'credit', 'dp' => 25, 'tenor' => 24,
                 'path' => [$processing, $approved], 'address' => 'Jl. Sudirman No. 21, Jakarta Pusat'],
-            ['email' => 'nur.aisyah@example.test', 'car' => 'hyundai-creta-1-5-prime-ivt-2025', 'method' => 'cash',
+            ['email' => 'nur.aisyah@example.test', 'car' => 'nissan-navara-vl-4x4-at-2024', 'method' => 'cash',
                 'path' => [$processing, $approved, PurchaseRequest::STATUS_COMPLETED], 'address' => 'Jl. Gajah Mada No. 3, Medan',
                 'admin_note' => 'Unit sudah diserahterimakan.'],
-            ['email' => 'maya.putri@example.test', 'car' => 'honda-brio-satya-e-cvt-2025', 'method' => 'credit', 'dp' => 20, 'tenor' => 60,
+            ['email' => 'maya.putri@example.test', 'car' => 'nissan-x-trail-e-power-e-4orce-vl-2025', 'method' => 'credit', 'dp' => 20, 'tenor' => 60,
                 'path' => [PurchaseRequest::STATUS_REJECTED], 'address' => 'Jl. Malioboro No. 12, Yogyakarta',
                 'admin_note' => 'Dokumen penghasilan belum lengkap.'],
-            ['email' => 'agus.setiawan@example.test', 'car' => 'toyota-innova-zenix-2-0-q-hv-2025', 'method' => 'cash',
+            ['email' => 'agus.setiawan@example.test', 'car' => 'nissan-gt-r-premium-edition-2024', 'method' => 'cash',
                 'path' => [$processing, $approved, PurchaseRequest::STATUS_CANCELLED], 'address' => 'Jl. Asia Afrika No. 7, Bandung',
                 'admin_note' => 'Customer membatalkan setelah disetujui; unit dikembalikan ke stok.'],
-            ['email' => 'siti.rahmawati@example.test', 'car' => 'mitsubishi-pajero-sport-dakar-4x2-2021', 'method' => 'credit', 'dp' => 40, 'tenor' => 12,
+            ['email' => 'siti.rahmawati@example.test', 'car' => 'nissan-skyline-gt-r-v-spec-ii-r34-2000', 'method' => 'credit', 'dp' => 40, 'tenor' => 12,
                 'path' => [PurchaseRequest::STATUS_CANCELLED], 'address' => 'Jl. Ahmad Yani No. 45, Makassar',
                 'admin_note' => 'Customer memilih mobil lain.'],
         ];

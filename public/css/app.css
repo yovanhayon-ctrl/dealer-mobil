@@ -1,25 +1,26 @@
 /*
- * Dealer Mobil — override tema Bootstrap 5.3 via CSS variables.
- * Warna: navy #0B2545 (utama), merah #D62828 (CTA), latar section #F4F6F9.
+ * JAF Dealer — override tema Bootstrap 5.3 via CSS variables.
+ * Warna: hitam #1C1C1E (utama), merah Nissan #C3002F (CTA), latar section #F4F6F9.
+ * Nama variabel --dm-navy dipertahankan agar tidak perlu mengganti seluruh CSS; nilainya kini hitam.
  */
 
 :root {
-    --dm-navy: #0b2545;
-    --dm-navy-dark: #071a31;
-    --dm-red: #d62828;
-    --dm-red-dark: #b71f1f;
+    --dm-navy: #1c1c1e;
+    --dm-navy-dark: #0b0b0c;
+    --dm-red: #c3002f;
+    --dm-red-dark: #9c0026;
     --dm-bg: #f4f6f9;
     --dm-font-heading: 'Poppins', system-ui, -apple-system, 'Segoe UI', sans-serif;
     --dm-font-body: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
 
     --bs-primary: var(--dm-navy);
-    --bs-primary-rgb: 11, 37, 69;
+    --bs-primary-rgb: 28, 28, 30;
     --bs-danger: var(--dm-red);
-    --bs-danger-rgb: 214, 40, 40;
+    --bs-danger-rgb: 195, 0, 47;
     --bs-link-color: var(--dm-navy);
-    --bs-link-color-rgb: 11, 37, 69;
+    --bs-link-color-rgb: 28, 28, 30;
     --bs-link-hover-color: var(--dm-red);
-    --bs-link-hover-color-rgb: 214, 40, 40;
+    --bs-link-hover-color-rgb: 195, 0, 47;
     --bs-body-font-family: var(--dm-font-body);
     --bs-body-color: #212529;
     --bs-border-radius: .5rem;
@@ -71,7 +72,7 @@ main {
     --bs-btn-active-border-color: var(--dm-navy-dark);
     --bs-btn-disabled-bg: var(--dm-navy);
     --bs-btn-disabled-border-color: var(--dm-navy);
-    --bs-btn-focus-shadow-rgb: 11, 37, 69;
+    --bs-btn-focus-shadow-rgb: 28, 28, 30;
 }
 
 .btn-outline-primary {
@@ -81,7 +82,7 @@ main {
     --bs-btn-hover-border-color: var(--dm-navy);
     --bs-btn-active-bg: var(--dm-navy);
     --bs-btn-active-border-color: var(--dm-navy);
-    --bs-btn-focus-shadow-rgb: 11, 37, 69;
+    --bs-btn-focus-shadow-rgb: 28, 28, 30;
 }
 
 .btn-accent,
@@ -98,7 +99,7 @@ main {
     --bs-btn-disabled-color: #fff;
     --bs-btn-disabled-bg: var(--dm-red);
     --bs-btn-disabled-border-color: var(--dm-red);
-    --bs-btn-focus-shadow-rgb: 214, 40, 40;
+    --bs-btn-focus-shadow-rgb: 195, 0, 47;
 }
 
 .text-accent {
@@ -110,8 +111,8 @@ main {
 .form-control:focus,
 .form-select:focus,
 .form-check-input:focus {
-    border-color: rgba(11, 37, 69, .5);
-    box-shadow: 0 0 0 .2rem rgba(11, 37, 69, .15);
+    border-color: rgba(28, 28, 30, .5);
+    box-shadow: 0 0 0 .2rem rgba(28, 28, 30, .15);
 }
 
 .form-check-input:checked {
@@ -124,7 +125,7 @@ main {
 .card {
     border: 0;
     border-radius: 1rem;
-    box-shadow: 0 .125rem .5rem rgba(11, 37, 69, .08);
+    box-shadow: 0 .125rem .5rem rgba(28, 28, 30, .08);
 }
 
 .card-hover {
@@ -133,7 +134,7 @@ main {
 
 .card-hover:hover {
     transform: translateY(-4px);
-    box-shadow: 0 .75rem 1.5rem rgba(11, 37, 69, .15);
+    box-shadow: 0 .75rem 1.5rem rgba(28, 28, 30, .15);
 }
 
 /* ---------- Navbar & footer public ---------- */
@@ -286,14 +287,14 @@ main {
     gap: .4rem;
     padding: .3rem .75rem;
     border-radius: 2rem;
-    background-color: rgba(11, 37, 69, .08);
+    background-color: rgba(28, 28, 30, .08);
     color: var(--dm-navy);
     font-size: .875rem;
     text-decoration: none;
 }
 
 .filter-chip:hover {
-    background-color: rgba(214, 40, 40, .1);
+    background-color: rgba(195, 0, 47, .1);
     color: var(--dm-red);
 }
 
@@ -373,7 +374,7 @@ main {
 }
 
 .promo-box {
-    background-color: rgba(214, 40, 40, .06);
+    background-color: rgba(195, 0, 47, .06);
     border-left: 4px solid var(--dm-red);
 }
 
@@ -416,7 +417,7 @@ main {
     width: 3rem;
     height: 3rem;
     border-radius: .75rem;
-    background-color: rgba(11, 37, 69, .08);
+    background-color: rgba(28, 28, 30, .08);
     color: var(--dm-navy);
     font-size: 1.35rem;
 }
@@ -630,8 +631,8 @@ main {
     font-size: 1.35rem;
 }
 
-.stat-card-icon-navy   { background-color: rgba(11, 37, 69, .1);   color: var(--dm-navy); }
-.stat-card-icon-red    { background-color: rgba(214, 40, 40, .1);  color: var(--dm-red); }
+.stat-card-icon-navy   { background-color: rgba(28, 28, 30, .1);   color: var(--dm-navy); }
+.stat-card-icon-red    { background-color: rgba(195, 0, 47, .1);  color: var(--dm-red); }
 .stat-card-icon-yellow { background-color: rgba(255, 193, 7, .18); color: #9a6b00; }
 .stat-card-icon-green  { background-color: rgba(25, 135, 84, .12); color: #198754; }
 .stat-card-icon-blue   { background-color: rgba(13, 110, 253, .1); color: #0d6efd; }

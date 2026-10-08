@@ -474,6 +474,7 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 17    | Testing               | ⏳                   |
 | 18    | Optimization          | ⏳                   |
 | 19    | Deployment            | ⏳                   |
+| +     | Branding JAF Dealer            | ✅ Selesai (nama & tagline, warna hitam + merah Nissan, data contoh Nissan & klasik Jepang, filter warna) |
 | +     | JAF Service (permintaan dosen) | ✅ Selesai (layanan servis, booking, riwayat, admin, dashboard, laporan) |
 
 > **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`.
@@ -485,6 +486,7 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 ### Keputusan desain
 
 - Customer **wajib login** untuk booking test drive dan mengajukan pembelian.
+- Identitas **JAF Dealer — Nissan Heritage & Performance**: fokus Nissan (baru & heritage) plus koleksi mobil klasik Jepang bekas.
 - Dealer menjual mobil **baru dan bekas**.
 - Simulasi kredit hanya berupa perhitungan (tanpa tabel). Hasilnya disimpan ke pengajuan pembelian.
 - Kontak dealer melalui WhatsApp dan halaman kontak.

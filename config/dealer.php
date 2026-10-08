@@ -12,7 +12,7 @@ return [
     |
     */
 
-    'name' => env('DEALER_NAME', 'Dealer Mobil'),
+    'name' => env('DEALER_NAME', 'JAF Dealer'),
 
     'tagline' => env('DEALER_TAGLINE', ''),
 

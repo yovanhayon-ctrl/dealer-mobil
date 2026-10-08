@@ -523,15 +523,15 @@ class PromoManagementTest extends TestCase
 
         $this->assertCount(5, $promos);
         $this->assertEquals(['running' => 3, 'scheduled' => 1, 'ended' => 1], $promos->countBy('status')->all());
-        $this->assertSame('toyota-avanza-1-5-g-cvt-2025', $promos['diskon-spesial-avanza']->car->slug);
-        $this->assertSame('honda-hr-v-1-5-se-cvt-2025', $promos['cashback-hr-v']->car->slug);
-        $this->assertSame('mitsubishi-xpander-cross-premium-cvt-2025', $promos['promo-xpander-akhir-tahun']->car->slug);
+        $this->assertSame('nissan-kicks-e-power-vl-2025', $promos['diskon-spesial-kicks-e-power']->car->slug);
+        $this->assertSame('nissan-serena-e-power-highway-star-2025', $promos['cashback-serena-e-power']->car->slug);
+        $this->assertSame('nissan-livina-vl-cvt-2025', $promos['promo-livina-akhir-tahun']->car->slug);
         $this->assertNull($promos['gratis-servis-3-tahun']->car_id);
         $this->assertNull($promos['promo-kemerdekaan']->discount_amount);
         $this->assertTrue($promos->every(fn (Promo $promo) => $promo->image === null));
 
-        $avanza = Car::with('activePromos')->where('slug', 'toyota-avanza-1-5-g-cvt-2025')->sole();
-        $this->assertSame(270_000_000, $avanza->finalPrice());
+        $kicks = Car::with('activePromos')->where('slug', 'nissan-kicks-e-power-vl-2025')->sole();
+        $this->assertSame(505_000_000, $kicks->finalPrice());
     }
 
     public function test_seeder_promo_melewati_promo_mobil_jika_mobil_belum_ada(): void

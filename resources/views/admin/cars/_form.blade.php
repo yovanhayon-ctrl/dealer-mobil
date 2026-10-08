@@ -17,7 +17,7 @@
     </div>
     <div class="col-12">
         <x-form.input name="name" label="Nama Mobil" :value="$car->name" required maxlength="150"
-                      placeholder="Contoh: Avanza 1.5 G CVT"
+                      placeholder="Contoh: Kicks e-Power VL"
                       :help="$car->exists ? 'Slug URL: '.$car->slug.' (tidak berubah saat diedit).' : 'Slug URL dibuat otomatis dari merek, nama, dan tahun.'" />
     </div>
 </div>
