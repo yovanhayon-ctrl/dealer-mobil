@@ -11,6 +11,8 @@
     $period = $report->period;
     $purchases = $report->purchaseSummary();
     $testDrives = $report->testDriveSummary();
+    $services = $report->serviceSummary();
+    $popularServices = $report->servicesByPopularity();
     $byBrand = $report->salesByBrand();
     $byCategory = $report->salesByCategory();
     $topCars = $report->topCars();
@@ -81,7 +83,7 @@
     <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-3 d-print-none">
         <h2 class="h5 mb-0">Periode: {{ $period->label() }}</h2>
         <span class="small text-muted">
-            Terjual = pengajuan Disetujui/Selesai · pengajuan menurut tanggal pengajuan · test drive menurut tanggal jadwal (WIB)
+            Terjual = pengajuan Disetujui/Selesai · pengajuan menurut tanggal pengajuan · test drive & servis menurut tanggal jadwal (WIB)
         </span>
     </div>
 
@@ -256,6 +258,75 @@
                                     <td colspan="2"></td>
                                 </tr>
                             </tfoot>
+                        </table>
+                    </div>
+                @endif
+            </div>
+        </div>
+    </div>
+
+    <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+            <div class="card h-100 report-card">
+                <div class="card-header bg-transparent border-0 pt-3 px-3 d-flex justify-content-between align-items-center">
+                    <h3 class="h6 mb-0">Booking Servis per Status</h3>
+                    <span class="small text-muted">Selesai: {{ $percentLabel($services['completion_rate']) }}</span>
+                </div>
+                @if ($services['total'] === 0)
+                    <x-empty-state icon="bi-wrench-adjustable" title="Belum ada booking servis" message="Tidak ada booking servis terjadwal pada periode ini." />
+                @else
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0 admin-table">
+                            <tbody>
+                                @foreach ($services['statuses'] as $status => $count)
+                                    @php($share = AdminReport::percent($count, $services['total']))
+                                    <tr>
+                                        <td style="width: 140px"><x-status-badge :status="$status" /></td>
+                                        <td class="text-end" style="width: 60px">{{ $count }}</td>
+                                        <td>@include('admin.reports._bar', ['value' => $share])</td>
+                                        <td class="text-end small text-muted" style="width: 70px">{{ $percentLabel($share) }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                            <tfoot>
+                                <tr class="fw-semibold">
+                                    <td>Total</td>
+                                    <td class="text-end">{{ $services['total'] }}</td>
+                                    <td colspan="2"></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                @endif
+            </div>
+        </div>
+
+        <div class="col-lg-6">
+            <div class="card h-100 report-card">
+                <div class="card-header bg-transparent border-0 pt-3 px-3"><h3 class="h6 mb-0">Layanan Servis Terpopuler</h3></div>
+                @if ($popularServices->isEmpty())
+                    <x-empty-state icon="bi-tools" title="Belum ada booking servis" message="Tidak ada booking servis terjadwal pada periode ini." />
+                @else
+                    <div class="table-responsive">
+                        <table class="table align-middle mb-0 admin-table">
+                            <thead>
+                                <tr>
+                                    <th class="text-center" style="width: 50px">#</th>
+                                    <th>Layanan</th>
+                                    <th class="text-center">Booking</th>
+                                    <th class="text-center">Selesai</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($popularServices as $service)
+                                    <tr>
+                                        <td class="text-center text-muted">{{ $loop->iteration }}</td>
+                                        <td>{{ $service->name }}</td>
+                                        <td class="text-center">{{ $service->total }}</td>
+                                        <td class="text-center">{{ $service->completed }}</td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
                         </table>
                     </div>
                 @endif

@@ -474,8 +474,11 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 17    | Testing               | ⏳                   |
 | 18    | Optimization          | ⏳                   |
 | 19    | Deployment            | ⏳                   |
+| +     | JAF Service (permintaan dosen) | ✅ Selesai (layanan servis, booking, riwayat, admin, dashboard, laporan) |
 
 > **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`.
+
+> **JAF Service:** daftar layanan servis di `/servis`, booking servis di `/servis/booking` (wajib login), riwayat & pembatalan di `/akun/servis`. Admin mengelola layanan di `/admin/layanan` dan booking di `/admin/servis`; ringkasan servis tampil di dashboard, detail pengguna, laporan, dan export CSV. Setelah pull, jalankan `php artisan migrate` lalu `php artisan db:seed --class=ServiceSeeder`.
 
 > **Urutan kerja:** semua halaman **admin** dikerjakan dulu (sudah selesai), lalu halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 
@@ -485,6 +488,7 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 - Dealer menjual mobil **baru dan bekas**.
 - Simulasi kredit hanya berupa perhitungan (tanpa tabel). Hasilnya disimpan ke pengajuan pembelian.
 - Kontak dealer melalui WhatsApp dan halaman kontak.
+- **JAF Service** (layanan purna jual): customer booking servis untuk kendaraannya sendiri (tidak terhubung ke tabel `cars`), maksimal 3 kendaraan per jam (`config/dealer.php`).
 
 ### Rancangan tabel
 
@@ -498,6 +502,8 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | `promos`            | Promo umum atau per mobil                         |
 | `test_drives`       | Booking test drive                                |
 | `purchase_requests` | Pengajuan pembelian cash/kredit                   |
+| `services`          | Master layanan JAF Service                        |
+| `service_bookings`  | Booking servis customer                           |
 
 ## Alur Kerja Git (Kerja Tim)
 

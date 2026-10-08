@@ -4,6 +4,7 @@ namespace App\Reports;
 
 use App\Models\Car;
 use App\Models\PurchaseRequest;
+use App\Models\ServiceBooking;
 use App\Models\TestDrive;
 
 /**
@@ -69,7 +70,7 @@ class AdminReportCsv
             ['Laporan', config('dealer.name')],
             ['Periode', $this->report->period->label()],
             ['Dibuat', now()->translatedFormat('j F Y H:i').' WIB'],
-            ['Catatan', 'Terjual = pengajuan Disetujui/Selesai; periode pengajuan berdasarkan tanggal pengajuan, test drive berdasarkan tanggal jadwal.'],
+            ['Catatan', 'Terjual = pengajuan Disetujui/Selesai; periode pengajuan berdasarkan tanggal pengajuan, test drive & booking servis berdasarkan tanggal jadwal.'],
             [],
             ['Ringkasan Pengajuan'],
             ['Keterangan', 'Jumlah'],
@@ -112,6 +113,23 @@ class AdminReportCsv
         }
         $rows[] = ['Total test drive', $testDrives['total']];
         $rows[] = ['Persentase selesai (%)', $testDrives['completion_rate']];
+
+        $services = $this->report->serviceSummary();
+        $rows[] = [];
+        $rows[] = ['Booking Servis per Status'];
+        $rows[] = ['Status', 'Jumlah'];
+        foreach ($services['statuses'] as $status => $count) {
+            $rows[] = [ServiceBooking::STATUS_LABELS[$status], $count];
+        }
+        $rows[] = ['Total booking servis', $services['total']];
+        $rows[] = ['Persentase servis selesai (%)', $services['completion_rate']];
+
+        $rows[] = [];
+        $rows[] = ['Layanan Servis Terpopuler'];
+        $rows[] = ['Layanan', 'Booking', 'Selesai'];
+        foreach ($this->report->servicesByPopularity() as $service) {
+            $rows[] = [$service->name, $service->total, $service->completed];
+        }
 
         $rows[] = [];
         $rows[] = ['Stok Menipis (mobil aktif, stok maksimal '.Car::LOW_STOCK_THRESHOLD.')'];
