@@ -12,7 +12,8 @@
     ];
 @endphp
 
-<nav class="navbar navbar-expand-lg navbar-dark navbar-dealer sticky-top" aria-label="Menu utama">
+{{-- 8 menu publik: navbar baru melebar di layar ≥1200px (xl) agar label tidak terpotong. --}}
+<nav class="navbar navbar-expand-xl navbar-dark navbar-dealer sticky-top" aria-label="Menu utama">
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">
             <i class="bi bi-car-front-fill"></i> {{ config('dealer.name') }}
@@ -24,7 +25,7 @@
         </button>
 
         <div class="collapse navbar-collapse" id="mainNavbar">
-            <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <ul class="navbar-nav me-auto mb-2 mb-xl-0 text-nowrap">
                 @foreach ($menu as $item)
                     @continue(! Route::has($item['route']))
 
@@ -42,7 +43,7 @@
                 @endif
             </ul>
 
-            <div class="d-flex align-items-lg-center gap-2">
+            <div class="d-flex align-items-xl-center gap-2">
                 @guest
                     <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm">
                         <i class="bi bi-box-arrow-in-right"></i>Masuk

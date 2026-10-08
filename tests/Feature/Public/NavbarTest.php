@@ -35,11 +35,14 @@ class NavbarTest extends TestCase
         $this->assertStringContainsString('href="'.route('home').'"', $navbar);
         $this->assertMatchesRegularExpression('/aria-current="page"\s*>Mobil<\/a>/', $navbar);
         $this->assertStringNotContainsString('Katalog', $navbar);
-        // Route belum dibuat: menu disembunyikan.
+        // Semua menu publik sudah punya route, jadi semuanya tampil.
         $this->assertStringContainsString('href="'.route('test-drives.create').'"', $navbar);
         $this->assertStringContainsString('href="'.route('promos.index').'"', $navbar);
         $this->assertStringContainsString('href="'.route('credit.index').'"', $navbar);
-        foreach (['Tentang Kami', 'Kontak', 'Dashboard Admin', 'Keluar', 'Test Drive Saya'] as $label) {
+        $this->assertStringContainsString('href="'.route('about').'"', $navbar);
+        $this->assertStringContainsString('href="'.route('contact').'"', $navbar);
+        // Menu khusus user login tidak tampil untuk tamu.
+        foreach (['Dashboard Admin', 'Keluar', 'Test Drive Saya'] as $label) {
             $this->assertStringNotContainsString($label, $navbar);
         }
     }
