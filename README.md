@@ -343,7 +343,7 @@ php artisan db:seed
 
 - `storage:link` membuat folder `public/storage` yang terhubung ke `storage/app/public`, supaya logo merek dan foto mobil yang di-upload bisa tampil di browser. Cukup sekali di setiap laptop. Foto mobil disimpan di `storage/app/public/cars/{id_mobil}/`.
 - Upload galeri mobil bisa sampai 10 file × 2 MB sekaligus. Jika muncul error *Content Too Large* / *POST Content-Length exceeds the limit*, naikkan `post_max_size` (misalnya `25M`) dan `upload_max_filesize` (minimal `2M`) di `php.ini`, lalu restart Apache.
-- `db:seed` membuat akun admin (dari `ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env`, wajib diisi dulu) serta data merek (Toyota, Honda, Daihatsu, Mitsubishi, Suzuki, Hyundai, Wuling), kategori (SUV, MPV, Sedan, Hatchback, Pickup, LCGC), 15 mobil contoh, dan 5 promo contoh (tanggal relatif terhadap hari seeder dijalankan). Jika `SEED_CUSTOMER_PASSWORD` diisi dan environment `local`, juga dibuat 8 customer dummy (misalnya `budi.santoso@example.test`) beserta 10 test drive dan 9 pengajuan dummy dengan berbagai status; stok mobil ikut disesuaikan untuk pengajuan yang disetujui/selesai. Aman dijalankan ulang: data yang sudah ada tidak digandakan dan tidak ditimpa.
+- `db:seed` membuat akun admin (dari `ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env`, wajib diisi dulu) serta data merek (Nissan, Toyota, Honda, Mazda, Mitsubishi, Subaru), kategori (SUV, MPV, Sedan, Hatchback, Pickup, Sport), 21 mobil contoh (Nissan baru & heritage + mobil klasik Jepang), 5 promo contoh (tanggal relatif terhadap hari seeder dijalankan), dan 6 layanan JAF Service. Jika `SEED_CUSTOMER_PASSWORD` diisi dan environment `local`, juga dibuat 8 customer dummy (misalnya `budi.santoso@example.test`) beserta 10 test drive, 9 pengajuan, dan 8 booking servis dummy dengan berbagai status; stok mobil ikut disesuaikan untuk pengajuan yang disetujui/selesai. Aman dijalankan ulang: data yang sudah ada tidak digandakan dan tidak ditimpa.
 
 ---
 
@@ -468,7 +468,7 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 11    | Test drive            | ✅ Selesai (admin + booking & riwayat customer) |
 | 12    | Pengajuan pembelian   | 🟡 Admin selesai (publik menyusul) |
 | 13    | Simulasi kredit       | ⏳                   |
-| 14    | Promo                 | ✅ Admin (publik menyusul) |
+| 14    | Promo                 | ✅ Selesai (admin + halaman publik `/promo` & detail) |
 | 15    | Dashboard & laporan   | ✅ Admin selesai (dashboard, daftar pengguna, laporan) |
 | 16    | Security              | ⏳                   |
 | 17    | Testing               | ⏳                   |
@@ -477,7 +477,7 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | +     | Branding JAF Dealer            | ✅ Selesai (nama & tagline, warna hitam + merah Nissan, data contoh Nissan & klasik Jepang, filter warna) |
 | +     | JAF Service (permintaan dosen) | ✅ Selesai (layanan servis, booking, riwayat, admin, dashboard, laporan) |
 
-> **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`.
+> **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`. Promo berjalan tampil di `/promo` (filter Semua/Khusus Mobil/Promo Umum) dan detailnya di `/promo/{slug}`.
 
 > **JAF Service:** daftar layanan servis di `/servis`, booking servis di `/servis/booking` (wajib login), riwayat & pembatalan di `/akun/servis`. Admin mengelola layanan di `/admin/layanan` dan booking di `/admin/servis`; ringkasan servis tampil di dashboard, detail pengguna, laporan, dan export CSV. Setelah pull, jalankan `php artisan migrate` lalu `php artisan db:seed --class=ServiceSeeder`.
 

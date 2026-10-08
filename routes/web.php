@@ -7,7 +7,7 @@ use App\Http\Controllers\Admin\CarController as AdminCarController;
 use App\Http\Controllers\Admin\CarImageController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
-use App\Http\Controllers\Admin\PromoController;
+use App\Http\Controllers\Admin\PromoController as AdminPromoController;
 use App\Http\Controllers\Admin\PurchaseRequestController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ServiceBookingController as AdminServiceBookingController;
@@ -18,6 +18,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\CarController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\PromoController;
 use App\Http\Controllers\ServiceBookingController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TestDriveController;
@@ -32,6 +33,8 @@ use Illuminate\Support\Facades\Route;
 Route::get('/', HomeController::class)->name('home');
 Route::get('/mobil', [CarController::class, 'index'])->name('cars.index');
 Route::get('/mobil/{car:slug}', [CarController::class, 'show'])->name('cars.show');
+Route::get('/promo', [PromoController::class, 'index'])->name('promos.index');
+Route::get('/promo/{promo:slug}', [PromoController::class, 'show'])->name('promos.show');
 Route::get('/servis', [ServiceController::class, 'index'])->name('services.index');
 
 /*
@@ -116,7 +119,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->parameters(['kategori' => 'category'])
         ->names('categories');
 
-    Route::resource('promo', PromoController::class)
+    Route::resource('promo', AdminPromoController::class)
         ->except('show')
         ->parameters(['promo' => 'promo'])
         ->names('promos');
