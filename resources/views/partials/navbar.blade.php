@@ -13,7 +13,7 @@
 @endphp
 
 {{-- 8 menu publik: navbar baru melebar di layar ≥1200px (xl) agar label tidak terpotong. --}}
-<nav class="navbar navbar-expand-xl navbar-dark navbar-dealer sticky-top" aria-label="Menu utama">
+<nav class="navbar navbar-expand-xl navbar-dark navbar-dealer sticky-top" aria-label="Menu utama" data-navbar>
     <div class="container">
         <a class="navbar-brand" href="{{ route('home') }}">
             <i class="bi bi-car-front-fill"></i> {{ config('dealer.name') }}
@@ -34,16 +34,10 @@
                         <a @class(['nav-link', 'active' => $isActive]) href="{{ route($item['route']) }}" @if ($isActive) aria-current="page" @endif>{{ $item['label'] }}</a>
                     </li>
                 @endforeach
-                @if (auth()->user()?->isAdmin())
-                    <li class="nav-item">
-                        <a class="nav-link" href="{{ route('admin.dashboard') }}">
-                            <i class="bi bi-speedometer2 me-1"></i>Dashboard Admin
-                        </a>
-                    </li>
-                @endif
             </ul>
 
-            <div class="d-flex align-items-xl-center gap-2">
+            {{-- Area akun: di HP memenuhi lebar di bawah menu, di desktop sejajar di kanan. --}}
+            <div class="navbar-actions">
                 @guest
                     <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm">
                         <i class="bi bi-box-arrow-in-right"></i>Masuk
@@ -52,6 +46,11 @@
                         <i class="bi bi-person-plus"></i>Daftar
                     </a>
                 @else
+                    @if (auth()->user()->isAdmin())
+                        <a href="{{ route('admin.dashboard') }}" class="btn btn-accent btn-sm" title="Dashboard Admin">
+                            <i class="bi bi-speedometer2"></i>Admin
+                        </a>
+                    @endif
                     @if (! auth()->user()->isAdmin() && Route::has('account.notifications.index'))
                         @php($unreadNotifications = auth()->user()->unreadNotifications()->count())
                         <a href="{{ route('account.notifications.index') }}"
@@ -63,7 +62,7 @@
                             @endif
                         </a>
                     @endif
-                    <div class="dropdown">
+                    <div class="dropdown navbar-account">
                         <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">
                             <i class="bi bi-person-circle"></i>{{ auth()->user()->name }}
