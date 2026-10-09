@@ -1083,3 +1083,83 @@ main {
     display: block;
     max-width: 100%;
 }
+
+/* ---------- Beranda: ritme bagian ---------- */
+
+.home-section {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+}
+
+.home-section-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.home-section-link {
+    font-size: .875rem;
+    font-weight: 600;
+    white-space: nowrap;
+}
+
+/* Judul kartu mobil maks. 2 baris dengan tinggi tetap: harga & tombol sejajar antar kartu. */
+.car-card-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    min-height: calc(1.2em * 2);
+    line-height: 1.2;
+}
+
+/* Kartu promo tanpa banner. */
+.promo-card-placeholder {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: .15rem;
+    padding: 1rem 1.25rem;
+    overflow: hidden;
+    color: #fff;
+    background: linear-gradient(110deg, var(--dm-navy) 0 62%, var(--dm-red) 62% 66%, var(--dm-navy) 66% 69%, rgba(195, 0, 47, .55) 69% 70.5%, var(--dm-navy) 70.5%);
+}
+
+.promo-card-placeholder-label {
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: rgba(255, 255, 255, .7);
+}
+
+.promo-card-placeholder-label .bi {
+    margin-right: .35rem;
+    color: var(--dm-red);
+}
+
+.promo-card-placeholder-value {
+    font-family: var(--dm-font-heading);
+    font-size: 1.6rem;
+    font-weight: 700;
+    line-height: 1.15;
+    max-width: 60%;
+}
+
+/* Jelajahi mobil: dua kartu (merek & kategori). */
+.shortcut-card-title {
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #6c757d;
+    margin-bottom: .85rem;
+}
+
+.shortcut-card-title .bi {
+    margin-right: .4rem;
+    color: var(--dm-red);
+}

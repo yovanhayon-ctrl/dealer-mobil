@@ -111,10 +111,10 @@
             <x-empty-state icon="bi-car-front" title="Belum ada mobil" message="Mobil akan tampil di sini setelah ditambahkan oleh dealer." />
         </section>
     @else
-        <section class="container py-5" aria-labelledby="latest-title">
-            <div class="d-flex align-items-end justify-content-between gap-2 mb-3">
+        <section class="container home-section" aria-labelledby="latest-title">
+            <div class="home-section-head">
                 <h2 id="latest-title" class="h4 mb-0">Mobil Terbaru</h2>
-                <a href="{{ route('cars.index') }}" class="small fw-semibold text-nowrap">Lihat semua <i class="bi bi-arrow-right"></i></a>
+                <a href="{{ route('cars.index') }}" class="home-section-link">Lihat semua <i class="bi bi-arrow-right"></i></a>
             </div>
             <div class="row g-4">
                 @foreach ($latestCars as $car)
@@ -127,12 +127,12 @@
     @endif
 
     @if ($promos->isNotEmpty())
-        <section class="bg-section py-5" aria-labelledby="promo-title">
+        <section class="bg-section home-section" aria-labelledby="promo-title">
             <div class="container">
-                <div class="d-flex align-items-end justify-content-between gap-2 mb-3">
+                <div class="home-section-head">
                     <h2 id="promo-title" class="h4 mb-0">Promo Berjalan</h2>
                     @if (Route::has('promos.index'))
-                        <a href="{{ route('promos.index') }}" class="small fw-semibold text-nowrap">Semua promo <i class="bi bi-arrow-right"></i></a>
+                        <a href="{{ route('promos.index') }}" class="home-section-link">Semua promo <i class="bi bi-arrow-right"></i></a>
                     @endif
                 </div>
                 <div class="row g-4">
@@ -147,12 +147,16 @@
     @endif
 
     @if ($brands->isNotEmpty() || $categories->isNotEmpty())
-        <section class="container py-5" aria-labelledby="shortcut-title">
-            <h2 id="shortcut-title" class="h4 mb-3">Jelajahi Mobil</h2>
+        <section class="container home-section" aria-labelledby="shortcut-title">
+            <div class="home-section-head">
+                <h2 id="shortcut-title" class="h4 mb-0">Jelajahi Mobil</h2>
+            </div>
             <div class="row g-4">
                 @if ($brands->isNotEmpty())
                     <div class="col-lg-6">
-                        <h3 class="h6 text-muted text-uppercase mb-2">Berdasarkan merek</h3>
+                        <div class="card h-100 shortcut-card">
+                            <div class="card-body p-3 p-lg-4">
+                        <h3 class="shortcut-card-title"><i class="bi bi-tags"></i>Berdasarkan merek</h3>
                         <div class="d-flex flex-wrap gap-2">
                             @foreach ($brands as $brand)
                                 <a href="{{ route('cars.index', ['merek' => $brand->slug]) }}" class="shortcut-chip">
@@ -160,17 +164,23 @@
                                 </a>
                             @endforeach
                         </div>
+                            </div>
+                        </div>
                     </div>
                 @endif
                 @if ($categories->isNotEmpty())
                     <div class="col-lg-6">
-                        <h3 class="h6 text-muted text-uppercase mb-2">Berdasarkan kategori</h3>
+                        <div class="card h-100 shortcut-card">
+                            <div class="card-body p-3 p-lg-4">
+                        <h3 class="shortcut-card-title"><i class="bi bi-grid"></i>Berdasarkan kategori</h3>
                         <div class="d-flex flex-wrap gap-2">
                             @foreach ($categories as $category)
                                 <a href="{{ route('cars.index', ['kategori' => $category->slug]) }}" class="shortcut-chip">
                                     {{ $category->name }} <span class="shortcut-chip-count">{{ $category->cars_count }}</span>
                                 </a>
                             @endforeach
+                        </div>
+                            </div>
                         </div>
                     </div>
                 @endif
@@ -179,8 +189,9 @@
     @endif
 
     @if ($testimonials->isNotEmpty())
-        <section class="container py-5" aria-labelledby="testimonial-title">
-            <div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
+        <section class="bg-section home-section" aria-labelledby="testimonial-title">
+            <div class="container">
+            <div class="home-section-head flex-wrap">
                 <h2 id="testimonial-title" class="h4 mb-0">Kata Pelanggan</h2>
                 <p class="mb-0 text-muted">
                     <i class="bi bi-star-fill text-warning me-1" aria-hidden="true"></i>
@@ -207,11 +218,12 @@
                     </div>
                 @endforeach
             </div>
+            </div>
         </section>
     @endif
 
     @if ($creditUrl || $dealer['whatsapp'])
-        <section class="container pb-2" aria-labelledby="cta-title">
+        <section class="container home-section" aria-labelledby="cta-title">
             <div class="home-cta rounded-4 p-4 p-lg-5 d-lg-flex align-items-center justify-content-between gap-4">
                 <div class="mb-3 mb-lg-0">
                     <h2 id="cta-title" class="h4 text-white mb-1">Butuh bantuan memilih mobil?</h2>

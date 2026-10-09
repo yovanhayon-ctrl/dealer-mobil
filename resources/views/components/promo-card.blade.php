@@ -7,14 +7,24 @@
 
 @php
     $detailUrl = Route::has('promos.show') ? route('promos.show', $promo) : null;
+    // Nominal ringkas untuk blok pengganti banner: Rp 15 jt, Rp 1,2 M.
+    $discount = (int) $promo->discount_amount;
+    $shortDiscount = match (true) {
+        $discount >= 1_000_000_000 => 'Rp '.str_replace('.', ',', rtrim(rtrim(number_format($discount / 1_000_000_000, 1, '.', ''), '0'), '.')).' M',
+        $discount >= 1_000_000 => 'Rp '.str_replace('.', ',', rtrim(rtrim(number_format($discount / 1_000_000, 1, '.', ''), '0'), '.')).' jt',
+        $discount > 0 => 'Rp '.number_format($discount, 0, ',', '.'),
+        default => null,
+    };
 @endphp
 
 <article {{ $attributes->class(['card promo-card card-hover h-100 overflow-hidden']) }}>
     @if ($promo->image_url)
         <img src="{{ $promo->image_url }}" alt="{{ $promo->title }}" class="promo-card-img" loading="lazy">
     @else
-        <div class="promo-card-img promo-card-img-empty" role="img" aria-label="Banner {{ $promo->title }}">
-            <i class="bi bi-percent"></i>
+        {{-- Tanpa banner: blok bergaya JAF berisi nilai hemat (bukan kotak abu kosong). --}}
+        <div class="promo-card-img promo-card-placeholder" role="img" aria-label="Banner {{ $promo->title }}">
+            <span class="promo-card-placeholder-label"><i class="bi bi-percent"></i>{{ $shortDiscount ? 'Hemat' : 'Promo' }}</span>
+            <span class="promo-card-placeholder-value">{{ $shortDiscount ?? \Illuminate\Support\Str::limit($promo->title, 28) }}</span>
         </div>
     @endif
 
