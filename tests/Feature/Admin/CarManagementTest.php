@@ -131,6 +131,20 @@ class CarManagementTest extends TestCase
         $this->assertSame(45_000, Car::sole()->mileage);
     }
 
+    public function test_mobil_klasik_sejak_tahun_minimal_diterima(): void
+    {
+        // Koleksi heritage & klasik Jepang, mis. AE86 1986, sampai batas bawah Car::MIN_YEAR.
+        foreach ([1986, Car::MIN_YEAR] as $year) {
+            $this->actingAs($this->admin)
+                ->post(route('admin.cars.store'), $this->validData(['year' => $year, 'name' => "Klasik {$year}"]))
+                ->assertSessionHasNoErrors();
+        }
+
+        $this->assertSame(2, Car::count());
+        $this->actingAs($this->admin)->get(route('admin.cars.create'))
+            ->assertSee('min="'.Car::MIN_YEAR.'"', false);
+    }
+
     public function test_validasi_field_lain_ditolak(): void
     {
         $cases = [
@@ -138,7 +152,7 @@ class CarManagementTest extends TestCase
             'category_id' => ['category_id' => 9999],
             'name' => ['name' => '   '],
             'vehicle_condition' => ['vehicle_condition' => 'rusak'],
-            'year' => ['year' => 1989],
+            'year' => ['year' => Car::MIN_YEAR - 1],
             'price' => ['price' => '0'],
             'transmission' => ['transmission' => 'cvt'],
             'fuel_type' => ['fuel_type' => 'avtur'],

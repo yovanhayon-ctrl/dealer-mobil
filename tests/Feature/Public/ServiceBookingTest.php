@@ -188,7 +188,7 @@ class ServiceBookingTest extends TestCase
             'plat kosong' => [['plate_number' => ''], 'plate_number'],
             'plat tidak valid' => [['plate_number' => '1234 ABC'], 'plate_number'],
             'plat angka terlalu panjang' => [['plate_number' => 'B 12345 A'], 'plate_number'],
-            'tahun terlalu lama' => [['vehicle_year' => '1979'], 'vehicle_year'],
+            'tahun terlalu lama' => [['vehicle_year' => '1949'], 'vehicle_year'],
             'tahun masa depan' => [['vehicle_year' => '2028'], 'vehicle_year'],
             'km terlalu besar' => [['mileage' => '2.000.001'], 'mileage'],
             'tanggal hari ini' => [['preferred_date' => '2026-10-08'], 'preferred_date'],

@@ -25,6 +25,9 @@ class Car extends Model
     /** @use HasFactory<CarFactory> */
     use HasFactory, HasUniqueSlug;
 
+    /** Tahun produksi terlama yang boleh diinput (koleksi heritage & klasik Jepang, mis. AE86 1986). */
+    public const MIN_YEAR = 1950;
+
     public const CONDITION_NEW = 'baru';
 
     public const CONDITION_USED = 'bekas';
