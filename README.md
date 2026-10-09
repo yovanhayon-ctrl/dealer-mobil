@@ -492,6 +492,27 @@ Wajib saat production (Phase 19):
 - `.env`: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `LOG_LEVEL=warning`, `SESSION_SECURE_COOKIE=true`, dan `MAIL_MAILER` ke SMTP sungguhan.
 - Server: `expose_php = Off` di `php.ini`, `ServerTokens Prod` dan `ServerSignature Off` di Apache (menyembunyikan versi PHP/Apache), serta HTTPS.
 
+## Performa
+
+Sudah diterapkan (Phase 18):
+
+- Query: tanpa N+1 (eager load, jumlah query per halaman tetap & dites), 0–16 query per halaman, waktu database < 20 ms.
+- Index tambahan untuk urutan "terbaru" dan rentang tanggal laporan (`cars(is_active, created_at)`, `created_at` di `purchase_requests`, `test_drives`, `service_bookings`).
+- CSS/JS lokal dipanggil lewat `App\Support\Asset::url('css/app.css')` (menambah `?v=<waktu ubah file>`). Jika menambah file CSS/JS baru di view, gunakan helper ini, jangan `asset()` langsung.
+- `public/.htaccess`: cache browser 1 tahun untuk CSS/JS/gambar (halaman PHP tetap `no-cache`) dan kompresi gzip bila `mod_deflate` aktif.
+
+Langkah production (Phase 19), dari folder project:
+
+```bash
+composer install --no-dev --optimize-autoloader
+php artisan migrate --force
+php artisan optimize
+```
+
+- `php artisan optimize` (cache config, route, view, event) mempercepat respon ±20–30% (diukur di lokal). Setelah mengubah kode/`.env` di server, jalankan ulang `php artisan optimize`. **Jangan** dipakai saat development lokal; bila terlanjur, jalankan `php artisan optimize:clear` (wajib sebelum menjalankan test).
+- Aktifkan `mod_deflate` di Apache (Laragon: Menu → Apache → `httpd.conf`, hapus `#` pada `LoadModule deflate_module modules/mod_deflate.so`, lalu restart) agar HTML ±50 KB terkirim terkompresi.
+- OPcache aktif secara bawaan di PHP 8.5.
+
 ## Progress Project
 
 | Phase | Tahap                            | Status          |
@@ -513,7 +534,7 @@ Wajib saat production (Phase 19):
 | 15    | Dashboard & laporan   | ✅ Admin selesai (dashboard, daftar pengguna, laporan) |
 | 16    | Security              | ✅ Selesai (audit + perbaikan, lihat bagian Keamanan) |
 | 17    | Testing               | ✅ Selesai (651 test SQLite & MySQL, uji browser per peran) |
-| 18    | Optimization          | ⏳                   |
+| 18    | Optimization          | ✅ Selesai (index, cache aset, panduan production) |
 | 19    | Deployment            | ⏳                   |
 | +     | Branding JAF Dealer            | ✅ Selesai (nama & tagline, warna hitam + merah Nissan, data contoh Nissan & klasik Jepang, filter warna) |
 | +     | JAF Service (permintaan dosen) | ✅ Selesai (layanan servis, booking, riwayat, admin, dashboard, laporan) |

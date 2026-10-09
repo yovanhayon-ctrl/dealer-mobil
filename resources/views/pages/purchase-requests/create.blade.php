@@ -161,6 +161,6 @@
 @endsection
 
 @push('scripts')
-    <script src="{{ asset('js/credit-simulation.js') }}"></script>
-    <script src="{{ asset('js/purchase-request.js') }}"></script>
+    <script src="{{ \App\Support\Asset::url('js/credit-simulation.js') }}"></script>
+    <script src="{{ \App\Support\Asset::url('js/purchase-request.js') }}"></script>
 @endpush

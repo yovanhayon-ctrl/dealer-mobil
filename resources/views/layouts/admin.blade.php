@@ -48,6 +48,6 @@
     </div>
 
     @include('partials.scripts')
-    <script src="{{ asset('js/admin.js') }}"></script>
+    <script src="{{ \App\Support\Asset::url('js/admin.js') }}"></script>
 </body>
 </html>
