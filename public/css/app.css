@@ -173,9 +173,89 @@ main {
 /* ---------- Publik: beranda ---------- */
 
 .home-hero {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
     background: linear-gradient(135deg, var(--dm-navy) 0%, var(--dm-navy-dark) 100%);
     color: rgba(255, 255, 255, .85);
     padding-bottom: 6rem !important;
+}
+
+/* Garis diagonal ala livery balap Nissan di sisi kanan hero (dekoratif, di belakang konten). */
+.home-hero::before {
+    content: "";
+    position: absolute;
+    inset: 0 -15% 0 40%;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(110deg,
+        transparent 0 28%,
+        rgba(195, 0, 47, .95) 28% 31%,
+        transparent 31% 33.5%,
+        rgba(195, 0, 47, .5) 33.5% 34.8%,
+        transparent 34.8% 58%,
+        rgba(255, 255, 255, .07) 58% 58.6%,
+        transparent 58.6% 63%,
+        rgba(255, 255, 255, .05) 63% 63.4%,
+        transparent 63.4%);
+}
+
+@media (max-width: 991.98px) {
+    /* Layar kecil: teks memenuhi lebar, garis digeser ke tepi kanan agar tidak menabrak tagline. */
+    .home-hero::before {
+        inset: 0 -75% 0 72%;
+        opacity: .6;
+    }
+}
+
+/* Kartu mobil unggulan di hero. */
+.hero-feature {
+    position: relative;
+    background-color: #fff;
+    border-radius: 1rem;
+    padding: .6rem;
+    box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, .45);
+    transform: rotate(-2deg);
+    transition: transform .25s ease;
+}
+
+.hero-feature:hover,
+.hero-feature:focus-visible {
+    transform: rotate(0deg) translateY(-4px);
+}
+
+.hero-feature-img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: cover;
+    border-radius: .65rem;
+}
+
+.hero-feature-badge {
+    position: absolute;
+    top: 1.1rem;
+    left: 1.1rem;
+    padding: .25rem .65rem;
+    border-radius: 999px;
+    background-color: var(--dm-red);
+    color: #fff;
+    font-size: .75rem;
+    font-weight: 600;
+}
+
+.hero-feature-badge .bi {
+    margin-right: .3rem;
+}
+
+.hero-feature-body {
+    padding: .75rem .4rem .25rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .hero-feature {
+        transition: none;
+    }
 }
 
 /* Kartu pencarian cepat menumpang di bawah hero. */
