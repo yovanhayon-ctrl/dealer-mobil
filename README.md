@@ -492,6 +492,12 @@ Wajib saat production (Phase 19):
 - `.env`: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `LOG_LEVEL=warning`, `SESSION_SECURE_COOKIE=true`, dan `MAIL_MAILER` ke SMTP sungguhan.
 - Server: `expose_php = Off` di `php.ini`, `ServerTokens Prod` dan `ServerSignature Off` di Apache (menyembunyikan versi PHP/Apache), serta HTTPS.
 
+## Deployment
+
+- **Demo lokal / presentasi:** [docs/DEMO.md](docs/DEMO.md) — persiapan, akun demo, alur demo ±15 menit, dan solusi masalah saat demo.
+- **Shared hosting (cPanel):** [docs/DEPLOY-CPANEL.md](docs/DEPLOY-CPANEL.md) — syarat hosting (**PHP ≥ 8.4**), upload, document root, database, `.env` production, HTTPS, dan pembaruan.
+- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md).
+
 ## Performa
 
 Sudah diterapkan (Phase 18):
@@ -535,7 +541,7 @@ php artisan optimize
 | 16    | Security              | ✅ Selesai (audit + perbaikan, lihat bagian Keamanan) |
 | 17    | Testing               | ✅ Selesai (651 test SQLite & MySQL, uji browser per peran) |
 | 18    | Optimization          | ✅ Selesai (index, cache aset, panduan production) |
-| 19    | Deployment            | ⏳                   |
+| 19    | Deployment            | ✅ Selesai (demo lokal & panduan cPanel, rilis v1.0.0) |
 | +     | Branding JAF Dealer            | ✅ Selesai (nama & tagline, warna hitam + merah Nissan, data contoh Nissan & klasik Jepang, filter warna) |
 | +     | JAF Service (permintaan dosen) | ✅ Selesai (layanan servis, booking, riwayat, admin, dashboard, laporan) |
 
