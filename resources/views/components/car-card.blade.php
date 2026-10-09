@@ -27,6 +27,11 @@
             @endif
         @if ($detailUrl)</a>@endif
 
+        {{-- Di atas stretched-link judul agar tombol tetap bisa diklik. --}}
+        <div class="car-card-favorite-wrap">
+            <x-favorite-button :car="$car" />
+        </div>
+
         <div class="car-card-badges">
             <span @class(['badge rounded-pill', 'badge-condition-new' => $car->isNew(), 'badge-condition-used' => ! $car->isNew()])>{{ $car->condition_label }}</span>
             @if ($car->hasPromoPrice())

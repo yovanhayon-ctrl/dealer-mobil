@@ -76,6 +76,13 @@
                                     </a>
                                 </li>
                             @endif
+                            @if (! auth()->user()->isAdmin() && Route::has('account.favorites.index'))
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('account.favorites.index') }}">
+                                        <i class="bi bi-heart me-2"></i>Favorit Saya
+                                    </a>
+                                </li>
+                            @endif
                             @if (! auth()->user()->isAdmin() && Route::has('account.test-drives.index'))
                                 <li>
                                     <a class="dropdown-item" href="{{ route('account.test-drives.index') }}">

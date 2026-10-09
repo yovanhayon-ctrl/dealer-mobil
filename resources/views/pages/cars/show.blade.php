@@ -161,6 +161,8 @@
                             @endif
                         @endif
 
+                        <x-favorite-button :car="$car" variant="full" />
+
                         @if ($whatsappUrl)
                             <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener" class="btn btn-success">
                                 <i class="bi bi-whatsapp"></i>Tanya via WhatsApp
