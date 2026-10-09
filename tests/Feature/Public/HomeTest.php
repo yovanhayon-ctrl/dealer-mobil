@@ -4,11 +4,13 @@ namespace Tests\Feature\Public;
 
 use App\Models\Brand;
 use App\Models\Car;
+use App\Models\CarImage;
 use App\Models\Category;
 use App\Models\Promo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\File;
 use Tests\TestCase;
 
 class HomeTest extends TestCase
@@ -140,6 +142,108 @@ class HomeTest extends TestCase
             ->assertSee('<title>Beranda — Dealer Maju</title>', false)
             ->assertSee('<meta name="description" content="Dealer Maju — Nissan Heritage &amp; Performance', false)
             ->assertSee('Nissan Heritage &amp; Performance</p>', false);
+    }
+
+    // ---------- Banner hero: mobil unggulan ----------
+
+    private function withPhoto(Car $car): Car
+    {
+        CarImage::create(['car_id' => $car->id, 'path' => "cars/{$car->id}/foto.jpg", 'is_primary' => true, 'sort_order' => 1]);
+
+        return $car;
+    }
+
+    public function test_hero_menampilkan_nissan_terbaru_yang_punya_foto(): void
+    {
+        config(['dealer.hero_videos' => []]);
+        $this->withPhoto($this->car('Nissan', 'Sport', 'Skyline GT-R', ['created_at' => now()->subDays(3)]));
+        $this->withPhoto($this->car('Subaru', 'Sedan', 'Impreza WRX', ['created_at' => now()->subDay()]));
+        $this->car('Nissan', 'MPV', 'Livina Tanpa Foto', ['created_at' => now()]);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('aria-label="Mobil unggulan: Nissan Skyline GT-R 2025"', false)
+            ->assertSee('hero-feature-badge', false)
+            ->assertDontSee('Mobil unggulan: Subaru', false)
+            ->assertDontSee('Mobil unggulan: Nissan Livina Tanpa Foto', false);
+    }
+
+    public function test_hero_memakai_merek_lain_bila_tidak_ada_nissan_berfoto(): void
+    {
+        config(['dealer.hero_videos' => []]);
+        $this->withPhoto($this->car('Toyota', 'Sport', 'Sprinter Trueno AE86'));
+
+        $this->get(route('home'))
+            ->assertSee('aria-label="Mobil unggulan: Toyota Sprinter Trueno AE86 2025"', false);
+    }
+
+    public function test_hero_tanpa_kartu_bila_tidak_ada_mobil_berfoto(): void
+    {
+        $this->car('Nissan', 'MPV', 'Livina');
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('Dealer Maju')
+            ->assertDontSee('hero-feature', false);
+    }
+
+    // ---------- Video latar hero ----------
+
+    /**
+     * File video sementara di public/ (dihapus lagi setelah test), agar test tidak bergantung pada video asli.
+     *
+     * @param  list<string>  $paths
+     */
+    private function withTemporaryVideos(array $paths, callable $callback): void
+    {
+        foreach ($paths as $path) {
+            File::ensureDirectoryExists(dirname(public_path($path)));
+            File::put(public_path($path), 'video-uji');
+        }
+
+        try {
+            $callback();
+        } finally {
+            File::delete(array_map(fn ($path) => public_path($path), $paths));
+            File::deleteDirectory(public_path('videos-uji'));
+        }
+    }
+
+    public function test_hero_memakai_video_dan_kartu_unggulan_disembunyikan(): void
+    {
+        $this->withTemporaryVideos(['videos-uji/satu.mp4', 'videos-uji/dua.mp4'], function () {
+            $this->assertHeroWithVideos();
+        });
+    }
+
+    private function assertHeroWithVideos(): void
+    {
+        config(['dealer.hero_videos' => ['videos-uji/satu.mp4', 'videos-uji/dua.mp4']]);
+        $this->withPhoto($this->car('Nissan', 'Sport', 'Skyline GT-R'));
+
+        $response = $this->get(route('home'))->assertOk();
+
+        $response->assertSee('class="home-hero py-5 has-video"', false)
+            ->assertDontSee('hero-video-toggle', false)
+            ->assertDontSee('hero-feature', false);
+
+        preg_match("/data-hero-videos='([^']+)'/", $response->getContent(), $match);
+        $sources = json_decode(html_entity_decode($match[1]), true, flags: JSON_THROW_ON_ERROR);
+        $this->assertCount(2, $sources);
+        $this->assertMatchesRegularExpression('#/videos-uji/satu\.mp4\?v=\d+$#', $sources[0]);
+        $this->assertMatchesRegularExpression('#/videos-uji/dua\.mp4\?v=\d+$#', $sources[1]);
+    }
+
+    public function test_video_tidak_valid_diabaikan_dan_kembali_ke_kartu_unggulan(): void
+    {
+        config(['dealer.hero_videos' => ['videos-uji/tidak-ada.mp4', '../.env', 'videos-uji/video.webm', 'css/app.css']]);
+        $this->withPhoto($this->car('Nissan', 'Sport', 'Skyline GT-R'));
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertDontSee('has-video', false)
+            ->assertDontSee('data-hero-videos', false)
+            ->assertSee('aria-label="Mobil unggulan: Nissan Skyline GT-R 2025"', false);
     }
 
     public function test_jumlah_query_tetap_walau_data_bertambah(): void

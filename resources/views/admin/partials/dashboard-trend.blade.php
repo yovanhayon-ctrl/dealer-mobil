@@ -9,9 +9,9 @@
 @endpush
 
 <section class="mb-4" aria-labelledby="trend-title">
-    <h3 id="trend-title" class="h6 text-muted text-uppercase small fw-semibold mb-3">
+    <h3 id="trend-title" class="dashboard-section-title">
         Tren {{ \App\Reports\DashboardTrend::MONTHS }} Bulan Terakhir
-        <span class="text-lowercase fw-normal">({{ $trend[0]['label'] }} – {{ $trend[array_key_last($trend)]['label'] }})</span>
+        <span class="dashboard-section-meta">· {{ $trend[0]['label'] }} – {{ $trend[array_key_last($trend)]['label'] }}</span>
     </h3>
 
     <div class="row g-4">
@@ -59,7 +59,7 @@
             <div class="card h-100">
                 <div class="card-header bg-transparent border-0 pt-3 px-3">
                     <h4 class="h6 mb-0">Penjualan per Bulan</h4>
-                    <p class="small text-muted mb-0">Pengajuan disetujui/selesai, menurut tanggal pengajuan (sama dengan Laporan).</p>
+                    <p class="small text-muted mb-0">Disetujui/selesai, menurut tanggal pengajuan.</p>
                 </div>
                 <div class="card-body pt-2">
                     <div class="dashboard-chart">
