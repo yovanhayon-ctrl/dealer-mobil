@@ -6,6 +6,7 @@ use App\Actions\ChangePurchaseRequestStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\PurchaseRequestStatusRequest;
 use App\Models\PurchaseRequest;
+use App\Notifications\Notifier;
 use App\Notifications\PurchaseRequestStatusChanged;
 use DomainException;
 use Illuminate\Database\Eloquent\Builder;
@@ -90,7 +91,7 @@ class PurchaseRequestController extends Controller
         }
 
         // Hanya perubahan status yang benar-benar tersimpan yang dikabarkan ke customer.
-        $updated->user->notify(new PurchaseRequestStatusChanged($updated));
+        Notifier::send($updated->user, new PurchaseRequestStatusChanged($updated));
 
         return $redirect->with('success', "Status pengajuan diubah dari {$oldLabel} menjadi {$updated->statusLabel()}.");
     }
