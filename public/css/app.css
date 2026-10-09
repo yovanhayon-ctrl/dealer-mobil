@@ -972,3 +972,114 @@ main {
 .testimonial-card blockquote {
     font-size: .95rem;
 }
+
+/* ---------- Admin: dashboard ---------- */
+
+.dashboard-section-title {
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #6c757d;
+    margin-bottom: .75rem;
+}
+
+.dashboard-section-meta {
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+}
+
+/* Kartu statistik: 2 kolom (HP), 3 kolom (laptop), 6 kolom hanya di layar sangat lebar agar label tidak terpotong. */
+.stat-grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+@media (min-width: 992px) {
+    .stat-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1680px) {
+    .stat-grid {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+}
+
+.stat-card-label {
+    line-height: 1.3;
+}
+
+.stat-card-alert {
+    display: inline-block;
+    width: .5rem;
+    height: .5rem;
+    margin-left: .25rem;
+    vertical-align: super;
+    border-radius: 50%;
+    background-color: var(--dm-red);
+}
+
+@media (max-width: 575.98px) {
+    .stat-grid .card-body {
+        gap: .75rem !important;
+    }
+
+    .stat-grid .stat-card-icon {
+        flex-basis: 40px;
+        width: 40px;
+        height: 40px;
+        font-size: 1.15rem;
+    }
+}
+
+.dashboard-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .5rem;
+    padding: 1rem 1rem .75rem;
+    background-color: transparent;
+    border-bottom: 0;
+}
+
+/* Nama mobil/layanan satu baris; teks lengkap ada di tooltip (title). */
+.dashboard-truncate {
+    display: inline-block;
+    max-width: 16rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    vertical-align: bottom;
+}
+
+.dashboard-table tr[data-row-link] {
+    cursor: pointer;
+}
+
+.dashboard-table td,
+.dashboard-table th {
+    padding: .7rem .85rem;
+}
+
+/* Tabel setengah lebar: kolom tetap, kolom tengah terpotong rapi; di layar sangat sempit tabel bisa digeser. */
+.dashboard-table-compact {
+    table-layout: fixed;
+    min-width: 420px;
+}
+
+.dashboard-table-compact .col-schedule {
+    width: 8rem;
+}
+
+.dashboard-table-compact .col-status {
+    width: 8.5rem;
+}
+
+.dashboard-table-compact .dashboard-truncate {
+    display: block;
+    max-width: 100%;
+}
