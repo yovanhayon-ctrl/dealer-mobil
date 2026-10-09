@@ -24,10 +24,6 @@
             {{-- Dekoratif: diputar app.js hanya di layar lebar & tanpa "reduce motion"; di HP tidak diunduh. --}}
             <video class="hero-video" muted playsinline preload="none" aria-hidden="true" tabindex="-1"
                    data-hero-videos='@json($heroVideos)'></video>
-            <button type="button" class="hero-video-toggle btn btn-sm" data-hero-video-toggle hidden
-                    aria-label="Jeda video latar" aria-pressed="false">
-                <i class="bi bi-pause-fill"></i>
-            </button>
         @endif
         <div class="container py-lg-4">
             <div class="row align-items-center g-4">

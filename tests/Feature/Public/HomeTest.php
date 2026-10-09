@@ -224,8 +224,7 @@ class HomeTest extends TestCase
         $response = $this->get(route('home'))->assertOk();
 
         $response->assertSee('class="home-hero py-5 has-video"', false)
-            ->assertSee('data-hero-video-toggle', false)
-            ->assertSee('aria-label="Jeda video latar"', false)
+            ->assertDontSee('hero-video-toggle', false)
             ->assertDontSee('hero-feature', false);
 
         preg_match("/data-hero-videos='([^']+)'/", $response->getContent(), $match);

@@ -61,12 +61,11 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // Video latar hero: hanya layar lebar (≥992px), tanpa "reduce motion", dan tidak dalam mode hemat data.
-    // Beberapa video diputar bergantian; tombol jeda untuk menghentikan gerakan (aksesibilitas).
+    // Satu video diputar berulang; beberapa video diputar bergantian.
     var heroVideo = document.querySelector('[data-hero-videos]');
 
     if (heroVideo) {
         var heroSection = heroVideo.closest('.home-hero');
-        var toggle = document.querySelector('[data-hero-video-toggle]');
         var sources = [];
 
         try {
@@ -81,7 +80,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         if (sources.length && wide && !calm && !saveData) {
             var index = 0;
-            var paused = false;
 
             // Autoplay hanya diizinkan bila video tanpa suara; set juga lewat properti (bukan hanya atribut).
             heroVideo.muted = true;
@@ -91,7 +89,7 @@ document.addEventListener('DOMContentLoaded', function () {
                 // Autoplay ditolak (mis. tab belum terlihat): banner tanpa video tetap tampil,
                 // lalu dicoba lagi saat tab terlihat atau saat pengunjung pertama kali berinteraksi.
                 var retry = function () {
-                    if (!paused && heroVideo.paused && !document.hidden) {
+                    if (heroVideo.paused && !document.hidden) {
                         heroVideo.play().catch(function () {});
                     }
                 };
@@ -120,23 +118,6 @@ document.addEventListener('DOMContentLoaded', function () {
                 index = (index + 1) % sources.length;
                 playCurrent();
             });
-
-            if (toggle) {
-                toggle.hidden = false;
-                toggle.addEventListener('click', function () {
-                    paused = !paused;
-
-                    if (paused) {
-                        heroVideo.pause();
-                    } else {
-                        heroVideo.play();
-                    }
-
-                    toggle.setAttribute('aria-pressed', paused ? 'true' : 'false');
-                    toggle.setAttribute('aria-label', paused ? 'Putar video latar' : 'Jeda video latar');
-                    toggle.querySelector('.bi').className = paused ? 'bi bi-play-fill' : 'bi bi-pause-fill';
-                });
-            }
 
             playCurrent();
         }
