@@ -133,7 +133,7 @@ class CarCardTest extends TestCase
         $this->get(route('cars.index'))
             ->assertOk()
             ->assertSee('<a href="'.$url.'" class="stretched-link text-reset text-decoration-none">Avanza 2025</a>', false)
-            ->assertSee('<a href="'.$url.'" class="btn btn-outline-primary btn-sm w-100">Detail</a>', false)
+            ->assertSee('<a href="'.$url.'" class="btn btn-outline-primary btn-sm flex-grow-1">Detail</a>', false)
             ->assertDontSee('aria-disabled="true">Detail', false);
     }
 }

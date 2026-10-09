@@ -23,6 +23,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\CompareController;
 use App\Http\Controllers\CreditSimulationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
@@ -46,6 +47,14 @@ Route::get('/promo', [PromoController::class, 'index'])->name('promos.index');
 Route::get('/promo/{promo:slug}', [PromoController::class, 'show'])->name('promos.show');
 Route::get('/simulasi-kredit', [CreditSimulationController::class, 'index'])->name('credit.index');
 Route::get('/servis', [ServiceController::class, 'index'])->name('services.index');
+
+// Bandingkan mobil (pilihan di session, tamu boleh).
+Route::get('/bandingkan', [CompareController::class, 'index'])->name('compare.index');
+Route::middleware('throttle:60,1')->controller(CompareController::class)->group(function () {
+    Route::delete('/bandingkan', 'clear')->name('compare.clear');
+    Route::post('/bandingkan/{car:slug}', 'store')->name('compare.store');
+    Route::delete('/bandingkan/{car:slug}', 'destroy')->name('compare.destroy');
+});
 Route::get('/tentang-kami', [PageController::class, 'about'])->name('about');
 Route::get('/kontak', [PageController::class, 'contact'])->name('contact');
 
