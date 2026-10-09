@@ -3,9 +3,10 @@
 namespace App\Notifications\Admin;
 
 use App\Models\User;
+use App\Notifications\Concerns\BuildsNotificationMail;
+use App\Notifications\Notifier;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notification;
-use Illuminate\Support\Facades\Notification as NotificationFacade;
 
 /**
  * Pemberitahuan ke semua admin saat customer membuat atau membatalkan test drive / pengajuan / booking servis.
@@ -14,6 +15,8 @@ use Illuminate\Support\Facades\Notification as NotificationFacade;
  */
 abstract class AdminActivityNotification extends Notification
 {
+    use BuildsNotificationMail;
+
     public const CREATED = 'created';
 
     public const CANCELLED = 'cancelled';
@@ -34,7 +37,7 @@ abstract class AdminActivityNotification extends Notification
      */
     public static function notifyAdmins(self $notification): void
     {
-        NotificationFacade::send(User::where('role', User::ROLE_ADMIN)->get(), $notification);
+        Notifier::send(User::where('role', User::ROLE_ADMIN)->get(), $notification);
     }
 
     /**
@@ -42,7 +45,17 @@ abstract class AdminActivityNotification extends Notification
      */
     public function via(object $notifiable): array
     {
-        return ['database'];
+        return Notifier::mailEnabled() ? ['database', 'mail'] : ['database'];
+    }
+
+    protected function openRoute(): string
+    {
+        return 'admin.notifications.open';
+    }
+
+    protected function mailActionText(): string
+    {
+        return 'Buka di Admin';
     }
 
     /**
