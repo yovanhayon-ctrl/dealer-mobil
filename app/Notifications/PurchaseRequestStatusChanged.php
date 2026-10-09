@@ -18,9 +18,17 @@ class PurchaseRequestStatusChanged extends StatusChangedNotification
 
     protected function description(): string
     {
-        $car = $this->record->car;
+        return self::describe($this->record);
+    }
 
-        return "{$car->brand->name} {$car->name} {$car->year} · {$this->record->paymentMethodLabel()}";
+    /**
+     * Ringkasan data (dipakai juga notifikasi admin).
+     */
+    public static function describe(PurchaseRequest $purchaseRequest): string
+    {
+        $car = $purchaseRequest->car;
+
+        return "{$car->brand->name} {$car->name} {$car->year} · {$purchaseRequest->paymentMethodLabel()}";
     }
 
     protected function routeName(): string

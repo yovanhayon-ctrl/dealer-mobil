@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\TestDriveStatusRequest;
 use App\Models\TestDrive;
+use App\Notifications\Notifier;
 use App\Notifications\TestDriveStatusChanged;
 use DateTime;
 use DomainException;
@@ -99,7 +100,7 @@ class TestDriveController extends Controller
         }
 
         // Hanya perubahan status yang benar-benar tersimpan yang dikabarkan ke customer.
-        $updated->user->notify(new TestDriveStatusChanged($updated));
+        Notifier::send($updated->user, new TestDriveStatusChanged($updated));
 
         return $redirect->with('success', "Status test drive diubah dari {$oldLabel} menjadi {$updated->statusLabel()}.");
     }

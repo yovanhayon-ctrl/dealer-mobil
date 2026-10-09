@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\Controller;
 use App\Models\PurchaseRequest;
+use App\Notifications\Admin\AdminActivityNotification;
+use App\Notifications\Admin\PurchaseRequestActivity;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -55,6 +57,11 @@ class PurchaseRequestController extends Controller
 
             return 'cancelled';
         });
+
+        // Hanya pembatalan yang benar-benar terjadi sekarang (bukan klik ganda / sudah batal) yang dikabarkan.
+        if ($result === 'cancelled') {
+            AdminActivityNotification::notifyAdmins(new PurchaseRequestActivity($purchaseRequest, AdminActivityNotification::CANCELLED));
+        }
 
         return match ($result) {
             'already' => $redirect->with('status', 'Pengajuan ini sudah dibatalkan.'),
