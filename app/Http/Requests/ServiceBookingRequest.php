@@ -5,6 +5,7 @@ namespace App\Http\Requests;
 use App\Actions\BookService;
 use App\Http\Requests\Concerns\NormalizesDigits;
 use App\Http\Requests\Concerns\NormalizesPhone;
+use App\Models\Car;
 use App\Models\Service;
 use App\Models\ServiceBooking;
 use Illuminate\Foundation\Http\FormRequest;
@@ -21,7 +22,8 @@ class ServiceBookingRequest extends FormRequest
 
     public const MAX_COMPLAINT_LENGTH = 500;
 
-    public const MIN_VEHICLE_YEAR = 1980;
+    /** Sama dengan batas tahun katalog: pemilik mobil klasik juga bisa booking servis. */
+    public const MIN_VEHICLE_YEAR = Car::MIN_YEAR;
 
     public const MAX_MILEAGE = 2_000_000;
 

@@ -451,6 +451,29 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 
 ---
 
+## Testing
+
+Test otomatis (PHPUnit) memakai SQLite in-memory, tidak menyentuh database lokal:
+
+```bash
+php artisan test
+```
+
+Menjalankan test yang sama di **MySQL** (database terpisah `dealer_mobil_testing`, dikosongkan setiap kali test berjalan):
+
+```sql
+CREATE DATABASE dealer_mobil_testing CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+```bash
+php artisan optimize:clear
+php vendor/bin/phpunit -c phpunit.mysql.xml
+```
+
+> **Pengaman:** `tests/TestCase.php` membatalkan test bila database tujuan bukan SQLite atau bukan nama berakhiran `_testing`, sehingga `dealer_mobil` tidak pernah ikut terhapus (misalnya saat `config:cache` lupa dibersihkan). Jangan menghapus pengaman ini.
+
+Hasil Phase 17: 651 test lulus di SQLite dan MySQL; semua route dirujuk test; crawler 119 halaman publik tanpa error; uji browser alur tamu, customer (test drive, servis, simulasi → pengajuan, profil), dan admin (dashboard, laporan & CSV, status, validasi, galeri) di desktop, tablet, dan HP. `tests/Feature/SeedDataValidationTest.php` memastikan semua data contoh seeder lolos validasi form admin.
+
 ## Keamanan
 
 Sudah diterapkan (Phase 16):
@@ -489,7 +512,7 @@ Wajib saat production (Phase 19):
 | 14    | Promo                 | ✅ Selesai (admin + halaman publik `/promo` & detail) |
 | 15    | Dashboard & laporan   | ✅ Admin selesai (dashboard, daftar pengguna, laporan) |
 | 16    | Security              | ✅ Selesai (audit + perbaikan, lihat bagian Keamanan) |
-| 17    | Testing               | ⏳                   |
+| 17    | Testing               | ✅ Selesai (651 test SQLite & MySQL, uji browser per peran) |
 | 18    | Optimization          | ⏳                   |
 | 19    | Deployment            | ⏳                   |
 | +     | Branding JAF Dealer            | ✅ Selesai (nama & tagline, warna hitam + merah Nissan, data contoh Nissan & klasik Jepang, filter warna) |
