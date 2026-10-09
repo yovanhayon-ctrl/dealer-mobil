@@ -408,6 +408,37 @@ main {
     border-left: 3px solid #0d6efd;
 }
 
+/* Dibuka dari notifikasi (#test-drive-5 dst.): beri jarak dari navbar sticky & sorot kartunya. */
+.test-drive-item {
+    scroll-margin-top: 5rem;
+}
+
+.test-drive-item:target {
+    box-shadow: 0 0 0 .2rem rgba(195, 0, 47, .35);
+}
+
+/* ---------- Notifikasi ---------- */
+
+.notification-bell {
+    position: relative;
+}
+
+.notification-bell .bi {
+    margin-right: 0;
+}
+
+.notification-bell .badge {
+    position: absolute;
+    top: -.35rem;
+    right: -.45rem;
+    font-size: .65rem;
+}
+
+.notification-item.is-unread {
+    background-color: rgba(195, 0, 47, .05);
+    border-left: 3px solid var(--dm-red);
+}
+
 /* ---------- Publik: JAF Service ---------- */
 
 .service-card-icon {
