@@ -3,13 +3,16 @@
 <head>
     @include('partials.head')
 </head>
-<body>
+<body id="top">
     @include('partials.navbar')
 
     <main>
-        <div class="container pt-3">
-            @include('partials.flash')
-        </div>
+        {{-- Wadah pesan hanya dirender bila ada pesan, agar hero beranda menempel ke navbar. --}}
+        @if (collect(['success', 'status', 'warning', 'error'])->contains(fn ($key) => session()->has($key)))
+            <div class="container pt-3">
+                @include('partials.flash')
+            </div>
+        @endif
 
         @yield('content')
     </main>

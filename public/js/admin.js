@@ -61,6 +61,17 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Baris tabel dashboard: klik di mana saja membuka detail (link di sel pertama tetap untuk keyboard).
+    document.querySelectorAll('tr[data-row-link]').forEach(function (row) {
+        row.addEventListener('click', function (event) {
+            if (event.target.closest('a, button, input, select, textarea')) {
+                return;
+            }
+
+            window.location.href = row.getAttribute('data-row-link');
+        });
+    });
+
     // Grafik dashboard: <canvas data-chart="activity|sales" data-chart-data='{...}'>.
     // Bila Chart.js gagal dimuat (CDN), tabel "Lihat angka" di bawahnya tetap berisi datanya.
     var chartCanvases = document.querySelectorAll('canvas[data-chart]');

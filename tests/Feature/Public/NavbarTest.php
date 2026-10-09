@@ -74,7 +74,10 @@ class NavbarTest extends TestCase
         $navbar = $this->navbar($this->actingAs($admin)->get(route('home'))->assertOk());
 
         $this->assertStringContainsString('href="'.route('admin.dashboard').'"', $navbar);
-        $this->assertSame(2, substr_count($navbar, 'Dashboard Admin')); // menu + dropdown
+        // Tidak lagi di deretan menu: tombol "Admin" di area akun + entri di dropdown akun.
+        $this->assertSame(1, substr_count($navbar, '>Dashboard Admin'));
+        $this->assertMatchesRegularExpression('/<i class="bi bi-speedometer2"><\/i>Admin\s*<\/a>/', $navbar);
+        $this->assertSame(2, substr_count($navbar, 'href="'.route('admin.dashboard').'"'));
     }
 
     public function test_footer_menampilkan_menu_jam_buka_dan_whatsapp(): void
@@ -88,7 +91,10 @@ class NavbarTest extends TestCase
             ->assertSee('Senin–Sabtu 08.00–17.00')
             ->assertSee('Chat WhatsApp')
             ->assertSee('https://wa.me/6281234567890')
-            ->assertSee('<li class="mb-2"><a href="'.route('cars.index').'">Mobil</a></li>', false);
+            ->assertSee('<li><a href="'.route('cars.index').'">Mobil</a></li>', false)
+            ->assertSee('<li><a href="'.route('test-drives.create').'">Test Drive</a></li>', false)
+            ->assertSee('<li><a href="'.route('compare.index').'">Bandingkan Mobil</a></li>', false)
+            ->assertSee('href="#top"', false);
     }
 
     public function test_footer_tanpa_whatsapp_jika_nomor_kosong(): void
