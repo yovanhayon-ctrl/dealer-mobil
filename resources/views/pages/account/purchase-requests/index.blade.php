@@ -29,7 +29,7 @@
                 @foreach ($purchaseRequests as $purchase)
                     @php($car = $purchase->car)
                     @php($carTitle = "{$car->brand->name} {$car->name} {$car->year}")
-                    <article class="card test-drive-item">
+                    <article class="card test-drive-item" id="pengajuan-{{ $purchase->id }}">
                         <div class="card-body p-3 d-flex flex-column flex-md-row gap-3">
                             @if ($car->primaryImage)
                                 <img src="{{ $car->primaryImage->url }}" alt="{{ $carTitle }}" class="test-drive-car-thumb" loading="lazy">

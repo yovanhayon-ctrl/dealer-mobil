@@ -52,6 +52,17 @@
                         <i class="bi bi-person-plus"></i>Daftar
                     </a>
                 @else
+                    @if (! auth()->user()->isAdmin() && Route::has('account.notifications.index'))
+                        @php($unreadNotifications = auth()->user()->unreadNotifications()->count())
+                        <a href="{{ route('account.notifications.index') }}"
+                           @class(['btn btn-outline-light btn-sm notification-bell', 'active' => request()->routeIs('account.notifications.*')])
+                           aria-label="Notifikasi{{ $unreadNotifications ? ", {$unreadNotifications} belum dibaca" : '' }}">
+                            <i class="bi bi-bell{{ $unreadNotifications ? '-fill' : '' }}"></i>
+                            @if ($unreadNotifications)
+                                <span class="badge rounded-pill bg-danger" aria-hidden="true">{{ $unreadNotifications > 9 ? '9+' : $unreadNotifications }}</span>
+                            @endif
+                        </a>
+                    @endif
                     <div class="dropdown">
                         <button class="btn btn-outline-light btn-sm dropdown-toggle" type="button"
                                 data-bs-toggle="dropdown" aria-expanded="false">

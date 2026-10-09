@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ServiceBookingStatusRequest;
 use App\Models\Service;
 use App\Models\ServiceBooking;
+use App\Notifications\ServiceBookingStatusChanged;
 use DateTime;
 use DomainException;
 use Illuminate\Database\Eloquent\Builder;
@@ -94,6 +95,9 @@ class ServiceBookingController extends Controller
         if (! $updated->wasChanged('status')) {
             return $redirect->with('status', "Booking servis ini sudah berstatus {$updated->statusLabel()}. Tidak ada perubahan. Catatan Anda tidak disimpan.");
         }
+
+        // Hanya perubahan status yang benar-benar tersimpan yang dikabarkan ke customer.
+        $updated->user->notify(new ServiceBookingStatusChanged($updated));
 
         return $redirect->with('success', "Status booking servis diubah dari {$oldLabel} menjadi {$updated->statusLabel()}.");
     }

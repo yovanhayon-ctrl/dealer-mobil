@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Account\NotificationController;
 use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\PurchaseRequestController as AccountPurchaseRequestController;
 use App\Http\Controllers\Account\ServiceBookingController as AccountServiceBookingController;
@@ -114,6 +115,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('servis', [AccountServiceBookingController::class, 'index'])->name('service-bookings.index');
         Route::patch('servis/{serviceBooking}/batal', [AccountServiceBookingController::class, 'cancel'])->name('service-bookings.cancel');
+
+        Route::get('notifikasi', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::patch('notifikasi/baca-semua', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+        Route::get('notifikasi/{notification}', [NotificationController::class, 'open'])->whereUuid('notification')->name('notifications.open');
     });
 });
 
