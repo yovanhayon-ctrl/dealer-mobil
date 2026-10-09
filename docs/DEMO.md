@@ -74,6 +74,7 @@ Mengikuti *customer journey* di proposal: Temukan → Kenali → Pertimbangkan �
 | 13 | Customer | **(v1.1.0)** Muat ulang halaman → lonceng 🔔 di navbar menunjukkan angka → klik → klik notifikasi *Pengajuan Pembelian Disetujui* | Notifikasi status + catatan dealer, kartu pengajuan tersorot |
 | 13a | Semua | **(v1.2.0)** Buka inbox **Mailtrap** (atau `storage/logs/laravel.log`) | Email "Pengajuan Pembelian Disetujui" ke customer dan email "… Baru" ke admin, berbahasa Indonesia |
 | 13b | Admin → Customer → Admin | **(v1.3.0)** Admin: **Pengajuan** → pengajuan *Disetujui* milik `andi.pratama@example.test` (Magnite) → *Selesai*. Login sebagai Andi → **Pengajuan Saya** → **Beri Ulasan** (5 bintang + komentar) → kirim. Admin: lonceng bertambah → menu **Ulasan** → **Setujui** → buka **Beranda** | Ulasan hanya untuk pembelian selesai, moderasi admin, ulasan tampil di *Kata Pelanggan* dengan nama "Andi P." |
+| 13c | Customer → Admin | **(v1.4.0)** Customer: **Pengajuan Saya** → **Cetak PDF** pada pengajuan langkah 7. Admin: detail pengajuan yang sama → **Cetak PDF** | Bukti pengajuan A4 terbuka di tab baru: nomor `PB-…`, data customer & mobil, rincian kredit, catatan dealer |
 | 14 | Admin | **Booking Servis** → konfirmasi → (pada tanggalnya) *Dikerjakan* → *Selesai* + catatan | Alur status servis (customer juga mendapat notifikasi) |
 | 15 | Admin | **Laporan** → *Export CSV* | Rekap penjualan, test drive, servis, stok menipis |
 | 16 | Semua | Tampilkan di HP (F12 → mode perangkat) | Responsif, menu ☰, tabel bandingkan bisa digeser |
@@ -94,5 +95,6 @@ Tips: booking test drive/servis hanya bisa untuk **besok s/d 30 hari ke depan**;
 | Aksi terasa lambat beberapa detik | SMTP tidak bisa dihubungi (internet/Mailtrap). Perbaiki `MAIL_*` atau set `DEALER_MAIL_NOTIFICATIONS=false`. |
 | Tabel `notifications` / `favorites` / `testimonials` tidak ditemukan | Database masih versi lama → `php artisan migrate`. |
 | Tombol **Beri Ulasan** tidak muncul | Hanya untuk pengajuan berstatus **Selesai**; ubah statusnya di admin (*Disetujui* → *Selesai*). Ulasan yang sudah disetujui tidak bisa diubah lagi. |
+| Klik **Cetak PDF** muncul error *Class "Dompdf\Dompdf" not found* | Dependency belum terpasang → `composer install` lalu `php artisan optimize:clear`. |
 | Bagian **Kata Pelanggan** tidak muncul di beranda | Belum ada ulasan yang **disetujui** → setujui di **Admin → Ulasan**, atau jalankan `php artisan db:seed --class=PurchaseRequestSeeder` lalu `--class=TestimonialSeeder`. |
 | Lupa kata sandi akun demo | Halaman **Lupa kata sandi?** → tautan reset ada di `storage/logs/laravel.log` (`MAIL_MAILER=log`). |
