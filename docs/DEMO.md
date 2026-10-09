@@ -19,6 +19,7 @@ php artisan test
 - `php artisan test` harus **lulus semua** sebelum demo.
 - `php artisan migrate` juga membuat tabel fitur v1.1.0 (`notifications`, `favorites`) bila laptop masih memakai database versi v1.0.0.
 - Laptop harus **terhubung internet**: Bootstrap, ikon, font, dan grafik dashboard (Chart.js) dimuat dari CDN.
+- **Email notifikasi (v1.2.0):** dengan `MAIL_MAILER=log` email hanya tercatat di `storage/logs/laravel.log`. Agar bisa ditunjukkan, pakai **Mailtrap** (lihat [RELEASE-v1.2.0.md](RELEASE-v1.2.0.md#pengaturan-email-env)) dan buka inbox Mailtrap di tab browser terpisah. Tanpa internet/Mailtrap, set `DEALER_MAIL_NOTIFICATIONS=false` agar tidak menunggu koneksi SMTP.
 - Pastikan `.env` berisi: `DEALER_NAME="JAF Dealer"`, `DEALER_TAGLINE`, kontak dealer (`DEALER_*`), `ADMIN_EMAIL`, `ADMIN_PASSWORD`, dan `SEED_CUSTOMER_PASSWORD` (lihat `.env.example`).
 - Laragon: **Start All** (Apache + MySQL), lalu buka `http://dealer-mobil.test`.
 
@@ -65,12 +66,13 @@ Mengikuti *customer journey* di proposal: Temukan → Kenali → Pertimbangkan �
 | 5 | Tamu | **Promo** → *Diskon Spesial Kicks e-Power* | Promo berjalan, harga setelah diskon |
 | 6 | Tamu | **Simulasi Kredit** → Kicks e-Power, klik *DP 30%*, ubah tenor | Hitung live, tabel perbandingan tenor |
 | 7 | Customer | Klik **Ajukan dengan Simulasi Ini** → kirim | Nilai simulasi terbawa ke form pengajuan |
-| 8 | Customer | **Test Drive** → booking mobil lain | Validasi jadwal & slot |
+| 8 | Customer → Admin | **Test Drive** → booking mobil lain → pindah ke jendela admin → lonceng 🔔 topbar & menu **Notifikasi** bertambah → klik notifikasi | Validasi jadwal & slot, **(v1.2.0)** notifikasi admin langsung membuka detail test drive |
 | 9 | Customer | **Servis** → booking servis (plat `b1234xyz`) | JAF Service, plat dirapikan otomatis |
 | 10 | Customer | Menu akun → **Pengajuan Saya / Test Drive Saya / Servis Saya** | Status *Menunggu*, tombol batal |
 | 11 | Admin | **Dashboard** → gulir ke **Tren 6 Bulan Terakhir** → buka *Lihat angka* | Kartu statistik, jadwal terdekat, **(v1.1.0)** grafik aktivitas & penjualan |
 | 12 | Admin | **Pengajuan** → buka pengajuan langkah 7 → *Diproses* → *Disetujui* + catatan | Stok mobil berkurang otomatis |
 | 13 | Customer | **(v1.1.0)** Muat ulang halaman → lonceng 🔔 di navbar menunjukkan angka → klik → klik notifikasi *Pengajuan Pembelian Disetujui* | Notifikasi status + catatan dealer, kartu pengajuan tersorot |
+| 13a | Semua | **(v1.2.0)** Buka inbox **Mailtrap** (atau `storage/logs/laravel.log`) | Email "Pengajuan Pembelian Disetujui" ke customer dan email "… Baru" ke admin, berbahasa Indonesia |
 | 14 | Admin | **Booking Servis** → konfirmasi → (pada tanggalnya) *Dikerjakan* → *Selesai* + catatan | Alur status servis (customer juga mendapat notifikasi) |
 | 15 | Admin | **Laporan** → *Export CSV* | Rekap penjualan, test drive, servis, stok menipis |
 | 16 | Semua | Tampilkan di HP (F12 → mode perangkat) | Responsif, menu ☰, tabel bandingkan bisa digeser |
@@ -86,6 +88,8 @@ Tips: booking test drive/servis hanya bisa untuk **besok s/d 30 hari ke depan**;
 | Perubahan kode/`.env` tidak terlihat | Cache aktif → `php artisan optimize:clear`. |
 | "Terlalu banyak percobaan…" | Rate limit (keamanan). Tunggu 1 menit. |
 | Grafik dashboard kosong, hanya ada tabel *Lihat angka* | Chart.js gagal dimuat dari CDN (tidak ada internet). Angkanya tetap ada di tabel *Lihat angka*. |
-| Lonceng notifikasi tidak muncul / tidak bertambah | Lonceng hanya untuk akun **customer**. Notifikasi dikirim hanya bila admin benar-benar **mengubah status** (menyimpan catatan saja tidak). Muat ulang halaman customer. |
+| Lonceng notifikasi tidak muncul / tidak bertambah | Customer: notifikasi dikirim hanya bila admin benar-benar **mengubah status** (menyimpan catatan saja tidak). Admin: hanya untuk booking/pengajuan **baru** atau yang **dibatalkan customer**. Muat ulang halaman. |
+| Email tidak masuk ke Mailtrap | Cek `MAIL_*` di `.env` lalu `php artisan optimize:clear`. Proses tetap berhasil walau email gagal; penyebabnya tercatat di `storage/logs/laravel.log`. |
+| Aksi terasa lambat beberapa detik | SMTP tidak bisa dihubungi (internet/Mailtrap). Perbaiki `MAIL_*` atau set `DEALER_MAIL_NOTIFICATIONS=false`. |
 | Tabel `notifications` / `favorites` tidak ditemukan | Database masih versi v1.0.0 → `php artisan migrate`. |
 | Lupa kata sandi akun demo | Halaman **Lupa kata sandi?** → tautan reset ada di `storage/logs/laravel.log` (`MAIL_MAILER=log`). |
