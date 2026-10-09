@@ -7,7 +7,7 @@ Panduan memasang aplikasi di shared hosting berbasis cPanel (mis. Niagahoster, H
 | Kebutuhan | Keterangan |
 |---|---|
 | **PHP 8.4 atau lebih baru (disarankan 8.5)** | **Wajib.** Paket yang terkunci di `composer.lock` (Symfony 8) membutuhkan PHP ≥ 8.4.1. Di PHP 8.3 aplikasi **tidak** akan berjalan. Atur di cPanel → *Select PHP Version* / *MultiPHP Manager*. |
-| Ekstensi PHP | `pdo_mysql`, `mbstring`, `openssl`, `fileinfo` (validasi upload), `ctype`, `tokenizer`, `xml`, `curl`. |
+| Ekstensi PHP | `pdo_mysql`, `mbstring`, `openssl`, `fileinfo` (validasi upload), `ctype`, `tokenizer`, `xml`, `curl`, `dom` (PDF bukti pengajuan, dompdf). |
 | Database | MySQL 8 (atau MariaDB 10.6+). |
 | Terminal / SSH di cPanel | **Sangat disarankan** (untuk `php artisan`). Tanpa Terminal lihat bagian 9. |
 | SSL | AutoSSL / Let's Encrypt (biasanya gratis di cPanel). |
