@@ -140,6 +140,38 @@
         </section>
     @endif
 
+    @if ($testimonials->isNotEmpty())
+        <section class="container py-5" aria-labelledby="testimonial-title">
+            <div class="d-flex flex-wrap align-items-end justify-content-between gap-2 mb-3">
+                <h2 id="testimonial-title" class="h4 mb-0">Kata Pelanggan</h2>
+                <p class="mb-0 text-muted">
+                    <i class="bi bi-star-fill text-warning me-1" aria-hidden="true"></i>
+                    <span class="fw-semibold text-body">{{ number_format((float) $ratingSummary->average, 1, ',', '.') }}</span> dari 5
+                    · {{ $ratingSummary->total }} ulasan
+                </p>
+            </div>
+            <div class="row g-4">
+                @foreach ($testimonials as $testimonial)
+                    @php($car = $testimonial->purchaseRequest->car)
+                    <div class="col-md-6 col-lg-4">
+                        <figure class="card h-100 testimonial-card mb-0">
+                            <div class="card-body p-4 d-flex flex-column">
+                                <x-rating-stars :rating="$testimonial->rating" class="mb-2" />
+                                <blockquote class="mb-3 flex-grow-1">
+                                    <p class="mb-0 text-break">{{ \Illuminate\Support\Str::limit($testimonial->comment, 220) }}</p>
+                                </blockquote>
+                                <figcaption class="small">
+                                    <span class="fw-semibold">{{ \App\Models\Testimonial::publicName($testimonial->user->name) }}</span>
+                                    <span class="text-muted d-block">Membeli {{ $car->brand->name }} {{ $car->name }} {{ $car->year }} · {{ $testimonial->approved_at?->translatedFormat('M Y') }}</span>
+                                </figcaption>
+                            </div>
+                        </figure>
+                    </div>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
     @if ($creditUrl || $dealer['whatsapp'])
         <section class="container pb-2" aria-labelledby="cta-title">
             <div class="home-cta rounded-4 p-4 p-lg-5 d-lg-flex align-items-center justify-content-between gap-4">

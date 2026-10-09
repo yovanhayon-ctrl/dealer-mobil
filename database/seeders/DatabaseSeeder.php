@@ -26,6 +26,7 @@ class DatabaseSeeder extends Seeder
             TestDriveSeeder::class,
             PurchaseRequestSeeder::class,
             ServiceBookingSeeder::class,
+            TestimonialSeeder::class,
         ]);
     }
 }

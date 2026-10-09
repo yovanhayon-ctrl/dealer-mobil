@@ -76,6 +76,38 @@
                                         {{ $purchase->admin_note }}
                                     </div>
                                 @endif
+
+                                {{-- Ulasan: hanya untuk pembelian yang sudah selesai. --}}
+                                @if ($purchase->canBeReviewed() && Route::has('account.testimonials.edit'))
+                                    @php($review = $purchase->testimonial)
+                                    <div class="testimonial-box small rounded-3 p-2 mb-2">
+                                        @if (! $review)
+                                            <span class="me-2"><i class="bi bi-star me-1"></i>Bagaimana pengalaman Anda membeli mobil ini?</span>
+                                            <a href="{{ route('account.testimonials.edit', $purchase) }}" class="btn btn-accent btn-sm mt-1 mt-sm-0">
+                                                <i class="bi bi-pencil-square"></i>Beri Ulasan
+                                            </a>
+                                        @else
+                                            <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
+                                                <span class="fw-semibold">Ulasan Anda</span>
+                                                <x-rating-stars :rating="$review->rating" />
+                                                <x-status-badge :status="$review->status" />
+                                            </div>
+                                            <p class="mb-1 text-break">{{ $review->comment }}</p>
+                                            @if ($review->status === \App\Models\Testimonial::STATUS_PENDING)
+                                                <p class="text-muted mb-1">Menunggu persetujuan admin sebelum tampil di beranda.</p>
+                                            @elseif ($review->status === \App\Models\Testimonial::STATUS_REJECTED)
+                                                <p class="text-danger mb-1"><span class="fw-semibold">Ditolak:</span> {{ $review->admin_note }}</p>
+                                            @else
+                                                <p class="text-muted mb-0">Tampil di beranda. Terima kasih atas ulasan Anda!</p>
+                                            @endif
+                                            @if ($review->canBeEditedByCustomer())
+                                                <a href="{{ route('account.testimonials.edit', $purchase) }}" class="btn btn-outline-primary btn-sm">
+                                                    <i class="bi bi-pencil"></i>{{ $review->status === \App\Models\Testimonial::STATUS_REJECTED ? 'Perbaiki Ulasan' : 'Ubah Ulasan' }}
+                                                </a>
+                                            @endif
+                                        @endif
+                                    </div>
+                                @endif
                             </div>
 
                             @if ($purchase->canBeCancelledByCustomer())
