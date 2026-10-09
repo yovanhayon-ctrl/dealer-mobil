@@ -1,6 +1,8 @@
 # Deploy ke Shared Hosting (cPanel) — JAF Dealer
 
-Panduan memasang aplikasi di shared hosting berbasis cPanel (mis. Niagahoster, Hostinger, Rumahweb, IDCloudHost). Tidak perlu queue worker maupun cron (aplikasi tidak memakai queue/scheduler).
+Panduan memasang aplikasi di shared hosting berbasis cPanel (mis. Niagahoster, Hostinger, Rumahweb, IDCloudHost). Tidak perlu queue worker maupun cron: aplikasi tidak memakai scheduler, dan notifikasi (lonceng + email) dikirim langsung tanpa queue.
+
+Berlaku untuk rilis **v1.4.0** (notifikasi customer & admin, email, favorit, bandingkan mobil, grafik dashboard, ulasan, bukti pengajuan PDF). Untuk dipakai klien, gunakan subdomain atau domain tambahan dengan document root ke folder `public` (bagian 4, opsi A).
 
 ## 1. Syarat hosting (cek sebelum membeli/memakai)
 
@@ -29,7 +31,7 @@ Ekstrak `dealer-mobil-release.zip` ke folder baru (mis. `C:/laragon/www/dealer-m
 composer install --no-dev --optimize-autoloader
 ```
 
-Kompres ulang isi folder tersebut menjadi `dealer-mobil.zip`. Paket **tidak** boleh berisi `.env` (berisi rahasia) — `git archive` sudah tidak menyertakannya.
+Perintah ini juga memasang `dompdf/dompdf` (fitur **Cetak PDF**), jadi folder `vendor` di paket sudah lengkap. Kompres ulang isi folder tersebut menjadi `dealer-mobil.zip`. Paket **tidak** boleh berisi `.env` (berisi rahasia) — `git archive` sudah tidak menyertakannya.
 
 ## 3. Upload
 
@@ -95,6 +97,7 @@ MAIL_SCHEME=smtps
 MAIL_USERNAME=noreply@domain-anda.com
 MAIL_PASSWORD=kata-sandi-email
 MAIL_FROM_ADDRESS=noreply@domain-anda.com
+DEALER_MAIL_NOTIFICATIONS=true
 
 DEALER_NAME="JAF Dealer"
 DEALER_TAGLINE="Dream the Legacy. Drive the Future."
@@ -109,7 +112,9 @@ ADMIN_EMAIL=admin@domain-anda.com
 ADMIN_PASSWORD=kata-sandi-admin-yang-kuat
 ```
 
-- `MAIL_*`: buat akun email di cPanel → **Email Accounts** (dipakai fitur *Lupa kata sandi*).
+- `MAIL_*`: buat akun email di cPanel → **Email Accounts**. Dipakai fitur *Lupa kata sandi* dan **notifikasi email**: customer menerima email saat status test drive/pengajuan/servis/ulasan berubah, admin menerima email saat ada booking, pengajuan, pembatalan, atau ulasan baru. Pastikan `ADMIN_EMAIL` adalah alamat yang benar-benar dibaca.
+- `DEALER_MAIL_NOTIFICATIONS=false` mematikan email notifikasi (lonceng tetap jalan). Kegagalan SMTP tidak menggagalkan proses, tetapi setting yang salah membuat aksi terasa lambat; cek `storage/logs/laravel.log`.
+- `DEALER_*` diisi **data klien** (nama dealer, alamat, telepon, WhatsApp, email, jam buka, peta): tampil di navbar, footer, Kontak, tombol WhatsApp, email, dan kop **PDF bukti pengajuan**.
 - `SESSION_SECURE_COOKIE=true` hanya bila situs sudah memakai **HTTPS**.
 - `SEED_CUSTOMER_PASSWORD` dibiarkan kosong: customer dummy tidak dibuat di production.
 - Peta Google: Google Maps → *Bagikan* → *Sematkan peta* → salin URL di dalam `src="…"`.
@@ -128,7 +133,7 @@ php artisan storage:link
 php artisan optimize
 ```
 
-- `db:seed --force` di production membuat: akun admin (dari `ADMIN_EMAIL`/`ADMIN_PASSWORD`), merek, kategori, 21 mobil contoh, 5 promo, dan 6 layanan servis. Data dummy customer/transaksi **tidak** dibuat (hanya local/testing). Lewati perintah ini bila ingin mengisi data sendiri lewat admin (akun admin tetap dibutuhkan: jalankan `php artisan db:seed --class=AdminUserSeeder --force`).
+- `db:seed --force` di production membuat: akun admin (dari `ADMIN_EMAIL`/`ADMIN_PASSWORD`), merek, kategori, 21 mobil contoh, 5 promo, dan 6 layanan servis. Data dummy customer, transaksi, dan ulasan contoh **tidak** dibuat (hanya local/testing), sehingga bagian *Kata Pelanggan* di beranda baru muncul setelah ada ulasan customer sungguhan yang disetujui admin. Lewati perintah ini bila ingin mengisi data sendiri lewat admin (akun admin tetap dibutuhkan: jalankan `php artisan db:seed --class=AdminUserSeeder --force`).
 - Opsi B (`public_html`): perintah `artisan` di terminal **tidak** membaca `public_html/index.php`, jadi `storage:link` membuat tautan di `dealer-mobil/public/storage` (tidak dipakai). Buat tautan untuk `public_html` secara manual:
   `ln -s ~/dealer-mobil/storage/app/public ~/public_html/storage`
 - Izin folder (bila muncul error "Permission denied"): `chmod -R 775 storage bootstrap/cache`.
@@ -158,11 +163,14 @@ Header keamanan (CSP, HSTS saat HTTPS, dll.) sudah dipasang aplikasi; aturan cac
 - [ ] Login admin berhasil; tambah foto mobil dan foto tampil di katalog.
 - [ ] Daftar akun customer baru → booking test drive → muncul di admin.
 - [ ] *Lupa kata sandi* mengirim email.
+- [ ] Admin mengubah status booking test drive tadi → customer melihat lonceng 🔔 dan menerima email; admin menerima notifikasi booking baru.
+- [ ] **Pengajuan Saya** → **Cetak PDF** membuka bukti pengajuan dengan kop data klien.
+- [ ] Favorit (❤), **Bandingkan**, dan grafik **Tren 6 Bulan** di dashboard admin tampil (grafik butuh akses ke cdn.jsdelivr.net).
 - [ ] Gembok HTTPS aktif; `https://domain-anda.com/.env` **tidak** bisa dibuka (harus 403/404).
 
 ## 11. Memperbarui aplikasi (rilis berikutnya)
 
-1. Siapkan paket baru seperti bagian 2 dan upload/ekstrak menimpa folder `dealer-mobil` (**jangan** menimpa `.env` dan `storage/app/public`).
+1. Siapkan paket baru seperti bagian 2 dan upload/ekstrak menimpa folder `dealer-mobil` (**jangan** menimpa `.env` dan `storage/app/public`). Folder `vendor` ikut diganti, sehingga dependency baru (mis. dompdf di v1.4.0) ikut terpasang. Bila memakai Terminal dengan `composer`, boleh juga `composer install --no-dev --optimize-autoloader` di server.
 2. Di Terminal: `cd ~/dealer-mobil && php artisan down && php artisan migrate --force && php artisan optimize && php artisan up`.
 3. Opsi B: salin ulang isi `dealer-mobil/public` ke `public_html` (kecuali `index.php` yang sudah diedit).
 
@@ -175,4 +183,7 @@ Header keamanan (CSP, HSTS saat HTTPS, dll.) sudah dipasang aplikasi; aturan cac
 | Perubahan `.env` tidak berlaku | Config ter-cache → `php artisan optimize`. |
 | Foto tidak tampil | `storage:link` belum ada / salah folder (opsi B: tautan harus `public_html/storage` → `~/dealer-mobil/storage/app/public`, dibuat manual dengan `ln -s`). |
 | Peta tidak tampil | `DEALER_MAPS_EMBED_URL` harus URL **embed** Google Maps (https). |
+| **Cetak PDF** error *Class "Dompdf\Dompdf" not found* | Folder `vendor` lama → upload paket baru (bagian 2) atau `composer install --no-dev`. |
+| **Cetak PDF** error terkait `DOMDocument` | Ekstensi PHP `dom` belum aktif → cPanel → *Select PHP Version* → *Extensions* → centang `dom`. |
+| Email notifikasi tidak terkirim / aksi lambat | `MAIL_*` salah atau port SMTP diblokir hosting → cek `laravel.log`, perbaiki lalu `php artisan optimize`, atau sementara `DEALER_MAIL_NOTIFICATIONS=false`. |
 | *419 Sesi Berakhir* terus-menerus | `SESSION_SECURE_COOKIE=true` padahal belum HTTPS, atau `APP_URL` tidak sesuai domain. |
