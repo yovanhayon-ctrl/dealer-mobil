@@ -10,10 +10,25 @@
     // (diambil dari $latestCars, tanpa query tambahan).
     $withPhoto = $latestCars->filter(fn ($car) => $car->primaryImage !== null);
     $featuredCar = $withPhoto->first(fn ($car) => $car->brand->slug === 'nissan') ?? $withPhoto->first();
+    // Video latar hero (DEALER_HERO_VIDEOS): hanya file .mp4 yang benar-benar ada di folder public.
+    $heroVideos = collect(config('dealer.hero_videos', []))
+        ->filter(fn ($path) => is_string($path) && str_ends_with(strtolower($path), '.mp4')
+            && ! str_contains($path, '..') && is_file(public_path($path)))
+        ->map(fn ($path) => \App\Support\Asset::url(ltrim($path, '/')))
+        ->values();
 @endphp
 
 @section('content')
-    <section class="home-hero py-5" aria-labelledby="hero-title">
+    <section @class(['home-hero py-5', 'has-video' => $heroVideos->isNotEmpty()]) aria-labelledby="hero-title">
+        @if ($heroVideos->isNotEmpty())
+            {{-- Dekoratif: diputar app.js hanya di layar lebar & tanpa "reduce motion"; di HP tidak diunduh. --}}
+            <video class="hero-video" muted playsinline preload="none" aria-hidden="true" tabindex="-1"
+                   data-hero-videos='@json($heroVideos)'></video>
+            <button type="button" class="hero-video-toggle btn btn-sm" data-hero-video-toggle hidden
+                    aria-label="Jeda video latar" aria-pressed="false">
+                <i class="bi bi-pause-fill"></i>
+            </button>
+        @endif
         <div class="container py-lg-4">
             <div class="row align-items-center g-4">
                 <div class="col-lg-7">
@@ -34,7 +49,7 @@
                     </div>
                 </div>
 
-                @if ($featuredCar)
+                @if ($featuredCar && $heroVideos->isEmpty())
                     @php($featuredTitle = "{$featuredCar->brand->name} {$featuredCar->name} {$featuredCar->year}")
                     {{-- Hanya layar lebar: di HP hero tetap ringkas, mobil terbaru ada tepat di bawahnya. --}}
                     <div class="col-lg-5 d-none d-lg-block">
