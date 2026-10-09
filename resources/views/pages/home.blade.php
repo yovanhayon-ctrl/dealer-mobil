@@ -6,13 +6,17 @@
 @php
     $dealer = config('dealer');
     $creditUrl = Route::has('credit.index') ? route('credit.index') : null;
+    // Mobil unggulan di hero: Nissan terbaru yang punya foto, bila tidak ada mobil terbaru lain yang punya foto
+    // (diambil dari $latestCars, tanpa query tambahan).
+    $withPhoto = $latestCars->filter(fn ($car) => $car->primaryImage !== null);
+    $featuredCar = $withPhoto->first(fn ($car) => $car->brand->slug === 'nissan') ?? $withPhoto->first();
 @endphp
 
 @section('content')
     <section class="home-hero py-5" aria-labelledby="hero-title">
         <div class="container py-lg-4">
-            <div class="row">
-                <div class="col-lg-8">
+            <div class="row align-items-center g-4">
+                <div class="col-lg-7">
                     <p class="text-uppercase small fw-semibold mb-2 opacity-75">Nissan Heritage &amp; Performance</p>
                     <h1 id="hero-title" class="display-5 fw-bold text-white mb-3">{{ $dealer['name'] }}</h1>
                     <p class="lead mb-4">
@@ -29,6 +33,29 @@
                         @endif
                     </div>
                 </div>
+
+                @if ($featuredCar)
+                    @php($featuredTitle = "{$featuredCar->brand->name} {$featuredCar->name} {$featuredCar->year}")
+                    {{-- Hanya layar lebar: di HP hero tetap ringkas, mobil terbaru ada tepat di bawahnya. --}}
+                    <div class="col-lg-5 d-none d-lg-block">
+                        <a href="{{ route('cars.show', $featuredCar) }}" class="hero-feature d-block text-decoration-none"
+                           aria-label="Mobil unggulan: {{ $featuredTitle }}">
+                            <span class="hero-feature-badge"><i class="bi bi-star-fill"></i>Unggulan</span>
+                            <img src="{{ $featuredCar->primaryImage->url }}" alt="{{ $featuredTitle }}" class="hero-feature-img">
+                            <span class="hero-feature-body d-flex align-items-end justify-content-between gap-3">
+                                <span class="min-w-0">
+                                    <span class="d-block small text-muted">{{ $featuredCar->brand->name }} · {{ $featuredCar->condition_label }}</span>
+                                    <span class="d-block fw-semibold text-body text-truncate">{{ $featuredCar->name }} {{ $featuredCar->year }}</span>
+                                    @if ($featuredCar->hasPromoPrice())
+                                        <del class="price-old small d-block"><x-price :amount="$featuredCar->price" /></del>
+                                    @endif
+                                    <x-price :amount="$featuredCar->finalPrice()" class="price-final" />
+                                </span>
+                                <span class="btn btn-accent btn-sm flex-shrink-0">Lihat Detail<i class="bi bi-arrow-right ms-1 me-0"></i></span>
+                            </span>
+                        </a>
+                    </div>
+                @endif
             </div>
         </div>
     </section>

@@ -4,6 +4,7 @@ namespace Tests\Feature\Public;
 
 use App\Models\Brand;
 use App\Models\Car;
+use App\Models\CarImage;
 use App\Models\Category;
 use App\Models\Promo;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -140,6 +141,47 @@ class HomeTest extends TestCase
             ->assertSee('<title>Beranda — Dealer Maju</title>', false)
             ->assertSee('<meta name="description" content="Dealer Maju — Nissan Heritage &amp; Performance', false)
             ->assertSee('Nissan Heritage &amp; Performance</p>', false);
+    }
+
+    // ---------- Banner hero: mobil unggulan ----------
+
+    private function withPhoto(Car $car): Car
+    {
+        CarImage::create(['car_id' => $car->id, 'path' => "cars/{$car->id}/foto.jpg", 'is_primary' => true, 'sort_order' => 1]);
+
+        return $car;
+    }
+
+    public function test_hero_menampilkan_nissan_terbaru_yang_punya_foto(): void
+    {
+        $this->withPhoto($this->car('Nissan', 'Sport', 'Skyline GT-R', ['created_at' => now()->subDays(3)]));
+        $this->withPhoto($this->car('Subaru', 'Sedan', 'Impreza WRX', ['created_at' => now()->subDay()]));
+        $this->car('Nissan', 'MPV', 'Livina Tanpa Foto', ['created_at' => now()]);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('aria-label="Mobil unggulan: Nissan Skyline GT-R 2025"', false)
+            ->assertSee('hero-feature-badge', false)
+            ->assertDontSee('Mobil unggulan: Subaru', false)
+            ->assertDontSee('Mobil unggulan: Nissan Livina Tanpa Foto', false);
+    }
+
+    public function test_hero_memakai_merek_lain_bila_tidak_ada_nissan_berfoto(): void
+    {
+        $this->withPhoto($this->car('Toyota', 'Sport', 'Sprinter Trueno AE86'));
+
+        $this->get(route('home'))
+            ->assertSee('aria-label="Mobil unggulan: Toyota Sprinter Trueno AE86 2025"', false);
+    }
+
+    public function test_hero_tanpa_kartu_bila_tidak_ada_mobil_berfoto(): void
+    {
+        $this->car('Nissan', 'MPV', 'Livina');
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('Dealer Maju')
+            ->assertDontSee('hero-feature', false);
     }
 
     public function test_jumlah_query_tetap_walau_data_bertambah(): void
