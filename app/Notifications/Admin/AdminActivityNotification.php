@@ -21,6 +21,8 @@ abstract class AdminActivityNotification extends Notification
 
     public const CANCELLED = 'cancelled';
 
+    public const UPDATED = 'updated';
+
     public function __construct(protected Model $record, protected string $event = self::CREATED) {}
 
     /** Contoh: "Test Drive". */
@@ -53,6 +55,16 @@ abstract class AdminActivityNotification extends Notification
         return 'admin.notifications.open';
     }
 
+    /**
+     * Parameter route tujuan; bawaan id data (halaman detail admin).
+     *
+     * @return array<int|string, mixed>
+     */
+    protected function routeParams(): array
+    {
+        return [$this->record->getKey()];
+    }
+
     protected function mailActionText(): string
     {
         return 'Buka di Admin';
@@ -64,9 +76,11 @@ abstract class AdminActivityNotification extends Notification
     public function toArray(object $notifiable): array
     {
         $customer = $this->record->user->name;
-        $title = $this->event === self::CANCELLED
-            ? "{$this->subject()} Dibatalkan Customer"
-            : "{$this->subject()} Baru";
+        $title = match ($this->event) {
+            self::CANCELLED => "{$this->subject()} Dibatalkan Customer",
+            self::UPDATED => "{$this->subject()} Diperbarui",
+            default => "{$this->subject()} Baru",
+        };
 
         return [
             'title' => "{$title} · {$customer}",
@@ -74,7 +88,7 @@ abstract class AdminActivityNotification extends Notification
             'status' => $this->event === self::CANCELLED ? 'cancelled' : $this->record->status,
             'admin_note' => null,
             'route' => $this->routeName(),
-            'params' => [$this->record->getKey()],
+            'params' => $this->routeParams(),
         ];
     }
 }

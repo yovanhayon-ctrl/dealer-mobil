@@ -45,6 +45,12 @@ abstract class StatusChangedNotification extends Notification
         return 'account.notifications.open';
     }
 
+    /** Id elemen kartu di halaman riwayat. */
+    protected function anchor(): string
+    {
+        return "{$this->anchorPrefix()}-{$this->record->getKey()}";
+    }
+
     /**
      * @return array<string, mixed>
      */
@@ -56,7 +62,7 @@ abstract class StatusChangedNotification extends Notification
             'status' => $this->record->status,
             'admin_note' => $this->record->admin_note,
             'route' => $this->routeName(),
-            'anchor' => "{$this->anchorPrefix()}-{$this->record->getKey()}",
+            'anchor' => $this->anchor(),
         ];
     }
 }

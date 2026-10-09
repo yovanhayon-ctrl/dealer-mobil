@@ -835,3 +835,26 @@ main {
     position: relative;
     height: 280px;
 }
+
+/* ---------- Ulasan customer ---------- */
+
+.rating-stars {
+    color: #f5a524;
+}
+
+.rating-stars .bi {
+    margin-right: .1rem;
+}
+
+.rating-input .btn .bi {
+    margin: 0;
+}
+
+.testimonial-box {
+    background-color: rgba(245, 165, 36, .08);
+    border-left: 3px solid #f5a524;
+}
+
+.testimonial-card blockquote {
+    font-size: .95rem;
+}
