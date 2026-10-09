@@ -106,6 +106,14 @@ class PurchaseRequest extends Model
     }
 
     /**
+     * Nomor dokumen untuk bukti pengajuan: PB-{tahun pengajuan}-{id 6 digit}, mis. PB-2026-000123.
+     */
+    public function documentNumber(): string
+    {
+        return sprintf('PB-%s-%06d', $this->created_at?->format('Y') ?? now()->format('Y'), $this->id);
+    }
+
+    /**
      * Ulasan hanya untuk pembelian yang sudah selesai (unit diserahterimakan).
      */
     public function canBeReviewed(): bool

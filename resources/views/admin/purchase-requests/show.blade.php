@@ -24,7 +24,15 @@
                 <div class="card-body p-4">
                     <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
                         <h2 class="h5 mb-0">Pengajuan #{{ $purchaseRequest->id }}</h2>
-                        <x-status-badge :status="$purchaseRequest->status" />
+                        <div class="d-flex align-items-center gap-2">
+                            <x-status-badge :status="$purchaseRequest->status" />
+                            @if (Route::has('admin.purchase-requests.pdf'))
+                                <a href="{{ route('admin.purchase-requests.pdf', $purchaseRequest) }}" target="_blank" rel="noopener"
+                                   class="btn btn-outline-secondary btn-sm" title="Bukti {{ $purchaseRequest->documentNumber() }}">
+                                    <i class="bi bi-file-earmark-pdf"></i>Cetak PDF
+                                </a>
+                            @endif
+                        </div>
                     </div>
 
                     <dl class="row small mb-0">

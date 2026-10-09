@@ -6,8 +6,10 @@ use App\Http\Controllers\Controller;
 use App\Models\PurchaseRequest;
 use App\Notifications\Admin\AdminActivityNotification;
 use App\Notifications\Admin\PurchaseRequestActivity;
+use App\Support\PurchaseRequestPdf;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\View\View;
 
@@ -33,6 +35,16 @@ class PurchaseRequestController extends Controller
             ->paginate(self::PER_PAGE);
 
         return view('pages.account.purchase-requests.index', ['purchaseRequests' => $purchaseRequests]);
+    }
+
+    /**
+     * Bukti pengajuan (PDF) milik customer yang login; milik customer lain = 404.
+     */
+    public function pdf(Request $request, PurchaseRequest $purchaseRequest, PurchaseRequestPdf $pdf): Response
+    {
+        abort_unless($purchaseRequest->user_id === $request->user()->id, 404);
+
+        return $pdf->response($purchaseRequest);
     }
 
     public function cancel(Request $request, PurchaseRequest $purchaseRequest): RedirectResponse

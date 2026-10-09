@@ -110,8 +110,15 @@
                                 @endif
                             </div>
 
+                            <div class="flex-shrink-0 d-flex flex-md-column gap-2">
+                                @if (Route::has('account.purchase-requests.pdf'))
+                                    <a href="{{ route('account.purchase-requests.pdf', $purchase) }}" target="_blank" rel="noopener"
+                                       class="btn btn-outline-secondary btn-sm" aria-label="Cetak PDF bukti pengajuan {{ $carTitle }}">
+                                        <i class="bi bi-file-earmark-pdf"></i>Cetak PDF
+                                    </a>
+                                @endif
                             @if ($purchase->canBeCancelledByCustomer())
-                                <div class="flex-shrink-0">
+                                <div>
                                     <form method="POST" action="{{ route('account.purchase-requests.cancel', $purchase) }}"
                                           data-confirm="Batalkan pengajuan {{ $carTitle }}?"
                                           data-disable-on-submit>
@@ -123,6 +130,7 @@
                                     </form>
                                 </div>
                             @endif
+                            </div>
                         </div>
                     </article>
                 @endforeach

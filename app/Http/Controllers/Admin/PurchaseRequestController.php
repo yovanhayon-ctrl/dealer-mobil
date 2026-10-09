@@ -8,10 +8,12 @@ use App\Http\Requests\Admin\PurchaseRequestStatusRequest;
 use App\Models\PurchaseRequest;
 use App\Notifications\Notifier;
 use App\Notifications\PurchaseRequestStatusChanged;
+use App\Support\PurchaseRequestPdf;
 use DomainException;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\View\View;
 
 /**
@@ -60,6 +62,14 @@ class PurchaseRequestController extends Controller
         ]);
 
         return view('admin.purchase-requests.show', ['purchaseRequest' => $purchaseRequest]);
+    }
+
+    /**
+     * Bukti pengajuan (PDF), sama dengan yang diunduh customer.
+     */
+    public function pdf(PurchaseRequest $purchaseRequest, PurchaseRequestPdf $pdf): Response
+    {
+        return $pdf->response($purchaseRequest);
     }
 
     public function updateStatus(
