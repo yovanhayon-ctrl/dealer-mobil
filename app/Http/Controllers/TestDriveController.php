@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Actions\BookTestDrive;
 use App\Http\Requests\TestDriveRequest;
 use App\Models\Car;
+use App\Notifications\Admin\AdminActivityNotification;
+use App\Notifications\Admin\TestDriveActivity;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -52,6 +54,7 @@ class TestDriveController extends Controller
     {
         $testDrive = $bookTestDrive->handle($request->user(), $request->validated());
         $testDrive->load('car:id,brand_id,name,year', 'car.brand:id,name');
+        AdminActivityNotification::notifyAdmins(new TestDriveActivity($testDrive));
 
         return redirect()->route('account.test-drives.index')->with('success', sprintf(
             'Booking test drive %s %s %s pada %s pukul %s WIB berhasil dikirim. Tunggu konfirmasi dari dealer.',
