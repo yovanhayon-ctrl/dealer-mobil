@@ -93,7 +93,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 data: set.data,
                                 borderColor: set.color,
                                 backgroundColor: set.color,
-                                tension: 0.3,
+                                cubicInterpolationMode: 'monotone',
                                 pointRadius: 3
                             };
                         })
@@ -123,7 +123,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 data: data.values,
                                 borderColor: '#1c1c1e',
                                 backgroundColor: '#1c1c1e',
-                                tension: 0.3,
+                                cubicInterpolationMode: 'monotone',
                                 yAxisID: 'value',
                                 order: 1
                             }
