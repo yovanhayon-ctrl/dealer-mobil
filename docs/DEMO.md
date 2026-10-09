@@ -33,7 +33,7 @@ Jika data lokal sudah berantakan setelah uji coba, database bisa diisi ulang den
 php artisan migrate:fresh --seed
 ```
 
-Hasilnya: 1 admin, 8 customer dummy (`…@example.test`), 21 mobil (Nissan + klasik Jepang), 5 promo, 6 layanan servis, serta contoh test drive, pengajuan, dan booking servis dengan berbagai status. Seeder **tidak** membuat notifikasi dan favorit; keduanya muncul saat demo (langkah 4 dan 13 di bawah). Karena semua data contoh dibuat hari ini, grafik dashboard hanya berisi bulan berjalan. Foto mobil diunggah manual lewat **Admin → Mobil → Galeri** (siapkan 5–10 foto sebelum demo agar katalog terlihat menarik).
+Hasilnya: 1 admin, 8 customer dummy (`…@example.test`), 21 mobil (Nissan + klasik Jepang), 5 promo, 6 layanan servis, serta contoh test drive, pengajuan, dan booking servis dengan berbagai status. Seeder **tidak** membuat notifikasi dan favorit; keduanya muncul saat demo (langkah 4 dan 13 di bawah). Seeder membuat 3 ulasan contoh yang sudah disetujui sehingga bagian **Kata Pelanggan** di beranda langsung terisi (v1.3.0). Karena semua data contoh dibuat hari ini, grafik dashboard hanya berisi bulan berjalan. Foto mobil diunggah manual lewat **Admin → Mobil → Galeri** (siapkan 5–10 foto sebelum demo agar katalog terlihat menarik).
 
 ### Mode "seperti production" saat demo (opsional)
 
@@ -73,6 +73,7 @@ Mengikuti *customer journey* di proposal: Temukan → Kenali → Pertimbangkan �
 | 12 | Admin | **Pengajuan** → buka pengajuan langkah 7 → *Diproses* → *Disetujui* + catatan | Stok mobil berkurang otomatis |
 | 13 | Customer | **(v1.1.0)** Muat ulang halaman → lonceng 🔔 di navbar menunjukkan angka → klik → klik notifikasi *Pengajuan Pembelian Disetujui* | Notifikasi status + catatan dealer, kartu pengajuan tersorot |
 | 13a | Semua | **(v1.2.0)** Buka inbox **Mailtrap** (atau `storage/logs/laravel.log`) | Email "Pengajuan Pembelian Disetujui" ke customer dan email "… Baru" ke admin, berbahasa Indonesia |
+| 13b | Admin → Customer → Admin | **(v1.3.0)** Admin: **Pengajuan** → pengajuan *Disetujui* milik `andi.pratama@example.test` (Magnite) → *Selesai*. Login sebagai Andi → **Pengajuan Saya** → **Beri Ulasan** (5 bintang + komentar) → kirim. Admin: lonceng bertambah → menu **Ulasan** → **Setujui** → buka **Beranda** | Ulasan hanya untuk pembelian selesai, moderasi admin, ulasan tampil di *Kata Pelanggan* dengan nama "Andi P." |
 | 14 | Admin | **Booking Servis** → konfirmasi → (pada tanggalnya) *Dikerjakan* → *Selesai* + catatan | Alur status servis (customer juga mendapat notifikasi) |
 | 15 | Admin | **Laporan** → *Export CSV* | Rekap penjualan, test drive, servis, stok menipis |
 | 16 | Semua | Tampilkan di HP (F12 → mode perangkat) | Responsif, menu ☰, tabel bandingkan bisa digeser |
@@ -91,5 +92,7 @@ Tips: booking test drive/servis hanya bisa untuk **besok s/d 30 hari ke depan**;
 | Lonceng notifikasi tidak muncul / tidak bertambah | Customer: notifikasi dikirim hanya bila admin benar-benar **mengubah status** (menyimpan catatan saja tidak). Admin: hanya untuk booking/pengajuan **baru** atau yang **dibatalkan customer**. Muat ulang halaman. |
 | Email tidak masuk ke Mailtrap | Cek `MAIL_*` di `.env` lalu `php artisan optimize:clear`. Proses tetap berhasil walau email gagal; penyebabnya tercatat di `storage/logs/laravel.log`. |
 | Aksi terasa lambat beberapa detik | SMTP tidak bisa dihubungi (internet/Mailtrap). Perbaiki `MAIL_*` atau set `DEALER_MAIL_NOTIFICATIONS=false`. |
-| Tabel `notifications` / `favorites` tidak ditemukan | Database masih versi v1.0.0 → `php artisan migrate`. |
+| Tabel `notifications` / `favorites` / `testimonials` tidak ditemukan | Database masih versi lama → `php artisan migrate`. |
+| Tombol **Beri Ulasan** tidak muncul | Hanya untuk pengajuan berstatus **Selesai**; ubah statusnya di admin (*Disetujui* → *Selesai*). Ulasan yang sudah disetujui tidak bisa diubah lagi. |
+| Bagian **Kata Pelanggan** tidak muncul di beranda | Belum ada ulasan yang **disetujui** → setujui di **Admin → Ulasan**, atau jalankan `php artisan db:seed --class=PurchaseRequestSeeder` lalu `--class=TestimonialSeeder`. |
 | Lupa kata sandi akun demo | Halaman **Lupa kata sandi?** → tautan reset ada di `storage/logs/laravel.log` (`MAIL_MAILER=log`). |
