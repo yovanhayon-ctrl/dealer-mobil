@@ -23,7 +23,7 @@
         @else
             <div class="d-flex flex-column gap-3">
                 @foreach ($bookings as $booking)
-                    <article class="card test-drive-item">
+                    <article class="card test-drive-item" id="servis-{{ $booking->id }}">
                         <div class="card-body p-3 d-flex flex-column flex-md-row gap-3">
                             <span class="service-card-icon flex-shrink-0" aria-hidden="true"><i class="bi bi-tools"></i></span>
 

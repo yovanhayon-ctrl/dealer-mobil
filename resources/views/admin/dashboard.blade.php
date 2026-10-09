@@ -34,6 +34,8 @@
         </div>
     </div>
 
+    @include('admin.partials.dashboard-trend', ['trend' => $trend])
+
     <div class="row g-4">
         <div class="col-xl-7">
             <div class="card h-100">
