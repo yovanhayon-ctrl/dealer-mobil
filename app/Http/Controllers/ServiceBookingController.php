@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Actions\BookService;
 use App\Http\Requests\ServiceBookingRequest;
 use App\Models\Service;
+use App\Notifications\Admin\AdminActivityNotification;
+use App\Notifications\Admin\ServiceBookingActivity;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -41,6 +43,7 @@ class ServiceBookingController extends Controller
     {
         $booking = $bookService->handle($request->user(), $request->bookingData());
         $booking->load('service:id,name');
+        AdminActivityNotification::notifyAdmins(new ServiceBookingActivity($booking));
 
         return redirect()->route('account.service-bookings.index')->with('success', sprintf(
             'Booking %s untuk %s pada %s pukul %s WIB berhasil dikirim. Tunggu konfirmasi dari dealer.',

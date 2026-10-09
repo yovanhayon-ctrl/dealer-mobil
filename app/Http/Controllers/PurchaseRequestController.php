@@ -6,6 +6,8 @@ use App\Actions\SubmitPurchaseRequest;
 use App\Http\Requests\PurchaseRequestRequest;
 use App\Models\Car;
 use App\Models\PurchaseRequest;
+use App\Notifications\Admin\AdminActivityNotification;
+use App\Notifications\Admin\PurchaseRequestActivity;
 use App\Support\CreditCalculator;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -53,6 +55,7 @@ class PurchaseRequestController extends Controller
 
         $purchaseRequest = $submit->handle($request->user(), $car, $request->purchaseData());
         $car->loadMissing('brand:id,name');
+        AdminActivityNotification::notifyAdmins(new PurchaseRequestActivity($purchaseRequest));
 
         $detail = $purchaseRequest->isCredit()
             ? sprintf('kredit DP %s, %d bulan, cicilan %s/bulan',

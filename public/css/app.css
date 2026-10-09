@@ -594,6 +594,9 @@ main {
 }
 
 .admin-sidebar-panel .nav-link {
+    /* Flex agar badge (mis. jumlah notifikasi) bisa didorong ke kanan dengan ms-auto. */
+    display: flex;
+    align-items: center;
     color: rgba(255, 255, 255, .75);
     border-radius: .5rem;
     border-left: 3px solid transparent;

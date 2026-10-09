@@ -11,6 +11,7 @@ use App\Http\Controllers\Admin\CarController as AdminCarController;
 use App\Http\Controllers\Admin\CarImageController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\Admin\PromoController as AdminPromoController;
 use App\Http\Controllers\Admin\PurchaseRequestController as AdminPurchaseRequestController;
 use App\Http\Controllers\Admin\ReportController;
@@ -148,6 +149,12 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::redirect('/', '/admin/dashboard')->name('home');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+
+    Route::controller(AdminNotificationController::class)->prefix('notifikasi')->name('notifications.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::patch('baca-semua', 'markAllAsRead')->name('read-all');
+        Route::get('{notification}', 'open')->whereUuid('notification')->name('open');
+    });
 
     Route::patch('mobil/{car}/status', [AdminCarController::class, 'toggleActive'])->name('cars.toggle-active');
 

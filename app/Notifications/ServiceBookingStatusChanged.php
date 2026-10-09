@@ -18,8 +18,16 @@ class ServiceBookingStatusChanged extends StatusChangedNotification
 
     protected function description(): string
     {
-        return "{$this->record->service->name} · {$this->record->vehicle_model} ({$this->record->plate_number}) · "
-            .$this->record->preferred_date->translatedFormat('d M Y')." pukul {$this->record->timeLabel()} WIB";
+        return self::describe($this->record);
+    }
+
+    /**
+     * Ringkasan data (dipakai juga notifikasi admin).
+     */
+    public static function describe(ServiceBooking $booking): string
+    {
+        return "{$booking->service->name} · {$booking->vehicle_model} ({$booking->plate_number}) · "
+            .$booking->preferred_date->translatedFormat('d M Y')." pukul {$booking->timeLabel()} WIB";
     }
 
     protected function routeName(): string

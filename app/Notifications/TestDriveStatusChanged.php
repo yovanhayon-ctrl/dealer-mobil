@@ -18,10 +18,18 @@ class TestDriveStatusChanged extends StatusChangedNotification
 
     protected function description(): string
     {
-        $car = $this->record->car;
+        return self::describe($this->record);
+    }
+
+    /**
+     * Ringkasan data (dipakai juga notifikasi admin).
+     */
+    public static function describe(TestDrive $testDrive): string
+    {
+        $car = $testDrive->car;
 
         return "{$car->brand->name} {$car->name} {$car->year} · "
-            .$this->record->preferred_date->translatedFormat('d M Y')." pukul {$this->record->timeLabel()} WIB";
+            .$testDrive->preferred_date->translatedFormat('d M Y')." pukul {$testDrive->timeLabel()} WIB";
     }
 
     protected function routeName(): string
