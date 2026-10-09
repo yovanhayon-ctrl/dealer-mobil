@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Account\FavoriteController;
 use App\Http\Controllers\Account\NotificationController;
 use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\PurchaseRequestController as AccountPurchaseRequestController;
@@ -95,6 +96,11 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:purchase-request')
         ->name('purchase-requests.store');
 
+    Route::middleware('throttle:30,1')->controller(FavoriteController::class)->group(function () {
+        Route::post('/mobil/{car:slug}/favorit', 'store')->name('favorites.store');
+        Route::delete('/mobil/{car:slug}/favorit', 'destroy')->name('favorites.destroy');
+    });
+
     Route::get('/servis/booking', [ServiceBookingController::class, 'create'])->name('service-bookings.create');
     Route::post('/servis/booking', [ServiceBookingController::class, 'store'])
         ->middleware('throttle:service-booking')
@@ -115,6 +121,8 @@ Route::middleware('auth')->group(function () {
 
         Route::get('servis', [AccountServiceBookingController::class, 'index'])->name('service-bookings.index');
         Route::patch('servis/{serviceBooking}/batal', [AccountServiceBookingController::class, 'cancel'])->name('service-bookings.cancel');
+
+        Route::get('favorit', [FavoriteController::class, 'index'])->name('favorites.index');
 
         Route::get('notifikasi', [NotificationController::class, 'index'])->name('notifications.index');
         Route::patch('notifikasi/baca-semua', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');

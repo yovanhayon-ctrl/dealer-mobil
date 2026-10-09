@@ -251,6 +251,33 @@ main {
     font-size: 2.5rem;
 }
 
+/* Tombol favorit (hati) di pojok kanan atas foto kartu mobil. */
+.car-card-favorite-wrap {
+    position: absolute;
+    top: .6rem;
+    right: .6rem;
+    z-index: 2;
+}
+
+.car-card-favorite {
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 .125rem .5rem rgba(0, 0, 0, .15);
+}
+
+.car-card-favorite .bi {
+    margin-right: 0;
+}
+
+.car-card-favorite.is-favorite,
+.car-card-favorite:hover {
+    color: var(--dm-red);
+}
+
 .car-card-badges {
     position: absolute;
     top: .75rem;

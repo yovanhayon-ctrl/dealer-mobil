@@ -20,7 +20,7 @@ class ProfileController extends Controller
         $user = $request->user();
 
         if (! $user->isAdmin()) {
-            $user->loadCount(['testDrives', 'purchaseRequests', 'serviceBookings']);
+            $user->loadCount(['testDrives', 'purchaseRequests', 'serviceBookings', 'favoriteCars']);
         }
 
         return view('pages.account.profile.edit', ['user' => $user]);
