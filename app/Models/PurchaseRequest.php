@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable([
     'user_id', 'car_id', 'car_price', 'payment_method', 'down_payment', 'tenor_months',
@@ -97,6 +98,19 @@ class PurchaseRequest extends Model
     public function car(): BelongsTo
     {
         return $this->belongsTo(Car::class);
+    }
+
+    public function testimonial(): HasOne
+    {
+        return $this->hasOne(Testimonial::class);
+    }
+
+    /**
+     * Ulasan hanya untuk pembelian yang sudah selesai (unit diserahterimakan).
+     */
+    public function canBeReviewed(): bool
+    {
+        return $this->status === self::STATUS_COMPLETED;
     }
 
     public function isPending(): bool

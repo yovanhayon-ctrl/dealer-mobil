@@ -6,6 +6,7 @@ use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\PurchaseRequestController as AccountPurchaseRequestController;
 use App\Http\Controllers\Account\ServiceBookingController as AccountServiceBookingController;
 use App\Http\Controllers\Account\TestDriveController as AccountTestDriveController;
+use App\Http\Controllers\Account\TestimonialController as AccountTestimonialController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CarController as AdminCarController;
 use App\Http\Controllers\Admin\CarImageController;
@@ -18,6 +19,7 @@ use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ServiceBookingController as AdminServiceBookingController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
 use App\Http\Controllers\Admin\TestDriveController as AdminTestDriveController;
+use App\Http\Controllers\Admin\TestimonialController as AdminTestimonialController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -128,6 +130,10 @@ Route::middleware('auth')->group(function () {
 
         Route::get('pengajuan', [AccountPurchaseRequestController::class, 'index'])->name('purchase-requests.index');
         Route::patch('pengajuan/{purchaseRequest}/batal', [AccountPurchaseRequestController::class, 'cancel'])->name('purchase-requests.cancel');
+        Route::get('pengajuan/{purchaseRequest}/ulasan', [AccountTestimonialController::class, 'edit'])->name('testimonials.edit');
+        Route::put('pengajuan/{purchaseRequest}/ulasan', [AccountTestimonialController::class, 'update'])
+            ->middleware('throttle:10,1')
+            ->name('testimonials.update');
 
         Route::get('servis', [AccountServiceBookingController::class, 'index'])->name('service-bookings.index');
         Route::patch('servis/{serviceBooking}/batal', [AccountServiceBookingController::class, 'cancel'])->name('service-bookings.cancel');
@@ -212,6 +218,13 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/', 'index')->name('index');
         Route::get('{serviceBooking}', 'show')->name('show');
         Route::patch('{serviceBooking}/status', 'updateStatus')->name('update-status');
+    });
+
+    // Moderasi ulasan customer (tampil di beranda setelah disetujui).
+    Route::controller(AdminTestimonialController::class)->prefix('ulasan')->name('testimonials.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::patch('{testimonial}/setujui', 'approve')->name('approve');
+        Route::patch('{testimonial}/tolak', 'reject')->name('reject');
     });
 
     // Laporan (hanya baca) + export CSV dengan periode yang sama.
