@@ -2,21 +2,28 @@
 
 namespace App\Http\Controllers\Account;
 
+use App\Http\Controllers\Concerns\HandlesNotifications;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Route;
 use Illuminate\View\View;
 
 /**
- * Notifikasi perubahan status (test drive, pengajuan, booking servis) milik user yang login.
+ * Notifikasi perubahan status (test drive, pengajuan, booking servis) milik customer yang login.
  */
 class NotificationController extends Controller
 {
+    use HandlesNotifications;
+
     public const PER_PAGE = 15;
 
-    public function index(Request $request): View
+    public function index(Request $request): View|RedirectResponse
     {
+        // Admin punya halaman notifikasi sendiri dengan layout admin.
+        if ($request->user()->isAdmin()) {
+            return redirect()->route('admin.notifications.index');
+        }
+
         $notifications = $request->user()->notifications()->paginate(self::PER_PAGE);
 
         return view('pages.account.notifications.index', [
@@ -30,26 +37,11 @@ class NotificationController extends Controller
      */
     public function open(Request $request, string $notification): RedirectResponse
     {
-        // Hanya notifikasi milik sendiri; milik user lain = 404.
-        $notification = $request->user()->notifications()->findOrFail($notification);
-        $notification->markAsRead();
-
-        $route = $notification->data['route'] ?? null;
-
-        if (! is_string($route) || ! Route::has($route)) {
-            return redirect()->route('account.notifications.index');
-        }
-
-        $anchor = $notification->data['anchor'] ?? null;
-
-        return redirect()->to(route($route).(is_string($anchor) ? "#{$anchor}" : ''));
+        return $this->openNotification($request, $notification, 'account.notifications.index');
     }
 
     public function markAllAsRead(Request $request): RedirectResponse
     {
-        $request->user()->unreadNotifications()->update(['read_at' => now()]);
-
-        return redirect()->route('account.notifications.index')
-            ->with('success', 'Semua notifikasi ditandai sudah dibaca.');
+        return $this->markAllNotificationsAsRead($request, 'account.notifications.index');
     }
 }

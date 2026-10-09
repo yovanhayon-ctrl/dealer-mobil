@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\Controller;
 use App\Models\ServiceBooking;
+use App\Notifications\Admin\AdminActivityNotification;
+use App\Notifications\Admin\ServiceBookingActivity;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -50,6 +52,11 @@ class ServiceBookingController extends Controller
 
             return 'cancelled';
         });
+
+        // Hanya pembatalan yang benar-benar terjadi sekarang (bukan klik ganda / sudah batal) yang dikabarkan.
+        if ($result === 'cancelled') {
+            AdminActivityNotification::notifyAdmins(new ServiceBookingActivity($serviceBooking, AdminActivityNotification::CANCELLED));
+        }
 
         return match ($result) {
             'already' => $redirect->with('status', 'Booking servis ini sudah dibatalkan.'),

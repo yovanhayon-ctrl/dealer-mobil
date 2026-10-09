@@ -4,6 +4,9 @@
     @include('partials.head')
 </head>
 <body class="admin-body">
+    {{-- Dihitung sekali; dipakai lonceng topbar & menu sidebar. --}}
+    @php($adminUnreadNotifications = Route::has('admin.notifications.index') ? auth()->user()->unreadNotifications()->count() : 0)
+
     <div class="admin-wrapper">
         @include('partials.admin-sidebar')
 
@@ -19,6 +22,16 @@
                     <h1 class="h5 mb-0 text-truncate">@yield('title', 'Admin')</h1>
 
                     <div class="d-flex align-items-center gap-2 gap-sm-3 ms-auto">
+                        @if (Route::has('admin.notifications.index'))
+                            <a href="{{ route('admin.notifications.index') }}"
+                               @class(['btn btn-sm btn-outline-secondary notification-bell', 'active' => request()->routeIs('admin.notifications.*')])
+                               aria-label="Notifikasi{{ $adminUnreadNotifications ? ", {$adminUnreadNotifications} belum dibaca" : '' }}">
+                                <i class="bi bi-bell{{ $adminUnreadNotifications ? '-fill' : '' }}"></i>
+                                @if ($adminUnreadNotifications)
+                                    <span class="badge rounded-pill bg-danger" aria-hidden="true">{{ $adminUnreadNotifications > 9 ? '9+' : $adminUnreadNotifications }}</span>
+                                @endif
+                            </a>
+                        @endif
                         <a href="{{ route('home') }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-primary" title="Lihat Website">
                             <i class="bi bi-box-arrow-up-right"></i><span class="d-none d-md-inline">Lihat Website</span>
                         </a>

@@ -29,6 +29,10 @@ return [
 
     'maps_embed_url' => env('DEALER_MAPS_EMBED_URL', ''),
 
+    // Notifikasi (status untuk customer, booking baru untuk admin) juga dikirim lewat email.
+    // Pengiriman memakai pengaturan MAIL_* (MAIL_MAILER=log = hanya dicatat di storage/logs/laravel.log).
+    'mail_notifications' => (bool) env('DEALER_MAIL_NOTIFICATIONS', true),
+
     /*
     |--------------------------------------------------------------------------
     | JAF Service (Bengkel)

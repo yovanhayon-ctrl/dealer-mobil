@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Account;
 
 use App\Http\Controllers\Controller;
 use App\Models\TestDrive;
+use App\Notifications\Admin\AdminActivityNotification;
+use App\Notifications\Admin\TestDriveActivity;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -54,6 +56,11 @@ class TestDriveController extends Controller
 
             return 'cancelled';
         });
+
+        // Hanya pembatalan yang benar-benar terjadi sekarang (bukan klik ganda / sudah batal) yang dikabarkan.
+        if ($result === 'cancelled') {
+            AdminActivityNotification::notifyAdmins(new TestDriveActivity($testDrive, AdminActivityNotification::CANCELLED));
+        }
 
         return match ($result) {
             'already' => $redirect->with('status', 'Test drive ini sudah dibatalkan.'),

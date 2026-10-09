@@ -2,6 +2,7 @@
     // Menu hanya tampil jika route-nya sudah terdaftar (lihat Route::has di bawah).
     $menu = [
         ['label' => 'Dashboard', 'icon' => 'bi-speedometer2', 'route' => 'admin.dashboard', 'active' => 'admin.dashboard'],
+        ['label' => 'Notifikasi', 'icon' => 'bi-bell', 'route' => 'admin.notifications.index', 'active' => 'admin.notifications.*', 'badge' => $adminUnreadNotifications ?? 0],
         ['label' => 'Mobil', 'icon' => 'bi-car-front', 'route' => 'admin.cars.index', 'active' => 'admin.cars.*'],
         ['label' => 'Merek', 'icon' => 'bi-tags', 'route' => 'admin.brands.index', 'active' => 'admin.brands.*'],
         ['label' => 'Kategori', 'icon' => 'bi-grid', 'route' => 'admin.categories.index', 'active' => 'admin.categories.*'],
@@ -37,6 +38,9 @@
                     @php($isActive = request()->routeIs($item['active']))
                     <a @class(['nav-link', 'active' => $isActive]) href="{{ route($item['route']) }}" @if ($isActive) aria-current="page" @endif>
                         <i class="bi {{ $item['icon'] }}"></i>{{ $item['label'] }}
+                        @if (! empty($item['badge']))
+                            <span class="badge rounded-pill bg-danger ms-auto">{{ $item['badge'] > 99 ? '99+' : $item['badge'] }}<span class="visually-hidden"> belum dibaca</span></span>
+                        @endif
                     </a>
                 @endforeach
             </nav>
