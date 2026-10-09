@@ -23,3 +23,24 @@
     RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^ index.php [L]
 </IfModule>
+
+# ---------------------------------------------------------------------------
+# Phase 18: performa (berlaku bila modul Apache-nya aktif; tanpa modul, diabaikan).
+# ---------------------------------------------------------------------------
+
+# Kompresi gzip untuk teks (HTML, CSS, JS, JSON, SVG). Butuh mod_deflate.
+<IfModule mod_deflate.c>
+    AddOutputFilterByType DEFLATE text/html text/plain text/css text/csv application/javascript text/javascript application/json image/svg+xml
+</IfModule>
+
+# Cache browser untuk aset statis (bukan halaman PHP). Butuh mod_headers.
+# - CSS/JS lokal selalu dipanggil dengan ?v=<waktu ubah file> (App\Support\Asset), jadi aman disimpan 1 tahun.
+# - Gambar unggahan di /storage memakai nama file acak, berganti bila gambarnya diganti.
+<IfModule mod_headers.c>
+    <FilesMatch "\.(css|js)$">
+        Header set Cache-Control "public, max-age=31536000, immutable"
+    </FilesMatch>
+    <FilesMatch "\.(jpe?g|png|webp|gif|ico|svg)$">
+        Header set Cache-Control "public, max-age=31536000"
+    </FilesMatch>
+</IfModule>
