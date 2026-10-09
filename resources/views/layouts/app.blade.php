@@ -14,6 +14,8 @@
         @yield('content')
     </main>
 
+    @include('partials.compare-bar')
+
     @include('partials.footer')
 
     @include('partials.scripts')

@@ -27,6 +27,11 @@
             @endif
         @if ($detailUrl)</a>@endif
 
+        {{-- Di atas stretched-link judul agar tombol tetap bisa diklik. --}}
+        <div class="car-card-favorite-wrap">
+            <x-favorite-button :car="$car" />
+        </div>
+
         <div class="car-card-badges">
             <span @class(['badge rounded-pill', 'badge-condition-new' => $car->isNew(), 'badge-condition-used' => ! $car->isNew()])>{{ $car->condition_label }}</span>
             @if ($car->hasPromoPrice())
@@ -65,11 +70,15 @@
                 <p class="small text-muted mb-3">Cicilan mulai <x-price :amount="$installment" />/bln</p>
             @endif
 
-            @if ($detailUrl)
-                <a href="{{ $detailUrl }}" class="btn btn-outline-primary btn-sm w-100">Detail</a>
-            @else
-                <span class="btn btn-outline-primary btn-sm w-100 disabled" aria-disabled="true">Detail</span>
-            @endif
+            <div class="d-flex gap-2">
+                @if ($detailUrl)
+                    <a href="{{ $detailUrl }}" class="btn btn-outline-primary btn-sm flex-grow-1">Detail</a>
+                @else
+                    <span class="btn btn-outline-primary btn-sm flex-grow-1 disabled" aria-disabled="true">Detail</span>
+                @endif
+                {{-- Di atas stretched-link judul agar tombol tetap bisa diklik. --}}
+                <x-compare-button :car="$car" class="car-card-compare" />
+            </div>
         </div>
     </div>
 </article>

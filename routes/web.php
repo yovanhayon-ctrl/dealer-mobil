@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Account\FavoriteController;
+use App\Http\Controllers\Account\NotificationController;
 use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\PurchaseRequestController as AccountPurchaseRequestController;
 use App\Http\Controllers\Account\ServiceBookingController as AccountServiceBookingController;
@@ -21,6 +23,7 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Auth\RegisterController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\CarController;
+use App\Http\Controllers\CompareController;
 use App\Http\Controllers\CreditSimulationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
@@ -44,6 +47,14 @@ Route::get('/promo', [PromoController::class, 'index'])->name('promos.index');
 Route::get('/promo/{promo:slug}', [PromoController::class, 'show'])->name('promos.show');
 Route::get('/simulasi-kredit', [CreditSimulationController::class, 'index'])->name('credit.index');
 Route::get('/servis', [ServiceController::class, 'index'])->name('services.index');
+
+// Bandingkan mobil (pilihan di session, tamu boleh).
+Route::get('/bandingkan', [CompareController::class, 'index'])->name('compare.index');
+Route::middleware('throttle:60,1')->controller(CompareController::class)->group(function () {
+    Route::delete('/bandingkan', 'clear')->name('compare.clear');
+    Route::post('/bandingkan/{car:slug}', 'store')->name('compare.store');
+    Route::delete('/bandingkan/{car:slug}', 'destroy')->name('compare.destroy');
+});
 Route::get('/tentang-kami', [PageController::class, 'about'])->name('about');
 Route::get('/kontak', [PageController::class, 'contact'])->name('contact');
 
@@ -94,6 +105,11 @@ Route::middleware('auth')->group(function () {
         ->middleware('throttle:purchase-request')
         ->name('purchase-requests.store');
 
+    Route::middleware('throttle:30,1')->controller(FavoriteController::class)->group(function () {
+        Route::post('/mobil/{car:slug}/favorit', 'store')->name('favorites.store');
+        Route::delete('/mobil/{car:slug}/favorit', 'destroy')->name('favorites.destroy');
+    });
+
     Route::get('/servis/booking', [ServiceBookingController::class, 'create'])->name('service-bookings.create');
     Route::post('/servis/booking', [ServiceBookingController::class, 'store'])
         ->middleware('throttle:service-booking')
@@ -114,6 +130,12 @@ Route::middleware('auth')->group(function () {
 
         Route::get('servis', [AccountServiceBookingController::class, 'index'])->name('service-bookings.index');
         Route::patch('servis/{serviceBooking}/batal', [AccountServiceBookingController::class, 'cancel'])->name('service-bookings.cancel');
+
+        Route::get('favorit', [FavoriteController::class, 'index'])->name('favorites.index');
+
+        Route::get('notifikasi', [NotificationController::class, 'index'])->name('notifications.index');
+        Route::patch('notifikasi/baca-semua', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+        Route::get('notifikasi/{notification}', [NotificationController::class, 'open'])->whereUuid('notification')->name('notifications.open');
     });
 });
 

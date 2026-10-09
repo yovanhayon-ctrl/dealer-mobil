@@ -8,6 +8,7 @@ use App\Models\PurchaseRequest;
 use App\Models\ServiceBooking;
 use App\Models\TestDrive;
 use App\Models\User;
+use App\Reports\DashboardTrend;
 use Illuminate\View\View;
 
 class DashboardController extends Controller
@@ -16,6 +17,7 @@ class DashboardController extends Controller
     {
         return view('admin.dashboard', [
             'stats' => $this->stats(),
+            'trend' => (new DashboardTrend)->months(),
             'latestPurchases' => PurchaseRequest::query()
                 ->with(['user:id,name', 'car:id,brand_id,name', 'car.brand:id,name'])
                 ->latest()

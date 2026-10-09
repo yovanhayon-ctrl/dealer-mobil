@@ -7,6 +7,7 @@
         ['account.test-drives.index', 'bi-calendar-check', 'Test Drive Saya', $user->test_drives_count ?? null],
         ['account.purchase-requests.index', 'bi-card-checklist', 'Pengajuan Saya', $user->purchase_requests_count ?? null],
         ['account.service-bookings.index', 'bi-wrench-adjustable', 'Servis Saya', $user->service_bookings_count ?? null],
+        ['account.favorites.index', 'bi-heart', 'Favorit Saya', $user->favorite_cars_count ?? null],
     ];
 @endphp
 
