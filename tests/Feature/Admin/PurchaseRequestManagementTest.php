@@ -456,7 +456,7 @@ class PurchaseRequestManagementTest extends TestCase
         $this->seed(PurchaseRequestSeeder::class);
 
         $seeded = PurchaseRequest::with('car:id,slug')->get();
-        $this->assertCount(9, $seeded);
+        $this->assertCount(11, $seeded);
         $this->assertEqualsCanonicalizing(PurchaseRequest::STATUSES, $seeded->pluck('status')->unique()->values()->all());
         $this->assertEquals($afterFirstRun, Car::pluck('stock', 'slug'), 'Menjalankan ulang tidak boleh mengubah stok.');
 
@@ -465,7 +465,7 @@ class PurchaseRequestManagementTest extends TestCase
         foreach ($initialStock as $slug => $stock) {
             $this->assertSame($stock - ($sold[$slug] ?? 0), $afterFirstRun[$slug], "Stok {$slug} tidak konsisten.");
         }
-        $this->assertSame(2, $sold->sum());
+        $this->assertSame(4, $sold->sum());
 
         // Nilai kredit sama dengan CreditCalculator; harga memakai promo aktif (Kicks e-Power −Rp 15 jt).
         $calculator = app(CreditCalculator::class);

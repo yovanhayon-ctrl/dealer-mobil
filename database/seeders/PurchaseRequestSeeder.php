@@ -155,6 +155,13 @@ class PurchaseRequestSeeder extends Seeder
             ['email' => 'siti.rahmawati@example.test', 'car' => 'nissan-skyline-gt-r-v-spec-ii-r34-2000', 'method' => 'credit', 'dp' => 40, 'tenor' => 12,
                 'path' => [PurchaseRequest::STATUS_CANCELLED], 'address' => 'Jl. Ahmad Yani No. 45, Makassar',
                 'admin_note' => 'Customer memilih mobil lain.'],
+            // Pembelian selesai tambahan untuk contoh ulasan (TestimonialSeeder).
+            ['email' => 'budi.santoso@example.test', 'car' => 'nissan-livina-vl-cvt-2025', 'method' => 'cash',
+                'path' => [$processing, $approved, PurchaseRequest::STATUS_COMPLETED], 'address' => 'Jl. Merdeka No. 10, Bandung',
+                'admin_note' => 'Unit sudah diserahterimakan.'],
+            ['email' => 'dewi.lestari@example.test', 'car' => 'nissan-magnite-premium-cvt-2025', 'method' => 'credit', 'dp' => 30, 'tenor' => 36,
+                'path' => [$processing, $approved, PurchaseRequest::STATUS_COMPLETED], 'address' => 'Jl. Diponegoro No. 5, Semarang',
+                'admin_note' => 'Unit sudah diserahterimakan.'],
         ];
     }
 }
