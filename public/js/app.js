@@ -59,4 +59,86 @@ document.addEventListener('DOMContentLoaded', function () {
         });
         lockedButtons = [];
     });
+
+    // Video latar hero: hanya layar lebar (≥992px), tanpa "reduce motion", dan tidak dalam mode hemat data.
+    // Beberapa video diputar bergantian; tombol jeda untuk menghentikan gerakan (aksesibilitas).
+    var heroVideo = document.querySelector('[data-hero-videos]');
+
+    if (heroVideo) {
+        var heroSection = heroVideo.closest('.home-hero');
+        var toggle = document.querySelector('[data-hero-video-toggle]');
+        var sources = [];
+
+        try {
+            sources = JSON.parse(heroVideo.getAttribute('data-hero-videos')) || [];
+        } catch (error) {
+            sources = [];
+        }
+
+        var wide = window.matchMedia('(min-width: 992px)').matches;
+        var calm = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        var saveData = navigator.connection && navigator.connection.saveData;
+
+        if (sources.length && wide && !calm && !saveData) {
+            var index = 0;
+            var paused = false;
+
+            // Autoplay hanya diizinkan bila video tanpa suara; set juga lewat properti (bukan hanya atribut).
+            heroVideo.muted = true;
+            heroVideo.defaultMuted = true;
+
+            var retryLater = function () {
+                // Autoplay ditolak (mis. tab belum terlihat): banner tanpa video tetap tampil,
+                // lalu dicoba lagi saat tab terlihat atau saat pengunjung pertama kali berinteraksi.
+                var retry = function () {
+                    if (!paused && heroVideo.paused && !document.hidden) {
+                        heroVideo.play().catch(function () {});
+                    }
+                };
+
+                document.addEventListener('visibilitychange', retry);
+                ['pointerdown', 'keydown', 'scroll'].forEach(function (type) {
+                    window.addEventListener(type, retry, { once: true, passive: true });
+                });
+            };
+
+            var playCurrent = function () {
+                heroVideo.src = sources[index];
+                var attempt = heroVideo.play();
+
+                if (attempt && typeof attempt.catch === 'function') {
+                    attempt.catch(retryLater);
+                }
+            };
+
+            heroVideo.loop = sources.length === 1;
+            heroVideo.addEventListener('playing', function () {
+                heroVideo.classList.add('is-playing');
+                heroSection.classList.add('video-on');
+            });
+            heroVideo.addEventListener('ended', function () {
+                index = (index + 1) % sources.length;
+                playCurrent();
+            });
+
+            if (toggle) {
+                toggle.hidden = false;
+                toggle.addEventListener('click', function () {
+                    paused = !paused;
+
+                    if (paused) {
+                        heroVideo.pause();
+                    } else {
+                        heroVideo.play();
+                    }
+
+                    toggle.setAttribute('aria-pressed', paused ? 'true' : 'false');
+                    toggle.setAttribute('aria-label', paused ? 'Putar video latar' : 'Jeda video latar');
+                    toggle.querySelector('.bi').className = paused ? 'bi bi-play-fill' : 'bi bi-pause-fill';
+                });
+            }
+
+            playCurrent();
+        }
+    }
 });

@@ -200,7 +200,66 @@ main {
         transparent 63.4%);
 }
 
+/* Video latar hero (layar lebar): muncul perlahan setelah siap diputar, lapisan gelap menjaga teks terbaca. */
+.hero-video {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity .8s ease;
+}
+
+.hero-video.is-playing {
+    opacity: 1;
+}
+
+.home-hero.has-video::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(11, 11, 12, .9) 0%, rgba(11, 11, 12, .6) 45%, rgba(11, 11, 12, .25) 100%);
+}
+
+/* Garis livery hanya tampil selama video tidak diputar (HP / reduce motion / video belum siap). */
+.home-hero.has-video.video-on::before {
+    display: none;
+}
+
+.hero-video-toggle {
+    position: absolute;
+    right: 1rem;
+    bottom: 5rem;
+    z-index: 1;
+    width: 2.25rem;
+    height: 2.25rem;
+    padding: 0;
+    border-radius: 50%;
+    color: #fff;
+    background-color: rgba(0, 0, 0, .45);
+    border: 1px solid rgba(255, 255, 255, .5);
+}
+
+.hero-video-toggle:hover,
+.hero-video-toggle:focus-visible {
+    color: #fff;
+    background-color: rgba(0, 0, 0, .7);
+}
+
+.hero-video-toggle .bi {
+    margin: 0;
+}
+
 @media (max-width: 991.98px) {
+    .hero-video,
+    .hero-video-toggle {
+        display: none;
+    }
+
     /* Layar kecil: teks memenuhi lebar, garis digeser ke tepi kanan agar tidak menabrak tagline. */
     .home-hero::before {
         inset: 0 -75% 0 72%;

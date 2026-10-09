@@ -33,6 +33,10 @@ return [
     // Pengiriman memakai pengaturan MAIL_* (MAIL_MAILER=log = hanya dicatat di storage/logs/laravel.log).
     'mail_notifications' => (bool) env('DEALER_MAIL_NOTIFICATIONS', true),
 
+    // Video latar hero beranda (MP4 di folder public, dipisah koma, diputar bergantian di layar lebar).
+    // Kosongkan untuk memakai banner tanpa video (garis diagonal + kartu mobil unggulan).
+    'hero_videos' => array_values(array_filter(array_map('trim', explode(',', (string) env('DEALER_HERO_VIDEOS', 'videos/video1.mp4,videos/video2.mp4'))))),
+
     /*
     |--------------------------------------------------------------------------
     | JAF Service (Bengkel)
