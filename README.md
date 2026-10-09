@@ -343,7 +343,7 @@ php artisan db:seed
 
 - `storage:link` membuat folder `public/storage` yang terhubung ke `storage/app/public`, supaya logo merek dan foto mobil yang di-upload bisa tampil di browser. Cukup sekali di setiap laptop. Foto mobil disimpan di `storage/app/public/cars/{id_mobil}/`.
 - Upload galeri mobil bisa sampai 10 file × 2 MB sekaligus. Jika muncul error *Content Too Large* / *POST Content-Length exceeds the limit*, naikkan `post_max_size` (misalnya `25M`) dan `upload_max_filesize` (minimal `2M`) di `php.ini`, lalu restart Apache.
-- `db:seed` membuat akun admin (dari `ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env`, wajib diisi dulu) serta data merek (Toyota, Honda, Daihatsu, Mitsubishi, Suzuki, Hyundai, Wuling), kategori (SUV, MPV, Sedan, Hatchback, Pickup, LCGC), 15 mobil contoh, dan 5 promo contoh (tanggal relatif terhadap hari seeder dijalankan). Jika `SEED_CUSTOMER_PASSWORD` diisi dan environment `local`, juga dibuat 8 customer dummy (misalnya `budi.santoso@example.test`) beserta 10 test drive dan 9 pengajuan dummy dengan berbagai status; stok mobil ikut disesuaikan untuk pengajuan yang disetujui/selesai. Aman dijalankan ulang: data yang sudah ada tidak digandakan dan tidak ditimpa.
+- `db:seed` membuat akun admin (dari `ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env`, wajib diisi dulu) serta data merek (Nissan, Toyota, Honda, Mazda, Mitsubishi, Subaru), kategori (SUV, MPV, Sedan, Hatchback, Pickup, Sport), 21 mobil contoh (Nissan baru & heritage + mobil klasik Jepang), 5 promo contoh (tanggal relatif terhadap hari seeder dijalankan), dan 6 layanan JAF Service. Jika `SEED_CUSTOMER_PASSWORD` diisi dan environment `local`, juga dibuat 8 customer dummy (misalnya `budi.santoso@example.test`) beserta 10 test drive, 9 pengajuan, dan 8 booking servis dummy dengan berbagai status; stok mobil ikut disesuaikan untuk pengajuan yang disetujui/selesai. Aman dijalankan ulang: data yang sudah ada tidak digandakan dan tidak ditimpa.
 
 ---
 
@@ -451,6 +451,74 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 
 ---
 
+## Testing
+
+Test otomatis (PHPUnit) memakai SQLite in-memory, tidak menyentuh database lokal:
+
+```bash
+php artisan test
+```
+
+Menjalankan test yang sama di **MySQL** (database terpisah `dealer_mobil_testing`, dikosongkan setiap kali test berjalan):
+
+```sql
+CREATE DATABASE dealer_mobil_testing CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+```
+
+```bash
+php artisan optimize:clear
+php vendor/bin/phpunit -c phpunit.mysql.xml
+```
+
+> **Pengaman:** `tests/TestCase.php` membatalkan test bila database tujuan bukan SQLite atau bukan nama berakhiran `_testing`, sehingga `dealer_mobil` tidak pernah ikut terhapus (misalnya saat `config:cache` lupa dibersihkan). Jangan menghapus pengaman ini.
+
+Hasil Phase 17: 651 test lulus di SQLite dan MySQL; semua route dirujuk test; crawler 119 halaman publik tanpa error; uji browser alur tamu, customer (test drive, servis, simulasi → pengajuan, profil), dan admin (dashboard, laporan & CSV, status, validasi, galeri) di desktop, tablet, dan HP. `tests/Feature/SeedDataValidationTest.php` memastikan semua data contoh seeder lolos validasi form admin.
+
+## Keamanan
+
+Sudah diterapkan (Phase 16):
+
+- Hak akses: semua route `/admin/*` memakai middleware `auth` + `admin`; data milik customer lain → 404.
+- CSRF di semua form, output Blade di-escape (`{{ }}`), query memakai parameter binding, `$fillable` (kolom `role` tidak bisa diisi dari form).
+- Upload hanya jpg/jpeg/png/webp (tanpa SVG), ukuran & dimensi dibatasi, nama file acak.
+- Rate limit: login (5/menit per email+IP), registrasi & lupa/reset kata sandi (5/menit per IP), booking test drive/servis, pengajuan, ganti kata sandi.
+- Redirect setelah login/daftar hanya ke URL di dalam aplikasi (mencegah *open redirect*).
+- Lupa kata sandi di `/lupa-kata-sandi` (pesan selalu sama agar email terdaftar tidak bisa ditebak; token sekali pakai, kedaluwarsa 60 menit). Di lokal `MAIL_MAILER=log`, tautan reset ada di `storage/logs/laravel.log`.
+- Header keamanan di semua response (`App\Http\Middleware\SecurityHeaders`): Content-Security-Policy, X-Frame-Options, X-Content-Type-Options, Referrer-Policy, Permissions-Policy, HSTS (khusus HTTPS); header `X-Powered-By` dihapus.
+  Jika menambah CDN/script baru, tambahkan domainnya ke `SecurityHeaders::CONTENT_SECURITY_POLICY`. Jangan memakai `<script>` inline atau atribut `onclick`; taruh JavaScript di `public/js`.
+
+Wajib saat production (Phase 19):
+
+- `.env`: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `LOG_LEVEL=warning`, `SESSION_SECURE_COOKIE=true`, dan `MAIL_MAILER` ke SMTP sungguhan.
+- Server: `expose_php = Off` di `php.ini`, `ServerTokens Prod` dan `ServerSignature Off` di Apache (menyembunyikan versi PHP/Apache), serta HTTPS.
+
+## Deployment
+
+- **Demo lokal / presentasi:** [docs/DEMO.md](docs/DEMO.md) — persiapan, akun demo, alur demo ±15 menit, dan solusi masalah saat demo.
+- **Shared hosting (cPanel):** [docs/DEPLOY-CPANEL.md](docs/DEPLOY-CPANEL.md) — syarat hosting (**PHP ≥ 8.4**), upload, document root, database, `.env` production, HTTPS, dan pembaruan.
+- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md).
+
+## Performa
+
+Sudah diterapkan (Phase 18):
+
+- Query: tanpa N+1 (eager load, jumlah query per halaman tetap & dites), 0–16 query per halaman, waktu database < 20 ms.
+- Index tambahan untuk urutan "terbaru" dan rentang tanggal laporan (`cars(is_active, created_at)`, `created_at` di `purchase_requests`, `test_drives`, `service_bookings`).
+- CSS/JS lokal dipanggil lewat `App\Support\Asset::url('css/app.css')` (menambah `?v=<waktu ubah file>`). Jika menambah file CSS/JS baru di view, gunakan helper ini, jangan `asset()` langsung.
+- `public/.htaccess`: cache browser 1 tahun untuk CSS/JS/gambar (halaman PHP tetap `no-cache`) dan kompresi gzip bila `mod_deflate` aktif.
+
+Langkah production (Phase 19), dari folder project:
+
+```bash
+composer install --no-dev --optimize-autoloader
+php artisan migrate --force
+php artisan optimize
+```
+
+- `php artisan optimize` (cache config, route, view, event) mempercepat respon ±20–30% (diukur di lokal). Setelah mengubah kode/`.env` di server, jalankan ulang `php artisan optimize`. **Jangan** dipakai saat development lokal; bila terlanjur, jalankan `php artisan optimize:clear` (wajib sebelum menjalankan test).
+- Aktifkan `mod_deflate` di Apache (Laragon: Menu → Apache → `httpd.conf`, hapus `#` pada `LoadModule deflate_module modules/mod_deflate.so`, lalu restart) agar HTML ±50 KB terkirim terkompresi.
+- OPcache aktif secara bawaan di PHP 8.5.
+
 ## Progress Project
 
 | Phase | Tahap                            | Status          |
@@ -462,27 +530,35 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | 5     | CRUD merek & kategori            | ✅ Selesai      |
 | 6     | CRUD mobil                       | ✅ Selesai      |
 | 7     | Upload & galeri mobil            | ✅ Selesai      |
-| 8     | Katalog publik        | ⏳                   |
-| 9     | Search & filter       | ⏳                   |
-| 10    | Detail mobil          | ⏳                   |
-| 11    | Test drive            | 🟡 Admin selesai (publik menyusul) |
-| 12    | Pengajuan pembelian   | 🟡 Admin selesai (publik menyusul) |
-| 13    | Simulasi kredit       | ⏳                   |
-| 14    | Promo                 | ✅ Admin (publik menyusul) |
+| 8     | Katalog publik        | ✅ Selesai (layout publik, beranda, katalog `/mobil`) |
+| 9     | Search & filter       | ✅ Selesai (filter & urutan lengkap) |
+| 10    | Detail mobil          | ✅ Selesai (tombol Ajukan/Test Drive/Simulasi tampil setelah route-nya dibuat) |
+| 11    | Test drive            | ✅ Selesai (admin + booking & riwayat customer) |
+| 12    | Pengajuan pembelian   | ✅ Selesai (admin + form `/mobil/{slug}/ajukan` & Pengajuan Saya) |
+| 13    | Simulasi kredit       | ✅ Selesai (`/simulasi-kredit`, hitung live + tabel tenor) |
+| 14    | Promo                 | ✅ Selesai (admin + halaman publik `/promo` & detail) |
 | 15    | Dashboard & laporan   | ✅ Admin selesai (dashboard, daftar pengguna, laporan) |
-| 16    | Security              | ⏳                   |
-| 17    | Testing               | ⏳                   |
-| 18    | Optimization          | ⏳                   |
-| 19    | Deployment            | ⏳                   |
+| 16    | Security              | ✅ Selesai (audit + perbaikan, lihat bagian Keamanan) |
+| 17    | Testing               | ✅ Selesai (651 test SQLite & MySQL, uji browser per peran) |
+| 18    | Optimization          | ✅ Selesai (index, cache aset, panduan production) |
+| 19    | Deployment            | ✅ Selesai (demo lokal & panduan cPanel, rilis v1.0.0) |
+| +     | Branding JAF Dealer            | ✅ Selesai (nama & tagline, warna hitam + merah Nissan, data contoh Nissan & klasik Jepang, filter warna) |
+| +     | JAF Service (permintaan dosen) | ✅ Selesai (layanan servis, booking, riwayat, admin, dashboard, laporan) |
+
+> **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`. Promo berjalan tampil di `/promo` (filter Semua/Khusus Mobil/Promo Umum) dan detailnya di `/promo/{slug}`. Simulasi kredit bunga flat di `/simulasi-kredit` (tanpa login; pilih mobil atau isi harga, DP, tenor). Customer mengajukan pembelian cash/kredit di `/mobil/{slug}/ajukan` (hasil simulasi bisa ikut terbawa) dan memantau/membatalkan di `/akun/pengajuan`. Halaman `/tentang-kami` dan `/kontak` (alamat, telepon, WhatsApp, email, jam operasional, Google Maps) membaca data dealer dari `.env` (`DEALER_*`). Setiap akun bisa mengubah data diri dan kata sandi di `/akun/profil`.
+
+> **JAF Service:** daftar layanan servis di `/servis`, booking servis di `/servis/booking` (wajib login), riwayat & pembatalan di `/akun/servis`. Admin mengelola layanan di `/admin/layanan` dan booking di `/admin/servis`; ringkasan servis tampil di dashboard, detail pengguna, laporan, dan export CSV. Setelah pull, jalankan `php artisan migrate` lalu `php artisan db:seed --class=ServiceSeeder`.
 
 > **Urutan kerja:** semua halaman **admin** dikerjakan dulu (sudah selesai), lalu halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 
 ### Keputusan desain
 
 - Customer **wajib login** untuk booking test drive dan mengajukan pembelian.
+- Identitas **JAF Dealer — Nissan Heritage & Performance**: fokus Nissan (baru & heritage) plus koleksi mobil klasik Jepang bekas.
 - Dealer menjual mobil **baru dan bekas**.
 - Simulasi kredit hanya berupa perhitungan (tanpa tabel). Hasilnya disimpan ke pengajuan pembelian.
 - Kontak dealer melalui WhatsApp dan halaman kontak.
+- **JAF Service** (layanan purna jual): customer booking servis untuk kendaraannya sendiri (tidak terhubung ke tabel `cars`), maksimal 3 kendaraan per jam (`config/dealer.php`).
 
 ### Rancangan tabel
 
@@ -496,6 +572,8 @@ Setelah itu buka GitHub, lalu buat **Pull Request** ke branch `main`. Minta tema
 | `promos`            | Promo umum atau per mobil                         |
 | `test_drives`       | Booking test drive                                |
 | `purchase_requests` | Pengajuan pembelian cash/kredit                   |
+| `services`          | Master layanan JAF Service                        |
+| `service_bookings`  | Booking servis customer                           |
 
 ## Alur Kerja Git (Kerja Tim)
 

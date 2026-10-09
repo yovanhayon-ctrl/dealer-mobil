@@ -1,0 +1,12 @@
+{
+    "Reset your password": "Reset kata sandi Anda",
+    "You are receiving this email because we received a password reset request for your account.": "Anda menerima email ini karena ada permintaan reset kata sandi untuk akun Anda.",
+    "Reset Password": "Reset Kata Sandi",
+    "This password reset link will expire in :count minutes.": "Tautan reset kata sandi ini kedaluwarsa dalam :count menit.",
+    "If you did not request a password reset, no further action is required.": "Jika Anda tidak meminta reset kata sandi, abaikan email ini.",
+    "Hello!": "Halo!",
+    "Regards,": "Salam,",
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\ninto your web browser:": "Jika tombol \":actionText\" tidak bisa diklik, salin dan tempel URL berikut\nke browser Anda:",
+    "All rights reserved.": "Hak cipta dilindungi.",
+    "Whoops!": "Ups!"
+}

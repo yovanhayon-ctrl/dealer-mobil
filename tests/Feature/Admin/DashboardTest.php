@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Car;
 use App\Models\PurchaseRequest;
+use App\Models\ServiceBooking;
 use App\Models\TestDrive;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -42,6 +43,9 @@ class DashboardTest extends TestCase
         PurchaseRequest::factory()->count(3)->recycle($customers)->recycle($cars)->create();
         PurchaseRequest::factory()->status('approved')->recycle($customers)->recycle($cars)->create();
 
+        ServiceBooking::factory()->recycle($customers)->create();
+        ServiceBooking::factory()->status('confirmed')->recycle($customers)->create();
+
         $this->actingAs($admin)->get('/admin/dashboard')
             ->assertOk()
             ->assertViewHas('stats', [
@@ -49,9 +53,10 @@ class DashboardTest extends TestCase
                 'out_of_stock_cars' => 2,
                 'pending_test_drives' => 2,
                 'pending_purchases' => 3,
+                'pending_service_bookings' => 1,
                 'customers' => 4,
             ])
-            ->assertSeeInOrder(['Mobil Aktif', 'Stok Habis', 'Test Drive Pending', 'Pengajuan Pending', 'Customer']);
+            ->assertSeeInOrder(['Mobil Aktif', 'Stok Habis', 'Test Drive Pending', 'Pengajuan Pending', 'Servis Pending', 'Customer']);
     }
 
     public function test_tabel_hanya_menampilkan_lima_data_yang_relevan(): void
@@ -94,7 +99,8 @@ class DashboardTest extends TestCase
         $this->actingAs($admin)->get('/admin/dashboard')
             ->assertOk()
             ->assertSee('Belum ada pengajuan')
-            ->assertSee('Belum ada jadwal test drive');
+            ->assertSee('Belum ada jadwal test drive')
+            ->assertSee('Belum ada jadwal servis');
     }
 
     public function test_jumlah_query_tidak_bertambah_seiring_data(): void
@@ -134,7 +140,8 @@ class DashboardTest extends TestCase
         $this->actingAs($admin)->get('/admin/dashboard')
             ->assertOk()
             ->assertSee('href="'.e(route('admin.test-drives.index', ['status' => 'pending'])).'"', false)
-            ->assertSee('href="'.e(route('admin.purchase-requests.index', ['status' => 'pending'])).'"', false);
+            ->assertSee('href="'.e(route('admin.purchase-requests.index', ['status' => 'pending'])).'"', false)
+            ->assertSee('href="'.e(route('admin.service-bookings.index', ['status' => 'pending'])).'"', false);
     }
 
     public function test_kartu_customer_mengarah_ke_daftar_pengguna_customer(): void
@@ -151,6 +158,7 @@ class DashboardTest extends TestCase
         // Tiap baris memakai customer & mobil (dengan merek) berbeda agar N+1 pasti terlihat.
         TestDrive::factory()->count($count)->create();
         PurchaseRequest::factory()->count($count)->create();
+        ServiceBooking::factory()->count($count)->create();
     }
 
     private function countDashboardQueries(User $admin): int

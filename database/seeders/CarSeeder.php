@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 class CarSeeder extends Seeder
 {
     /**
-     * 15 mobil dummy (harga perkiraan OTR, tanpa gambar).
+     * 21 mobil dummy JAF Dealer (harga perkiraan, data fiktif, tanpa gambar).
      * Aman dijalankan ulang: dicari berdasarkan slug, mobil yang sudah ada tidak diubah.
      */
     public function run(): void
@@ -51,68 +51,83 @@ class CarSeeder extends Seeder
     }
 
     /**
+     * Fokus Nissan (mobil baru + heritage), ditambah mobil klasik Jepang lain sebagai koleksi bekas.
+     * Variasi sengaja dipertahankan: mobil baru stok 0 (Leaf, unit display), mobil bekas stok 0
+     * (Silvia S15, sudah terjual), dan satu mobil nonaktif (X-Trail T32).
+     *
      * @return list<array<string, mixed>>
      */
     private function cars(): array
     {
         return [
-            // Toyota
-            ['brand' => 'Toyota', 'category' => 'MPV', 'name' => 'Avanza 1.5 G CVT', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
-                'price' => 285_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 1496, 'seats' => 7, 'color' => 'Putih', 'stock' => 5,
-                'description' => 'MPV keluarga terlaris dengan kabin lega tujuh penumpang dan transmisi CVT yang halus.'],
-            ['brand' => 'Toyota', 'category' => 'SUV', 'name' => 'Fortuner 2.8 GR Sport', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
-                'price' => 731_000_000, 'transmission' => 'automatic', 'fuel' => 'diesel', 'cc' => 2755, 'seats' => 7, 'color' => 'Hitam', 'stock' => 0,
-                'description' => 'SUV diesel bertenaga dengan penggerak 4x4 dan tampilan sporty GR Sport. Stok sedang kosong, unit display tersedia untuk test drive.'],
-            ['brand' => 'Toyota', 'category' => 'MPV', 'name' => 'Innova Zenix 2.0 Q HV', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
-                'price' => 612_000_000, 'transmission' => 'automatic', 'fuel' => 'hybrid', 'cc' => 1987, 'seats' => 7, 'color' => 'Silver', 'stock' => 3,
-                'description' => 'MPV hybrid premium yang irit bahan bakar dengan captain seat baris kedua.'],
-            ['brand' => 'Toyota', 'category' => 'LCGC', 'name' => 'Calya 1.2 G', 'condition' => 'bekas', 'year' => 2022, 'mileage' => 38_000,
-                'price' => 135_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1197, 'seats' => 7, 'color' => 'Abu-abu', 'stock' => 1,
-                'description' => 'Tangan pertama, servis rutin di bengkel resmi, pajak hidup.'],
+            // Nissan — baru
+            ['brand' => 'Nissan', 'category' => 'SUV', 'name' => 'Kicks e-Power VL', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
+                'price' => 520_000_000, 'transmission' => 'automatic', 'fuel' => 'hybrid', 'cc' => 1198, 'seats' => 5, 'color' => 'Putih', 'stock' => 4,
+                'description' => 'Crossover e-Power: roda digerakkan motor listrik, mesin bensin hanya mengisi baterai. Responsif dan irit.'],
+            ['brand' => 'Nissan', 'category' => 'MPV', 'name' => 'Serena e-Power Highway Star', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
+                'price' => 650_000_000, 'transmission' => 'automatic', 'fuel' => 'hybrid', 'cc' => 1433, 'seats' => 7, 'color' => 'Hitam', 'stock' => 3,
+                'description' => 'MPV keluarga dengan pintu geser elektrik, ProPILOT, dan kabin lapang untuk tujuh penumpang.'],
+            ['brand' => 'Nissan', 'category' => 'SUV', 'name' => 'X-Trail e-Power e-4ORCE VL', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
+                'price' => 830_000_000, 'transmission' => 'automatic', 'fuel' => 'hybrid', 'cc' => 1497, 'seats' => 7, 'color' => 'Abu-abu', 'stock' => 2,
+                'description' => 'SUV tujuh penumpang dengan penggerak semua roda elektrik e-4ORCE.'],
+            ['brand' => 'Nissan', 'category' => 'MPV', 'name' => 'Livina VL CVT', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
+                'price' => 330_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 1499, 'seats' => 7, 'color' => 'Silver', 'stock' => 5,
+                'description' => 'Low MPV tujuh penumpang yang praktis untuk kebutuhan harian keluarga.'],
+            ['brand' => 'Nissan', 'category' => 'SUV', 'name' => 'Magnite Premium CVT', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
+                'price' => 285_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 999, 'seats' => 5, 'color' => 'Merah', 'stock' => 6,
+                'description' => 'Compact SUV bermesin turbo 1.0 dengan ground clearance tinggi.'],
+            ['brand' => 'Nissan', 'category' => 'Hatchback', 'name' => 'Leaf', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
+                'price' => 750_000_000, 'transmission' => 'automatic', 'fuel' => 'listrik', 'cc' => null, 'seats' => 5, 'color' => 'Biru', 'stock' => 0,
+                'description' => 'Mobil listrik penuh dengan e-Pedal. Stok sedang kosong, unit display tersedia untuk test drive.'],
+            ['brand' => 'Nissan', 'category' => 'Pickup', 'name' => 'Navara VL 4x4 AT', 'condition' => 'baru', 'year' => 2024, 'mileage' => 0,
+                'price' => 560_000_000, 'transmission' => 'automatic', 'fuel' => 'diesel', 'cc' => 2488, 'seats' => 5, 'color' => 'Abu-abu', 'stock' => 2,
+                'description' => 'Double cabin 4x4 bermesin diesel untuk kerja berat maupun petualangan.'],
+            ['brand' => 'Nissan', 'category' => 'Sport', 'name' => 'GT-R Premium Edition', 'condition' => 'baru', 'year' => 2024, 'mileage' => 0,
+                'price' => 4_650_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 3799, 'seats' => 4, 'color' => 'Putih', 'stock' => 1,
+                'description' => 'R35 GT-R: V6 twin-turbo rakitan tangan Takumi dengan penggerak ATTESA E-TS.'],
 
-            // Honda
-            ['brand' => 'Honda', 'category' => 'SUV', 'name' => 'HR-V 1.5 SE CVT', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
-                'price' => 402_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 1498, 'seats' => 5, 'color' => 'Merah', 'stock' => 4,
-                'description' => 'Compact SUV stylish dengan fitur keselamatan Honda Sensing.'],
-            ['brand' => 'Honda', 'category' => 'LCGC', 'name' => 'Brio Satya E CVT', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
-                'price' => 199_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 1199, 'seats' => 5, 'color' => 'Kuning', 'stock' => 6,
-                'description' => 'City car lincah dan irit, cocok untuk mobil pertama.'],
-            ['brand' => 'Honda', 'category' => 'Sedan', 'name' => 'Civic 1.5 RS Turbo', 'condition' => 'bekas', 'year' => 2022, 'mileage' => 24_000,
-                'price' => 520_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 1498, 'seats' => 5, 'color' => 'Putih', 'stock' => 0,
-                'description' => 'Sedan sporty bermesin turbo, kondisi istimewa. Unit sudah terjual.'],
+            // Nissan — heritage (bekas)
+            ['brand' => 'Nissan', 'category' => 'Sport', 'name' => 'Skyline GT-R V-Spec II (R34)', 'condition' => 'bekas', 'year' => 2000, 'mileage' => 86_000,
+                'price' => 3_500_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 2568, 'seats' => 4, 'color' => 'Biru', 'stock' => 1,
+                'description' => 'Ikon JDM bermesin RB26DETT, warna Bayside Blue, dokumen lengkap.'],
+            ['brand' => 'Nissan', 'category' => 'Sport', 'name' => 'Silvia Spec-R (S15)', 'condition' => 'bekas', 'year' => 2001, 'mileage' => 105_000,
+                'price' => 650_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1998, 'seats' => 4, 'color' => 'Putih', 'stock' => 0,
+                'description' => 'Mesin SR20DET dengan penggerak roda belakang. Unit sudah terjual.'],
+            ['brand' => 'Nissan', 'category' => 'Sport', 'name' => '350Z (Z33)', 'condition' => 'bekas', 'year' => 2007, 'mileage' => 98_000,
+                'price' => 480_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 3498, 'seats' => 2, 'color' => 'Silver', 'stock' => 1,
+                'description' => 'Fairlady Z generasi Z33 dengan V6 VQ35, kondisi terawat.'],
+            ['brand' => 'Nissan', 'category' => 'SUV', 'name' => 'Juke RX CVT', 'condition' => 'bekas', 'year' => 2016, 'mileage' => 92_000,
+                'price' => 165_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 1498, 'seats' => 5, 'color' => 'Merah', 'stock' => 1,
+                'description' => 'Crossover berdesain unik, servis rutin di bengkel resmi.'],
+            ['brand' => 'Nissan', 'category' => 'MPV', 'name' => 'Grand Livina XV', 'condition' => 'bekas', 'year' => 2018, 'mileage' => 85_000,
+                'price' => 125_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 1498, 'seats' => 7, 'color' => 'Hitam', 'stock' => 2,
+                'description' => 'MPV keluarga yang nyaman, pajak hidup.'],
+            ['brand' => 'Nissan', 'category' => 'SUV', 'name' => 'X-Trail 2.5 CVT (T32)', 'condition' => 'bekas', 'year' => 2015, 'mileage' => 120_000,
+                'price' => 185_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 2488, 'seats' => 7, 'color' => 'Hitam', 'stock' => 1,
+                'description' => 'Sedang dalam perbaikan bodi, belum ditampilkan di katalog.', 'active' => false],
 
-            // Daihatsu
-            ['brand' => 'Daihatsu', 'category' => 'MPV', 'name' => 'Xenia 1.3 R CVT', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
-                'price' => 254_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 1329, 'seats' => 7, 'color' => 'Silver', 'stock' => 5,
-                'description' => 'MPV tujuh penumpang dengan platform DNGA yang nyaman dan irit.'],
-            ['brand' => 'Daihatsu', 'category' => 'LCGC', 'name' => 'Sigra 1.2 X', 'condition' => 'bekas', 'year' => 2021, 'mileage' => 61_000,
-                'price' => 118_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1197, 'seats' => 7, 'color' => 'Putih', 'stock' => 1,
-                'active' => false,
-                'description' => 'LCGC tujuh penumpang, sedang dalam pengecekan sebelum dijual kembali.'],
-
-            // Mitsubishi
-            ['brand' => 'Mitsubishi', 'category' => 'MPV', 'name' => 'Xpander Cross Premium CVT', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
-                'price' => 363_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 1499, 'seats' => 7, 'color' => 'Hijau', 'stock' => 3,
-                'description' => 'Crossover MPV dengan ground clearance tinggi, tangguh untuk berbagai medan.'],
-            ['brand' => 'Mitsubishi', 'category' => 'SUV', 'name' => 'Pajero Sport Dakar 4x2', 'condition' => 'bekas', 'year' => 2021, 'mileage' => 72_000,
-                'price' => 455_000_000, 'transmission' => 'automatic', 'fuel' => 'diesel', 'cc' => 2442, 'seats' => 7, 'color' => 'Hitam', 'stock' => 1,
-                'description' => 'SUV diesel tangguh, riwayat servis lengkap, ban baru.'],
-            ['brand' => 'Mitsubishi', 'category' => 'Pickup', 'name' => 'Triton Exceed Double Cab 4x4', 'condition' => 'baru', 'year' => 2024, 'mileage' => 0,
-                'price' => 575_000_000, 'transmission' => 'automatic', 'fuel' => 'diesel', 'cc' => 2442, 'seats' => 5, 'color' => 'Abu-abu', 'stock' => 2,
-                'description' => 'Double cabin 4x4 untuk kebutuhan kerja maupun petualangan.'],
-
-            // Suzuki
-            ['brand' => 'Suzuki', 'category' => 'Hatchback', 'name' => 'Swift 1.2 GL', 'condition' => 'bekas', 'year' => 2019, 'mileage' => 54_000,
-                'price' => 145_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1197, 'seats' => 5, 'color' => 'Biru', 'stock' => 1,
-                'description' => 'Hatchback ringan dan responsif, kondisi terawat.'],
-
-            // Hyundai
-            ['brand' => 'Hyundai', 'category' => 'SUV', 'name' => 'Creta 1.5 Prime IVT', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
-                'price' => 412_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 1497, 'seats' => 5, 'color' => 'Putih', 'stock' => 3,
-                'description' => 'Compact SUV dengan panoramic sunroof dan fitur keselamatan Hyundai SmartSense.'],
-            ['brand' => 'Hyundai', 'category' => 'SUV', 'name' => 'Ioniq 5 Signature Long Range', 'condition' => 'baru', 'year' => 2024, 'mileage' => 0,
-                'price' => 859_000_000, 'transmission' => 'automatic', 'fuel' => 'listrik', 'cc' => null, 'seats' => 5, 'color' => 'Silver', 'stock' => 2,
-                'description' => 'Mobil listrik dengan jarak tempuh jauh dan pengisian daya cepat.'],
+            // Klasik Jepang lainnya (bekas)
+            ['brand' => 'Toyota', 'category' => 'Sport', 'name' => 'Supra RZ (A80)', 'condition' => 'bekas', 'year' => 1997, 'mileage' => 112_000,
+                'price' => 2_800_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 2997, 'seats' => 4, 'color' => 'Hitam', 'stock' => 1,
+                'description' => 'Mesin legendaris 2JZ-GTE twin-turbo dengan transmisi manual 6 percepatan.'],
+            ['brand' => 'Toyota', 'category' => 'Hatchback', 'name' => 'Sprinter Trueno GT-Apex (AE86)', 'condition' => 'bekas', 'year' => 1986, 'mileage' => 165_000,
+                'price' => 550_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1587, 'seats' => 4, 'color' => 'Putih', 'stock' => 1,
+                'description' => 'Hachi-roku dengan lampu pop-up dan mesin 4A-GE, penggerak roda belakang.'],
+            ['brand' => 'Honda', 'category' => 'Sport', 'name' => 'NSX (NA1)', 'condition' => 'bekas', 'year' => 1991, 'mileage' => 88_000,
+                'price' => 2_400_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 2977, 'seats' => 2, 'color' => 'Merah', 'stock' => 1,
+                'description' => 'Supercar bermesin tengah dengan sasis aluminium dan V6 VTEC.'],
+            ['brand' => 'Honda', 'category' => 'Hatchback', 'name' => 'Civic Type R (EK9)', 'condition' => 'bekas', 'year' => 1998, 'mileage' => 125_000,
+                'price' => 450_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1595, 'seats' => 5, 'color' => 'Putih', 'stock' => 1,
+                'description' => 'Type R pertama dengan mesin B16B, warna Championship White.'],
+            ['brand' => 'Mazda', 'category' => 'Sport', 'name' => 'RX-7 Spirit R (FD3S)', 'condition' => 'bekas', 'year' => 2002, 'mileage' => 76_000,
+                'price' => 1_650_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1308, 'seats' => 4, 'color' => 'Kuning', 'stock' => 1,
+                'description' => 'Edisi terakhir RX-7 bermesin rotary 13B-REW twin-turbo.'],
+            ['brand' => 'Mitsubishi', 'category' => 'Sedan', 'name' => 'Lancer Evolution IX GSR', 'condition' => 'bekas', 'year' => 2006, 'mileage' => 130_000,
+                'price' => 750_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1997, 'seats' => 5, 'color' => 'Abu-abu', 'stock' => 1,
+                'description' => 'Sedan rally bermesin 4G63 turbo MIVEC dengan penggerak semua roda.'],
+            ['brand' => 'Subaru', 'category' => 'Sedan', 'name' => 'Impreza WRX STI (GC8)', 'condition' => 'bekas', 'year' => 1998, 'mileage' => 140_000,
+                'price' => 600_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1994, 'seats' => 5, 'color' => 'Biru', 'stock' => 1,
+                'description' => 'Mesin boxer EJ20 turbo dan AWD simetris, warna khas WR Blue.'],
         ];
     }
 }

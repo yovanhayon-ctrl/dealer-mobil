@@ -4,6 +4,7 @@ namespace App\Reports;
 
 use App\Models\Car;
 use App\Models\PurchaseRequest;
+use App\Models\ServiceBooking;
 use App\Models\TestDrive;
 use Illuminate\Database\Eloquent\Collection as EloquentCollection;
 use Illuminate\Database\Query\Builder;
@@ -15,7 +16,7 @@ use Illuminate\Support\Facades\DB;
  * jumlah query tetap berapa pun datanya, dan setiap bagian dihitung sekali (memo).
  *
  * - Terjual = pengajuan berstatus approved/completed (unit sudah dipotong dari stok).
- * - Pengajuan difilter berdasarkan tanggal pengajuan (created_at); test drive berdasarkan jadwal (preferred_date).
+ * - Pengajuan difilter berdasarkan tanggal pengajuan (created_at); test drive & booking servis berdasarkan jadwal (preferred_date).
  */
 class AdminReport
 {
@@ -80,6 +81,33 @@ class AdminReport
     }
 
     /**
+     * @return array{total: int, statuses: array<string, int>, completion_rate: float}
+     */
+    public function serviceSummary(): array
+    {
+        return $this->memo[__FUNCTION__] ??= $this->scheduledStatusSummary('service_bookings', ServiceBooking::STATUSES, ServiceBooking::STATUS_COMPLETED);
+    }
+
+    /**
+     * Jumlah booking servis per layanan (semua status) dan yang selesai, urut terbanyak.
+     *
+     * @return Collection<int, object{name: string, total: int, completed: int}>
+     */
+    public function servicesByPopularity(): Collection
+    {
+        return $this->memo[__FUNCTION__] ??= DB::table('service_bookings')
+            ->join('services', 'services.id', '=', 'service_bookings.service_id')
+            ->whereBetween('service_bookings.preferred_date', [$this->period->from->toDateTimeString(), $this->period->to->toDateTimeString()])
+            ->groupBy('services.id', 'services.name')
+            ->selectRaw('services.name AS name, COUNT(*) AS total')
+            ->selectRaw('COUNT(CASE WHEN service_bookings.status = ? THEN 1 END) AS completed', [ServiceBooking::STATUS_COMPLETED])
+            ->orderByDesc('total')
+            ->orderBy('services.name')
+            ->get()
+            ->map(fn ($row) => (object) ['name' => $row->name, 'total' => (int) $row->total, 'completed' => (int) $row->completed]);
+    }
+
+    /**
      * Mobil aktif dengan stok ≤ Car::LOW_STOCK_THRESHOLD (tidak bergantung periode).
      *
      * @return EloquentCollection<int, Car>
@@ -134,20 +162,31 @@ class AdminReport
 
     private function loadTestDriveSummary(): array
     {
+        return $this->scheduledStatusSummary('test_drives', TestDrive::STATUSES, TestDrive::STATUS_COMPLETED);
+    }
+
+    /**
+     * Jumlah per status untuk tabel berjadwal (test drive / booking servis) dalam periode.
+     *
+     * @param  array<int, string>  $allStatuses
+     * @return array{total: int, statuses: array<string, int>, completion_rate: float}
+     */
+    private function scheduledStatusSummary(string $table, array $allStatuses, string $completedStatus): array
+    {
         // Rentang datetime (bukan whereDate) agar index preferred_date tetap terpakai.
-        $counts = DB::table('test_drives')
+        $counts = DB::table($table)
             ->whereBetween('preferred_date', [$this->period->from->toDateTimeString(), $this->period->to->toDateTimeString()])
             ->groupBy('status')
             ->selectRaw('status, COUNT(*) AS total')
             ->pluck('total', 'status');
 
-        $statuses = collect(TestDrive::STATUSES)->mapWithKeys(fn ($status) => [$status => (int) ($counts[$status] ?? 0)])->all();
+        $statuses = collect($allStatuses)->mapWithKeys(fn ($status) => [$status => (int) ($counts[$status] ?? 0)])->all();
         $total = array_sum($statuses);
 
         return [
             'total' => $total,
             'statuses' => $statuses,
-            'completion_rate' => self::percent($statuses[TestDrive::STATUS_COMPLETED], $total),
+            'completion_rate' => self::percent($statuses[$completedStatus], $total),
         ];
     }
 

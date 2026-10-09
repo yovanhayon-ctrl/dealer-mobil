@@ -121,4 +121,18 @@ class Promo extends Model
     {
         return $this->car_id === null;
     }
+
+    /**
+     * Label sisa waktu promo berjalan ("Hari terakhir", "Berakhir dalam 3 hari"); null bila tidak berjalan.
+     */
+    public function remainingLabel(): ?string
+    {
+        if ($this->status !== self::STATUS_RUNNING) {
+            return null;
+        }
+
+        $days = (int) today()->diffInDays($this->end_date);
+
+        return $days === 0 ? 'Hari terakhir' : "Berakhir dalam {$days} hari";
+    }
 }

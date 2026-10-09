@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Car;
 use App\Models\PurchaseRequest;
+use App\Models\ServiceBooking;
 use App\Models\TestDrive;
 use App\Models\User;
 use Illuminate\View\View;
@@ -24,6 +25,14 @@ class DashboardController extends Controller
                 ->with(['user:id,name', 'car:id,brand_id,name', 'car.brand:id,name'])
                 ->whereDate('preferred_date', '>=', today())
                 ->whereIn('status', ['pending', 'confirmed'])
+                ->orderBy('preferred_date')
+                ->orderBy('preferred_time')
+                ->limit(5)
+                ->get(),
+            'upcomingServiceBookings' => ServiceBooking::query()
+                ->with(['user:id,name', 'service:id,name'])
+                ->whereDate('preferred_date', '>=', today())
+                ->active()
                 ->orderBy('preferred_date')
                 ->orderBy('preferred_time')
                 ->limit(5)
@@ -48,6 +57,7 @@ class DashboardController extends Controller
             'out_of_stock_cars' => (int) $cars->out_of_stock,
             'pending_test_drives' => TestDrive::where('status', 'pending')->count(),
             'pending_purchases' => PurchaseRequest::where('status', 'pending')->count(),
+            'pending_service_bookings' => ServiceBooking::where('status', ServiceBooking::STATUS_PENDING)->count(),
             'customers' => User::where('role', User::ROLE_CUSTOMER)->count(),
         ];
     }
