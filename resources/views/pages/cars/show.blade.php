@@ -162,6 +162,7 @@
                         @endif
 
                         <x-favorite-button :car="$car" variant="full" />
+                        <x-compare-button :car="$car" variant="full" />
 
                         @if ($whatsappUrl)
                             <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener" class="btn btn-success">

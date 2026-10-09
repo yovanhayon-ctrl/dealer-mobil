@@ -444,6 +444,57 @@ main {
     box-shadow: 0 0 0 .2rem rgba(195, 0, 47, .35);
 }
 
+/* ---------- Bandingkan mobil ---------- */
+
+/* Tombol Bandingkan di kartu: di atas stretched-link judul. */
+.car-card-compare {
+    position: relative;
+    z-index: 2;
+}
+
+/* Sticky (bukan fixed): menempel di bawah layar saat menggulir, tetapi tidak menutupi footer. */
+.compare-bar {
+    position: sticky;
+    bottom: 0;
+    z-index: 1020;
+    background-color: var(--dm-navy);
+    color: #fff;
+    box-shadow: 0 -.25rem 1rem rgba(0, 0, 0, .2);
+}
+
+.compare-table {
+    min-width: 640px;
+    /* Kolom mobil sama lebar, tidak bergantung panjang teksnya. */
+    table-layout: fixed;
+}
+
+.compare-table .compare-label {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    width: 9rem;
+    background-color: var(--bs-body-bg);
+    color: var(--bs-secondary-color);
+    font-weight: 500;
+}
+
+.compare-table .compare-col {
+    min-width: 12rem;
+    vertical-align: top;
+}
+
+.compare-img {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: .5rem;
+    background-color: var(--dm-bg);
+    font-size: 2rem;
+}
+
 /* ---------- Notifikasi ---------- */
 
 .notification-bell {
