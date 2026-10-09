@@ -60,6 +60,18 @@ document.addEventListener('DOMContentLoaded', function () {
         lockedButtons = [];
     });
 
+    // Navbar: bayangan tipis setelah halaman digulir.
+    var navbar = document.querySelector('[data-navbar]');
+
+    if (navbar) {
+        var syncNavbar = function () {
+            navbar.classList.toggle('is-scrolled', window.scrollY > 4);
+        };
+
+        syncNavbar();
+        window.addEventListener('scroll', syncNavbar, { passive: true });
+    }
+
     // Video latar hero: hanya layar lebar (≥992px), tanpa "reduce motion", dan tidak dalam mode hemat data.
     // Satu video diputar berulang; beberapa video diputar bergantian.
     var heroVideo = document.querySelector('[data-hero-videos]');
