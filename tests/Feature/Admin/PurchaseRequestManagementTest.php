@@ -467,14 +467,14 @@ class PurchaseRequestManagementTest extends TestCase
         }
         $this->assertSame(2, $sold->sum());
 
-        // Nilai kredit sama dengan CreditCalculator; harga memakai promo aktif (Avanza −Rp 15 jt).
+        // Nilai kredit sama dengan CreditCalculator; harga memakai promo aktif (Kicks e-Power −Rp 15 jt).
         $calculator = app(CreditCalculator::class);
         foreach ($seeded->where('payment_method', 'credit') as $purchase) {
             $expected = $calculator->calculate($purchase->car_price, $purchase->down_payment, $purchase->tenor_months);
             $this->assertSame($expected['monthly_installment'], $purchase->monthly_installment);
             $this->assertEquals($expected['interest_rate'], (float) $purchase->interest_rate);
         }
-        $this->assertSame(270_000_000, $seeded->first(fn ($purchase) => $purchase->car->slug === 'toyota-avanza-1-5-g-cvt-2025')->car_price);
+        $this->assertSame(505_000_000, $seeded->first(fn ($purchase) => $purchase->car->slug === 'nissan-kicks-e-power-vl-2025')->car_price);
 
         // Status tolak/batal punya catatan admin.
         $this->assertTrue($seeded->whereIn('status', ['rejected', 'cancelled'])->every(fn ($purchase) => filled($purchase->admin_note)));

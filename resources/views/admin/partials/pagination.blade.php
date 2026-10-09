@@ -8,7 +8,7 @@
         </div>
 
         @if ($paginator->hasPages())
-            {{ $paginator->onEachSide(1)->links('admin.partials.pagination-links') }}
+            {{ $paginator->onEachSide(1)->links('partials.pagination-links') }}
         @endif
     </div>
 @endif

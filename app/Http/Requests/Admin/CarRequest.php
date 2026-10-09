@@ -54,7 +54,7 @@ class CarRequest extends FormRequest
             'mileage' => $isUsed
                 ? ['required', 'integer', 'min:1', 'max:2000000']
                 : ['nullable', 'integer', 'min:0'],
-            'year' => ['required', 'integer', 'between:1990,'.(now()->year + 1)],
+            'year' => ['required', 'integer', 'between:'.Car::MIN_YEAR.','.(now()->year + 1)],
             'price' => ['required', 'integer', 'min:1', 'max:999999999999'],
             'transmission' => ['required', Rule::in(array_keys(Car::TRANSMISSIONS))],
             'fuel_type' => ['required', Rule::in(array_keys(Car::FUEL_TYPES))],

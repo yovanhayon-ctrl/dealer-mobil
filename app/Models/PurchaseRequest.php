@@ -61,6 +61,12 @@ class PurchaseRequest extends Model
     /** Dihitung "terjual" di laporan: unit sudah dipotong dari stok. */
     public const SOLD_STATUSES = [self::STATUS_APPROVED, self::STATUS_COMPLETED];
 
+    /** Pengajuan yang masih berjalan: customer tidak boleh mengajukan mobil yang sama lagi. */
+    public const ACTIVE_STATUSES = [self::STATUS_PENDING, self::STATUS_PROCESSING, self::STATUS_APPROVED];
+
+    /** Customer hanya boleh membatalkan saat status ini (RANCANGAN §5); tanpa efek stok. */
+    public const CUSTOMER_CANCELLABLE_STATUSES = [self::STATUS_PENDING];
+
     public const PAYMENT_CASH = 'cash';
 
     public const PAYMENT_CREDIT = 'credit';
@@ -96,6 +102,12 @@ class PurchaseRequest extends Model
     public function isPending(): bool
     {
         return $this->status === self::STATUS_PENDING;
+    }
+
+    public function canBeCancelledByCustomer(): bool
+    {
+        return in_array($this->status, self::CUSTOMER_CANCELLABLE_STATUSES, true)
+            && $this->canTransitionTo(self::STATUS_CANCELLED);
     }
 
     public function isCredit(): bool

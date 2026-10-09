@@ -9,8 +9,8 @@ use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Daftar pengguna hanya baca: menghapus user akan ikut menghapus riwayat test drive
- * dan pengajuannya (FK cascadeOnDelete), jadi tidak ada tambah/edit/hapus.
+ * Daftar pengguna hanya baca: menghapus user akan ikut menghapus riwayat test drive,
+ * pengajuan, dan booking servisnya (FK cascadeOnDelete), jadi tidak ada tambah/edit/hapus.
  */
 class UserController extends Controller
 {
@@ -35,7 +35,7 @@ class UserController extends Controller
         $users = User::query()
             // Password & remember_token tidak pernah diambil dari database.
             ->select(['id', 'name', 'email', 'phone', 'role', 'created_at'])
-            ->withCount(['testDrives', 'purchaseRequests'])
+            ->withCount(['testDrives', 'purchaseRequests', 'serviceBookings'])
             ->tap(fn (Builder $query) => $this->applyFilters($query, $filters))
             ->orderBy($sortColumn, $sortDirection)
             ->orderByDesc('id')
@@ -58,6 +58,8 @@ class UserController extends Controller
             'testDrives.car' => $car,
             'purchaseRequests' => fn ($query) => $query->latest()->orderByDesc('id'),
             'purchaseRequests.car' => $car,
+            'serviceBookings' => fn ($query) => $query->orderByDesc('preferred_date')->orderByDesc('preferred_time')->orderByDesc('id'),
+            'serviceBookings.service:id,name',
         ]);
 
         return view('admin.users.show', ['user' => $user]);

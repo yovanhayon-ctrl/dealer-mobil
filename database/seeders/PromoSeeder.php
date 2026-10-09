@@ -48,24 +48,24 @@ class PromoSeeder extends Seeder
     {
         return [
             [
-                'title' => 'Diskon Spesial Avanza', 'car' => 'toyota-avanza-1-5-g-cvt-2025', 'discount' => 15_000_000,
+                'title' => 'Diskon Spesial Kicks e-Power', 'car' => 'nissan-kicks-e-power-vl-2025', 'discount' => 15_000_000,
                 'start' => -7, 'end' => 23,
-                'description' => 'Potongan harga Rp 15 juta untuk pembelian Toyota Avanza 1.5 G CVT selama periode promo.',
+                'description' => 'Potongan harga Rp 15 juta untuk pembelian Nissan Kicks e-Power VL selama periode promo.',
             ],
             [
-                'title' => 'Cashback HR-V', 'car' => 'honda-hr-v-1-5-se-cvt-2025', 'discount' => 10_000_000,
+                'title' => 'Cashback Serena e-Power', 'car' => 'nissan-serena-e-power-highway-star-2025', 'discount' => 10_000_000,
                 'start' => -7, 'end' => 23,
-                'description' => 'Cashback Rp 10 juta untuk Honda HR-V 1.5 SE CVT, berlaku cash maupun kredit.',
+                'description' => 'Cashback Rp 10 juta untuk Nissan Serena e-Power Highway Star, berlaku cash maupun kredit.',
             ],
             [
                 'title' => 'Gratis Servis 3 Tahun', 'car' => null, 'discount' => null,
                 'start' => -7, 'end' => 53,
-                'description' => 'Gratis biaya jasa servis berkala selama 3 tahun untuk setiap pembelian mobil baru.',
+                'description' => 'Gratis biaya jasa servis berkala di JAF Service selama 3 tahun untuk setiap pembelian mobil Nissan baru.',
             ],
             [
-                'title' => 'Promo Xpander Akhir Tahun', 'car' => 'mitsubishi-xpander-cross-premium-cvt-2025', 'discount' => 12_000_000,
+                'title' => 'Promo Livina Akhir Tahun', 'car' => 'nissan-livina-vl-cvt-2025', 'discount' => 12_000_000,
                 'start' => 10, 'end' => 40,
-                'description' => 'Potongan harga Rp 12 juta untuk Mitsubishi Xpander Cross Premium CVT menjelang akhir tahun.',
+                'description' => 'Potongan harga Rp 12 juta untuk Nissan Livina VL CVT menjelang akhir tahun.',
             ],
             [
                 'title' => 'Promo Kemerdekaan', 'car' => null, 'discount' => null,

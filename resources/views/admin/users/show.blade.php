@@ -43,7 +43,10 @@
                         <dd class="col-7">{{ $user->testDrives->count() }}</dd>
 
                         <dt class="col-5 text-muted fw-normal">Pengajuan</dt>
-                        <dd class="col-7 mb-0">{{ $user->purchaseRequests->count() }}</dd>
+                        <dd class="col-7">{{ $user->purchaseRequests->count() }}</dd>
+
+                        <dt class="col-5 text-muted fw-normal">Booking servis</dt>
+                        <dd class="col-7 mb-0">{{ $user->serviceBookings->count() }}</dd>
                     </dl>
                 </div>
             </div>
@@ -90,7 +93,7 @@
                 @endif
             </div>
 
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-header bg-transparent border-0 pt-3 px-3">
                     <h3 class="h6 mb-0">Riwayat Pengajuan</h3>
                 </div>
@@ -124,6 +127,48 @@
                                                 <a href="{{ route('admin.purchase-requests.show', $purchase) }}" class="btn btn-sm btn-outline-primary">Detail</a>
                                             </td>
                                         @endif
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
+                @endif
+            </div>
+
+            <div class="card">
+                <div class="card-header bg-transparent border-0 pt-3 px-3">
+                    <h3 class="h6 mb-0">Riwayat Servis</h3>
+                </div>
+                @if ($user->serviceBookings->isEmpty())
+                    <x-empty-state icon="bi-wrench-adjustable" title="Belum ada booking servis" message="Pengguna ini belum pernah booking servis." />
+                @else
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle mb-0 admin-table">
+                            <thead>
+                                <tr>
+                                    <th>Tanggal</th>
+                                    <th>Layanan</th>
+                                    <th>Kendaraan</th>
+                                    <th>Status</th>
+                                    <th class="text-end">Aksi</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach ($user->serviceBookings as $booking)
+                                    <tr>
+                                        <td class="text-nowrap">
+                                            {{ $booking->preferred_date->translatedFormat('d M Y') }}
+                                            <div class="small text-muted">{{ $booking->timeLabel() }} WIB</div>
+                                        </td>
+                                        <td>{{ $booking->service->name }}</td>
+                                        <td>
+                                            {{ $booking->vehicle_model }}
+                                            <div class="small text-muted">{{ $booking->plate_number }}</div>
+                                        </td>
+                                        <td><x-status-badge :status="$booking->status" /></td>
+                                        <td class="text-end">
+                                            <a href="{{ route('admin.service-bookings.show', $booking) }}" class="btn btn-sm btn-outline-primary">Detail</a>
+                                        </td>
                                     </tr>
                                 @endforeach
                             </tbody>

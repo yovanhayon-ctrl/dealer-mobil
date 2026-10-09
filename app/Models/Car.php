@@ -13,6 +13,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use InvalidArgumentException;
 
 #[Fillable([
     'brand_id', 'category_id', 'name', 'slug', 'vehicle_condition', 'year', 'mileage',
@@ -23,6 +24,9 @@ class Car extends Model
 {
     /** @use HasFactory<CarFactory> */
     use HasFactory, HasUniqueSlug;
+
+    /** Tahun produksi terlama yang boleh diinput (koleksi heritage & klasik Jepang, mis. AE86 1986). */
+    public const MIN_YEAR = 1950;
 
     public const CONDITION_NEW = 'baru';
 
@@ -54,6 +58,12 @@ class Car extends Model
 
     /** Batas "stok menipis" di laporan admin (mobil aktif dengan stok ≤ nilai ini). */
     public const LOW_STOCK_THRESHOLD = 1;
+
+    /** Relasi yang dipakai x-car-card; di-eager load agar tidak terjadi N+1. */
+    public const CARD_RELATIONS = [
+        'brand:id,name,slug', 'category:id,name,slug', 'primaryImage:id,car_id,path',
+        'activePromos:id,car_id,discount_amount',
+    ];
 
     protected function casts(): array
     {
@@ -114,6 +124,65 @@ class Car extends Model
         $query->where('is_active', true);
     }
 
+    /**
+     * Mobil yang boleh di-test drive: aktif, dan baru (stok 0 tetap boleh) atau bekas dengan stok.
+     * Aturannya sama dengan canBeTestDriven().
+     */
+    #[Scope]
+    protected function testDrivable(Builder $query): void
+    {
+        $query->where('cars.is_active', true)
+            ->where(fn (Builder $query) => $query
+                ->where('cars.vehicle_condition', self::CONDITION_NEW)
+                ->orWhere('cars.stock', '>', 0));
+    }
+
+    /**
+     * Tambah kolom `final_price` (harga setelah diskon promo aktif terbesar) yang dihitung di SQL,
+     * untuk urutan harga di katalog. Aturannya sama dengan bestActivePromo().
+     */
+    #[Scope]
+    protected function withFinalPrice(Builder $query): void
+    {
+        if ($query->getQuery()->columns === null) {
+            $query->select('cars.*');
+        }
+
+        [$sql, $bindings] = self::finalPriceSql();
+        $query->selectRaw("{$sql} as final_price", $bindings);
+    }
+
+    /**
+     * Filter menurut harga setelah promo, mis. whereFinalPrice('>=', 100_000_000).
+     */
+    #[Scope]
+    protected function whereFinalPrice(Builder $query, string $operator, int $amount): void
+    {
+        if (! in_array($operator, ['<', '<=', '=', '>=', '>'], true)) {
+            throw new InvalidArgumentException("Operator {$operator} tidak didukung.");
+        }
+
+        [$sql, $bindings] = self::finalPriceSql();
+        $query->whereRaw("{$sql} {$operator} ?", [...$bindings, $amount]);
+    }
+
+    /**
+     * Ekspresi SQL harga setelah promo: harga − diskon promo aktif terbesar (diskon ≥ harga diabaikan).
+     *
+     * @return array{0: string, 1: array<int, mixed>}
+     */
+    private static function finalPriceSql(): array
+    {
+        $discount = Promo::query()
+            ->selectRaw('MAX(promos.discount_amount)')
+            ->active()
+            ->whereColumn('promos.car_id', 'cars.id')
+            ->where('promos.discount_amount', '>', 0)
+            ->whereColumn('promos.discount_amount', '<', 'cars.price');
+
+        return ['(cars.price - COALESCE(('.$discount->toSql().'), 0))', $discount->getBindings()];
+    }
+
     protected function conditionLabel(): Attribute
     {
         return Attribute::get(fn () => self::CONDITIONS[$this->vehicle_condition] ?? $this->vehicle_condition);
@@ -158,6 +227,22 @@ class Car extends Model
     public function inStock(): bool
     {
         return $this->stock > 0;
+    }
+
+    /**
+     * Boleh diajukan pembelian: mobil aktif dan stok tersedia (RANCANGAN §5).
+     */
+    public function canBePurchased(): bool
+    {
+        return $this->is_active && $this->inStock();
+    }
+
+    /**
+     * Boleh test drive: mobil baru stok 0 tetap boleh (unit display), mobil bekas stok 0 tidak (sudah terjual).
+     */
+    public function canBeTestDriven(): bool
+    {
+        return $this->is_active && ($this->isNew() || $this->inStock());
     }
 
     /**

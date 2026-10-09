@@ -254,7 +254,7 @@ class BrandManagementTest extends TestCase
         $this->seed(BrandSeeder::class);
         $this->seed(BrandSeeder::class);
 
-        $this->assertSame(7, Brand::count());
-        $this->assertDatabaseHas('brands', ['name' => 'Toyota', 'slug' => 'toyota', 'logo' => null]);
+        $this->assertSame(6, Brand::count());
+        $this->assertDatabaseHas('brands', ['name' => 'Nissan', 'slug' => 'nissan', 'logo' => null]);
     }
 }

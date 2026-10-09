@@ -57,6 +57,7 @@
                             <th>Role</th>
                             <th class="text-center">Test Drive</th>
                             <th class="text-center">Pengajuan</th>
+                            <th class="text-center">Servis</th>
                             <th>Terdaftar</th>
                             <th class="text-end">Aksi</th>
                         </tr>
@@ -72,6 +73,7 @@
                                 <td>@include('admin.users._role-badge')</td>
                                 <td class="text-center">{{ $user->test_drives_count }}</td>
                                 <td class="text-center">{{ $user->purchase_requests_count }}</td>
+                                <td class="text-center">{{ $user->service_bookings_count }}</td>
                                 <td class="text-nowrap small">{{ $user->created_at->translatedFormat('d M Y') }}</td>
                                 <td class="text-end">
                                     <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-outline-primary">

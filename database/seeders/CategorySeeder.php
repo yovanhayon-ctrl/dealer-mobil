@@ -13,7 +13,7 @@ class CategorySeeder extends Seeder
      */
     public function run(): void
     {
-        foreach (['SUV', 'MPV', 'Sedan', 'Hatchback', 'Pickup', 'LCGC'] as $name) {
+        foreach (['SUV', 'MPV', 'Sedan', 'Hatchback', 'Pickup', 'Sport'] as $name) {
             Category::firstOrCreate(['name' => $name], ['slug' => Str::slug($name)]);
         }
     }

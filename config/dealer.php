@@ -12,7 +12,7 @@ return [
     |
     */
 
-    'name' => env('DEALER_NAME', 'Dealer Mobil'),
+    'name' => env('DEALER_NAME', 'JAF Dealer'),
 
     'tagline' => env('DEALER_TAGLINE', ''),
 
@@ -28,6 +28,18 @@ return [
     'hours' => env('DEALER_HOURS', ''),
 
     'maps_embed_url' => env('DEALER_MAPS_EMBED_URL', ''),
+
+    /*
+    |--------------------------------------------------------------------------
+    | JAF Service (Bengkel)
+    |--------------------------------------------------------------------------
+    |
+    | Jumlah booking servis aktif (menunggu / dikonfirmasi / dikerjakan) maksimal
+    | per slot jam, sesuai jumlah stall bengkel.
+    |
+    */
+
+    'service_slot_capacity' => 3,
 
     /*
     |--------------------------------------------------------------------------
