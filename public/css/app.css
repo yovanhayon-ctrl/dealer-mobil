@@ -825,3 +825,10 @@ main {
         color: inherit !important;
     }
 }
+
+/* ---------- Admin: grafik dashboard ---------- */
+
+.dashboard-chart {
+    position: relative;
+    height: 280px;
+}

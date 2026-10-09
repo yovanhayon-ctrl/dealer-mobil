@@ -60,4 +60,114 @@ document.addEventListener('DOMContentLoaded', function () {
             }
         });
     });
+
+    // Grafik dashboard: <canvas data-chart="activity|sales" data-chart-data='{...}'>.
+    // Bila Chart.js gagal dimuat (CDN), tabel "Lihat angka" di bawahnya tetap berisi datanya.
+    var chartCanvases = document.querySelectorAll('canvas[data-chart]');
+
+    if (chartCanvases.length && window.Chart) {
+        var number = new Intl.NumberFormat('id-ID');
+        var rupiahShort = function (value) {
+            if (value >= 1e9) {
+                return 'Rp ' + number.format(Math.round(value / 1e8) / 10) + ' M';
+            }
+
+            if (value >= 1e6) {
+                return 'Rp ' + number.format(Math.round(value / 1e6)) + ' jt';
+            }
+
+            return 'Rp ' + number.format(value);
+        };
+
+        window.Chart.defaults.font.family = getComputedStyle(document.body).fontFamily;
+
+        var builders = {
+            activity: function (data) {
+                return {
+                    type: 'line',
+                    data: {
+                        labels: data.labels,
+                        datasets: data.datasets.map(function (set) {
+                            return {
+                                label: set.label,
+                                data: set.data,
+                                borderColor: set.color,
+                                backgroundColor: set.color,
+                                tension: 0.3,
+                                pointRadius: 3
+                            };
+                        })
+                    },
+                    options: {
+                        interaction: { mode: 'index', intersect: false },
+                        scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                    }
+                };
+            },
+            sales: function (data) {
+                return {
+                    type: 'bar',
+                    data: {
+                        labels: data.labels,
+                        datasets: [
+                            {
+                                label: 'Unit terjual',
+                                data: data.units,
+                                backgroundColor: 'rgba(195, 0, 47, .75)',
+                                yAxisID: 'y',
+                                order: 2
+                            },
+                            {
+                                type: 'line',
+                                label: 'Nilai penjualan',
+                                data: data.values,
+                                borderColor: '#1c1c1e',
+                                backgroundColor: '#1c1c1e',
+                                tension: 0.3,
+                                yAxisID: 'value',
+                                order: 1
+                            }
+                        ]
+                    },
+                    options: {
+                        interaction: { mode: 'index', intersect: false },
+                        scales: {
+                            y: { beginAtZero: true, ticks: { precision: 0 }, title: { display: true, text: 'Unit' } },
+                            value: {
+                                position: 'right',
+                                beginAtZero: true,
+                                grid: { drawOnChartArea: false },
+                                ticks: { callback: rupiahShort }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function (context) {
+                                        return context.dataset.yAxisID === 'value'
+                                            ? context.dataset.label + ': Rp ' + number.format(context.parsed.y)
+                                            : context.dataset.label + ': ' + number.format(context.parsed.y);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                };
+            }
+        };
+
+        chartCanvases.forEach(function (canvas) {
+            var build = builders[canvas.getAttribute('data-chart')];
+
+            if (!build) {
+                return;
+            }
+
+            var config = build(JSON.parse(canvas.getAttribute('data-chart-data')));
+            config.options.maintainAspectRatio = false;
+            config.options.plugins = Object.assign({ legend: { position: 'bottom' } }, config.options.plugins);
+
+            new window.Chart(canvas, config);
+        });
+    }
 });
