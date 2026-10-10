@@ -17,44 +17,49 @@
 @endphp
 
 @section('content')
+    <x-admin.detail-header :title="$user->name" :back-url="route('admin.users.index')" back-label="Pengguna">
+        @include('admin.users._role-badge')
+    </x-admin.detail-header>
+
     <div class="row g-4">
-        <div class="col-xl-4">
-            <div class="card h-100">
+        <div class="col-xxl-4">
+            <div class="card admin-sticky-panel">
                 <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-                        <h2 class="h5 mb-0">{{ $user->name }}</h2>
-                        @include('admin.users._role-badge')
-                    </div>
+                    <h3 class="admin-card-title">Profil</h3>
+                    <dl class="admin-detail-list admin-detail-list-stacked">
+                        <dt>Email</dt>
+                        <dd><a href="mailto:{{ $user->email }}">{{ $user->email }}</a></dd>
 
-                    <dl class="row small mb-0">
-                        <dt class="col-5 text-muted fw-normal">Email</dt>
-                        <dd class="col-7 text-break">{{ $user->email }}</dd>
+                        <dt>Nomor HP</dt>
+                        <dd>
+                            @if ($user->phone)
+                                <a href="tel:{{ $user->phone }}">{{ $user->phone }}</a>
+                                <a href="https://wa.me/{{ preg_replace('/^0/', '62', preg_replace('/\D/', '', $user->phone)) }}" target="_blank" rel="noopener"
+                                   class="btn btn-sm btn-outline-success py-0 ms-2"><i class="bi bi-whatsapp"></i>WhatsApp</a>
+                            @else
+                                —
+                            @endif
+                        </dd>
 
-                        <dt class="col-5 text-muted fw-normal">Nomor HP</dt>
-                        <dd class="col-7">{{ $user->phone ?: '—' }}</dd>
+                        <dt>Terdaftar</dt>
+                        <dd>{{ $user->created_at->translatedFormat('d F Y') }}</dd>
 
-                        <dt class="col-5 text-muted fw-normal">Terdaftar</dt>
-                        <dd class="col-7">{{ $user->created_at->translatedFormat('d F Y') }}</dd>
-
-                        <dt class="col-5 text-muted fw-normal">Email terverifikasi</dt>
-                        <dd class="col-7">{{ $user->email_verified_at ? 'Ya' : 'Belum' }}</dd>
-
-                        <dt class="col-5 text-muted fw-normal">Test drive</dt>
-                        <dd class="col-7">{{ $user->testDrives->count() }}</dd>
-
-                        <dt class="col-5 text-muted fw-normal">Pengajuan</dt>
-                        <dd class="col-7">{{ $user->purchaseRequests->count() }}</dd>
-
-                        <dt class="col-5 text-muted fw-normal">Booking servis</dt>
-                        <dd class="col-7 mb-0">{{ $user->serviceBookings->count() }}</dd>
+                        <dt>Email terverifikasi</dt>
+                        <dd>{{ $user->email_verified_at ? 'Ya' : 'Belum' }}</dd>
                     </dl>
+
+                    <div class="admin-mini-stats">
+                        <div>Test drive <span>{{ $user->testDrives->count() }}</span></div>
+                        <div>Pengajuan <span>{{ $user->purchaseRequests->count() }}</span></div>
+                        <div>Booking servis <span>{{ $user->serviceBookings->count() }}</span></div>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="col-xl-8">
+        <div class="col-xxl-8">
             <div class="card mb-4">
-                <div class="card-header bg-transparent border-0 pt-3 px-3">
+                <div class="card-header dashboard-card-header">
                     <h3 class="h6 mb-0">Riwayat Test Drive</h3>
                 </div>
                 @if ($user->testDrives->isEmpty())
@@ -65,8 +70,7 @@
                             <thead>
                                 <tr>
                                     <th>Mobil</th>
-                                    <th>Tanggal</th>
-                                    <th>Jam</th>
+                                    <th>Jadwal</th>
                                     <th>Status</th>
                                     @if ($testDriveDetailRoute)
                                         <th class="text-end">Aksi</th>
@@ -75,14 +79,17 @@
                             </thead>
                             <tbody>
                                 @foreach ($user->testDrives as $testDrive)
-                                    <tr>
-                                        <td>{{ $carLabel($testDrive->car) }}</td>
-                                        <td class="text-nowrap">{{ $testDrive->preferred_date->translatedFormat('d M Y') }}</td>
-                                        <td class="text-nowrap">{{ substr($testDrive->preferred_time, 0, 5) }} WIB</td>
+                                    @php($detailUrl = $testDriveDetailRoute ? route('admin.test-drives.show', $testDrive) : null)
+                                    <tr @if ($detailUrl) data-row-link="{{ $detailUrl }}" @endif>
+                                        <td><span class="admin-truncate" title="{{ $carLabel($testDrive->car) }}">{{ $carLabel($testDrive->car) }}</span></td>
+                                        <td class="text-nowrap">
+                                            {{ $testDrive->preferred_date->translatedFormat('d M Y') }}
+                                            <div class="small text-muted">{{ substr($testDrive->preferred_time, 0, 5) }} WIB</div>
+                                        </td>
                                         <td><x-status-badge :status="$testDrive->status" /></td>
                                         @if ($testDriveDetailRoute)
                                             <td class="text-end">
-                                                <a href="{{ route('admin.test-drives.show', $testDrive) }}" class="btn btn-sm btn-outline-primary">Detail</a>
+                                                <a href="{{ $detailUrl }}" class="btn btn-sm btn-outline-primary btn-icon" title="Detail" aria-label="Detail test drive {{ $carLabel($testDrive->car) }}"><i class="bi bi-chevron-right"></i></a>
                                             </td>
                                         @endif
                                     </tr>
@@ -94,7 +101,7 @@
             </div>
 
             <div class="card mb-4">
-                <div class="card-header bg-transparent border-0 pt-3 px-3">
+                <div class="card-header dashboard-card-header">
                     <h3 class="h6 mb-0">Riwayat Pengajuan</h3>
                 </div>
                 @if ($user->purchaseRequests->isEmpty())
@@ -106,8 +113,7 @@
                                 <tr>
                                     <th>Tanggal</th>
                                     <th>Mobil</th>
-                                    <th>Metode</th>
-                                    <th class="text-end">Harga</th>
+                                    <th class="text-end">Pembayaran</th>
                                     <th>Status</th>
                                     @if ($purchaseDetailRoute)
                                         <th class="text-end">Aksi</th>
@@ -116,15 +122,18 @@
                             </thead>
                             <tbody>
                                 @foreach ($user->purchaseRequests as $purchase)
-                                    <tr>
+                                    @php($detailUrl = $purchaseDetailRoute ? route('admin.purchase-requests.show', $purchase) : null)
+                                    <tr @if ($detailUrl) data-row-link="{{ $detailUrl }}" @endif>
                                         <td class="text-nowrap">{{ $purchase->created_at->translatedFormat('d M Y') }}</td>
-                                        <td>{{ $carLabel($purchase->car) }}</td>
-                                        <td>{{ $purchase->isCredit() ? 'Kredit' : 'Cash' }}</td>
-                                        <td class="text-end"><x-price :amount="$purchase->car_price" /></td>
+                                        <td><span class="admin-truncate" title="{{ $carLabel($purchase->car) }}">{{ $carLabel($purchase->car) }}</span></td>
+                                        <td class="text-end text-nowrap">
+                                            <div class="small text-muted">{{ $purchase->isCredit() ? 'Kredit' : 'Cash' }}</div>
+                                            <x-price :amount="$purchase->car_price" />
+                                        </td>
                                         <td><x-status-badge :status="$purchase->status" /></td>
                                         @if ($purchaseDetailRoute)
                                             <td class="text-end">
-                                                <a href="{{ route('admin.purchase-requests.show', $purchase) }}" class="btn btn-sm btn-outline-primary">Detail</a>
+                                                <a href="{{ $detailUrl }}" class="btn btn-sm btn-outline-primary btn-icon" title="Detail" aria-label="Detail pengajuan {{ $carLabel($purchase->car) }}"><i class="bi bi-chevron-right"></i></a>
                                             </td>
                                         @endif
                                     </tr>
@@ -136,7 +145,7 @@
             </div>
 
             <div class="card">
-                <div class="card-header bg-transparent border-0 pt-3 px-3">
+                <div class="card-header dashboard-card-header">
                     <h3 class="h6 mb-0">Riwayat Servis</h3>
                 </div>
                 @if ($user->serviceBookings->isEmpty())
@@ -155,19 +164,20 @@
                             </thead>
                             <tbody>
                                 @foreach ($user->serviceBookings as $booking)
-                                    <tr>
+                                    @php($detailUrl = route('admin.service-bookings.show', $booking))
+                                    <tr data-row-link="{{ $detailUrl }}">
                                         <td class="text-nowrap">
                                             {{ $booking->preferred_date->translatedFormat('d M Y') }}
                                             <div class="small text-muted">{{ $booking->timeLabel() }} WIB</div>
                                         </td>
-                                        <td>{{ $booking->service->name }}</td>
+                                        <td><span class="admin-truncate" title="{{ $booking->service->name }}">{{ $booking->service->name }}</span></td>
                                         <td>
-                                            {{ $booking->vehicle_model }}
+                                            <span class="admin-truncate" title="{{ $booking->vehicle_model }}">{{ $booking->vehicle_model }}</span>
                                             <div class="small text-muted">{{ $booking->plate_number }}</div>
                                         </td>
                                         <td><x-status-badge :status="$booking->status" /></td>
                                         <td class="text-end">
-                                            <a href="{{ route('admin.service-bookings.show', $booking) }}" class="btn btn-sm btn-outline-primary">Detail</a>
+                                            <a href="{{ $detailUrl }}" class="btn btn-sm btn-outline-primary btn-icon" title="Detail" aria-label="Detail booking servis {{ $booking->service->name }}"><i class="bi bi-chevron-right"></i></a>
                                         </td>
                                     </tr>
                                 @endforeach
