@@ -92,6 +92,8 @@
 </div>
 
 <x-form.checkbox name="is_active" label="Aktif (tampil di katalog)" :checked="$car->is_active" />
+<x-form.checkbox name="is_featured" label="Jadikan unggulan di beranda" :checked="$car->is_featured"
+                 help="Tampil di kartu banner beranda (bila video latar tidak dipakai). Perlu mobil aktif dan punya foto; bila beberapa dicentang, yang terakhir diubah yang tampil." />
 
 <div class="alert alert-light border small mb-0 d-flex flex-wrap align-items-center gap-2">
     <i class="bi bi-images"></i>

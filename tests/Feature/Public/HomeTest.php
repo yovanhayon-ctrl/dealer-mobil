@@ -177,6 +177,31 @@ class HomeTest extends TestCase
             ->assertSee('aria-label="Mobil unggulan: Toyota Sprinter Trueno AE86 2025"', false);
     }
 
+    public function test_hero_memakai_mobil_unggulan_pilihan_admin(): void
+    {
+        config(['dealer.hero_videos' => []]);
+        $this->withPhoto($this->car('Nissan', 'Sport', 'Skyline GT-R', ['created_at' => now()]));
+        // Lebih lama & bukan Nissan, tetapi dipilih admin.
+        $this->withPhoto($this->car('Toyota', 'Sport', 'Supra RZ', ['created_at' => now()->subYear(), 'is_featured' => true]));
+        // Unggulan tetapi nonaktif / tanpa foto: diabaikan.
+        $this->withPhoto($this->car('Honda', 'Sport', 'NSX', ['is_featured' => true, 'is_active' => false]));
+        $this->car('Mazda', 'Sport', 'RX-7', ['is_featured' => true]);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('aria-label="Mobil unggulan: Toyota Supra RZ 2025"', false);
+    }
+
+    public function test_unggulan_tanpa_foto_kembali_ke_pilihan_otomatis(): void
+    {
+        config(['dealer.hero_videos' => []]);
+        $this->withPhoto($this->car('Nissan', 'Sport', 'Skyline GT-R'));
+        $this->car('Mazda', 'Sport', 'RX-7', ['is_featured' => true]);
+
+        $this->get(route('home'))
+            ->assertSee('aria-label="Mobil unggulan: Nissan Skyline GT-R 2025"', false);
+    }
+
     public function test_hero_tanpa_kartu_bila_tidak_ada_mobil_berfoto(): void
     {
         $this->car('Nissan', 'MPV', 'Livina');
@@ -244,6 +269,17 @@ class HomeTest extends TestCase
             ->assertDontSee('has-video', false)
             ->assertDontSee('data-hero-videos', false)
             ->assertSee('aria-label="Mobil unggulan: Nissan Skyline GT-R 2025"', false);
+    }
+
+    public function test_mobil_terbaru_bisa_digeser_di_hp(): void
+    {
+        $this->car('Nissan', 'Sport', 'Skyline GT-R');
+        $this->car('Nissan', 'MPV', 'Livina');
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('class="row g-4 car-scroller"', false)
+            ->assertSee('Geser untuk melihat mobil lainnya');
     }
 
     public function test_jumlah_query_tetap_walau_data_bertambah(): void

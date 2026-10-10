@@ -6,10 +6,12 @@
 @php
     $dealer = config('dealer');
     $creditUrl = Route::has('credit.index') ? route('credit.index') : null;
-    // Mobil unggulan di hero: Nissan terbaru yang punya foto, bila tidak ada mobil terbaru lain yang punya foto
-    // (diambil dari $latestCars, tanpa query tambahan).
+    // Mobil unggulan di hero: pilihan admin ("Jadikan unggulan"); bila tidak ada, Nissan terbaru yang punya foto,
+    // lalu mobil terbaru lain yang punya foto (dari $latestCars).
     $withPhoto = $latestCars->filter(fn ($car) => $car->primaryImage !== null);
-    $featuredCar = $withPhoto->first(fn ($car) => $car->brand->slug === 'nissan') ?? $withPhoto->first();
+    $featuredCar = $chosenFeaturedCar
+        ?? $withPhoto->first(fn ($car) => $car->brand->slug === 'nissan')
+        ?? $withPhoto->first();
     // Video latar hero (DEALER_HERO_VIDEOS): hanya file .mp4 yang benar-benar ada di folder public.
     $heroVideos = collect(config('dealer.hero_videos', []))
         ->filter(fn ($path) => is_string($path) && str_ends_with(strtolower($path), '.mp4')
@@ -116,13 +118,17 @@
                 <h2 id="latest-title" class="h4 mb-0">Mobil Terbaru</h2>
                 <a href="{{ route('cars.index') }}" class="home-section-link">Lihat semua <i class="bi bi-arrow-right"></i></a>
             </div>
-            <div class="row g-4">
+            {{-- HP (<576px): satu baris yang bisa digeser; layar lebih besar: grid seperti biasa. --}}
+            <div class="row g-4 car-scroller" tabindex="0" role="region" aria-label="Daftar mobil terbaru, geser untuk melihat lainnya">
                 @foreach ($latestCars as $car)
                     <div class="col-12 col-sm-6 col-lg-3">
                         <x-car-card :car="$car" />
                     </div>
                 @endforeach
             </div>
+            @if ($latestCars->count() > 1)
+                <p class="car-scroller-hint small text-muted mb-0 mt-2"><i class="bi bi-arrow-left-right me-1"></i>Geser untuk melihat mobil lainnya</p>
+            @endif
         </section>
     @endif
 

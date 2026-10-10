@@ -232,6 +232,26 @@ class CarManagementTest extends TestCase
         $this->assertSame('toyota-avanza-2025', $car->slug, 'Slug mobil tidak boleh berubah saat edit.');
     }
 
+    public function test_admin_menjadikan_mobil_unggulan_dan_melepasnya(): void
+    {
+        $this->actingAs($this->admin)->post(route('admin.cars.store'), $this->validData(['is_featured' => '1']));
+        $car = Car::sole();
+        $this->assertTrue($car->is_featured);
+
+        $this->actingAs($this->admin)->get(route('admin.cars.index'))
+            ->assertOk()
+            ->assertSee('title="Unggulan di beranda"', false);
+
+        $this->actingAs($this->admin)->get(route('admin.cars.edit', $car))
+            ->assertOk()
+            ->assertSee('Jadikan unggulan di beranda');
+
+        // Checkbox tidak dikirim = bukan unggulan lagi.
+        $this->actingAs($this->admin)->put(route('admin.cars.update', $car), $this->validData())
+            ->assertSessionHasNoErrors();
+        $this->assertFalse($car->fresh()->is_featured);
+    }
+
     public function test_ubah_ke_kondisi_baru_mereset_kilometer(): void
     {
         $car = Car::factory()->used()->create(['mileage' => 30_000]);

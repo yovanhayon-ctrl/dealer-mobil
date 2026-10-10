@@ -1287,3 +1287,35 @@ main {
     margin-right: .4rem;
     color: var(--dm-red);
 }
+
+/* Mobil terbaru di HP: satu baris yang bisa digeser (scroll-snap), kartu berikutnya sedikit terlihat. */
+.car-scroller-hint {
+    display: none;
+}
+
+@media (max-width: 575.98px) {
+    .car-scroller {
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        scroll-padding-left: calc(var(--bs-gutter-x) * .5);
+        padding-bottom: .5rem;
+        scrollbar-width: thin;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .car-scroller > [class*="col-"] {
+        flex: 0 0 82%;
+        max-width: 82%;
+        scroll-snap-align: start;
+    }
+
+    .car-scroller:focus-visible {
+        outline: 2px solid var(--dm-red);
+        outline-offset: 4px;
+    }
+
+    .car-scroller-hint {
+        display: block;
+    }
+}
