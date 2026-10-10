@@ -64,6 +64,7 @@ class CarRequest extends FormRequest
             'stock' => ['required', 'integer', 'min:0', 'max:9999'],
             'description' => ['nullable', 'string', 'max:5000'],
             'is_active' => ['nullable', 'boolean'],
+            'is_featured' => ['nullable', 'boolean'],
         ];
     }
 
@@ -103,16 +104,17 @@ class CarRequest extends FormRequest
     }
 
     /**
-     * Data siap simpan (tanpa slug). is_active dari checkbox: tidak dicentang = false.
+     * Data siap simpan (tanpa slug). is_active & is_featured dari checkbox: tidak dicentang = false.
      *
      * @return array<string, mixed>
      */
     public function carData(): array
     {
         return [
-            ...$this->safe()->except('is_active'),
+            ...$this->safe()->except(['is_active', 'is_featured']),
             'mileage' => (int) $this->validated('mileage', 0),
             'is_active' => $this->boolean('is_active'),
+            'is_featured' => $this->boolean('is_featured'),
         ];
     }
 }

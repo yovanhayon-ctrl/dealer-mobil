@@ -18,7 +18,7 @@ use InvalidArgumentException;
 #[Fillable([
     'brand_id', 'category_id', 'name', 'slug', 'vehicle_condition', 'year', 'mileage',
     'price', 'transmission', 'fuel_type', 'engine_cc', 'seats', 'color', 'stock',
-    'description', 'is_active',
+    'description', 'is_active', 'is_featured',
 ])]
 class Car extends Model
 {
@@ -75,6 +75,7 @@ class Car extends Model
             'seats' => 'integer',
             'stock' => 'integer',
             'is_active' => 'boolean',
+            'is_featured' => 'boolean',
         ];
     }
 

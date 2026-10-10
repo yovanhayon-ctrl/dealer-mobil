@@ -79,6 +79,8 @@ Mengikuti *customer journey* di proposal: Temukan → Kenali → Pertimbangkan �
 | 15 | Admin | **Laporan** → *Export CSV* | Rekap penjualan, test drive, servis, stok menipis |
 | 16 | Semua | Tampilkan di HP (F12 → mode perangkat) | Responsif, menu ☰, tabel bandingkan bisa digeser |
 
+Tips (v1.5.0): banner beranda memutar **video latar** di laptop. Untuk menunjukkan **kartu mobil unggulan**, kosongkan `DEALER_HERO_VIDEOS=` di `.env` lalu `php artisan optimize:clear`, dan di **Admin → Mobil → Edit** centang **Jadikan unggulan di beranda** pada mobil yang punya foto (mis. Skyline R34). Di HP, *Mobil Terbaru* bisa digeser ke samping.
+
 Tips: booking test drive/servis hanya bisa untuk **besok s/d 30 hari ke depan**; status *Dikerjakan* (servis) hanya bisa dipilih pada tanggal jadwalnya. Kosongkan daftar bandingkan sebelum demo (tombol **Kosongkan** di bar bawah) agar mulai dari nol.
 
 ## 4. Jika terjadi masalah saat demo
@@ -93,7 +95,8 @@ Tips: booking test drive/servis hanya bisa untuk **besok s/d 30 hari ke depan**;
 | Lonceng notifikasi tidak muncul / tidak bertambah | Customer: notifikasi dikirim hanya bila admin benar-benar **mengubah status** (menyimpan catatan saja tidak). Admin: hanya untuk booking/pengajuan **baru** atau yang **dibatalkan customer**. Muat ulang halaman. |
 | Email tidak masuk ke Mailtrap | Cek `MAIL_*` di `.env` lalu `php artisan optimize:clear`. Proses tetap berhasil walau email gagal; penyebabnya tercatat di `storage/logs/laravel.log`. |
 | Aksi terasa lambat beberapa detik | SMTP tidak bisa dihubungi (internet/Mailtrap). Perbaiki `MAIL_*` atau set `DEALER_MAIL_NOTIFICATIONS=false`. |
-| Tabel `notifications` / `favorites` / `testimonials` tidak ditemukan | Database masih versi lama → `php artisan migrate`. |
+| Tabel `notifications` / `favorites` / `testimonials` atau kolom `is_featured` tidak ditemukan | Database masih versi lama → `php artisan migrate`. |
+| Video beranda tidak berputar | Hanya di layar ≥ 992 px; tidak diputar bila *reduce motion* / hemat data aktif atau file di `DEALER_HERO_VIDEOS` tidak ada di `public/`. Cek `.env` lalu `php artisan optimize:clear`. |
 | Tombol **Beri Ulasan** tidak muncul | Hanya untuk pengajuan berstatus **Selesai**; ubah statusnya di admin (*Disetujui* → *Selesai*). Ulasan yang sudah disetujui tidak bisa diubah lagi. |
 | Klik **Cetak PDF** muncul error *Class "Dompdf\Dompdf" not found* | Dependency belum terpasang → `composer install` lalu `php artisan optimize:clear`. |
 | Bagian **Kata Pelanggan** tidak muncul di beranda | Belum ada ulasan yang **disetujui** → setujui di **Admin → Ulasan**, atau jalankan `php artisan db:seed --class=PurchaseRequestSeeder` lalu `--class=TestimonialSeeder`. |

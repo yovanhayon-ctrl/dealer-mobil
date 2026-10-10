@@ -55,6 +55,15 @@ class HomeController extends Controller
                 ->orderBy('name')
                 ->get(),
             // Ulasan yang disetujui admin + ringkasan rating (1 query agregat).
+            // Mobil unggulan pilihan admin (aktif + punya foto), terakhir diubah; null = pilihan otomatis di view.
+            'chosenFeaturedCar' => Car::query()
+                ->active()
+                ->where('is_featured', true)
+                ->whereHas('primaryImage')
+                ->with(Car::CARD_RELATIONS)
+                ->latest('updated_at')
+                ->orderByDesc('id')
+                ->first(),
             'testimonials' => Testimonial::query()
                 ->approved()
                 ->with([

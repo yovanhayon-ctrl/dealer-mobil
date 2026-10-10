@@ -126,6 +126,9 @@
                                 <td>
                                     <div class="fw-semibold">
                                         {{ $car->name }}
+                                        @if ($car->is_featured)
+                                            <span class="badge rounded-pill badge-status-dark ms-1" title="Unggulan di beranda"><i class="bi bi-star-fill me-1"></i>Unggulan</span>
+                                        @endif
                                         @if ($car->hasPromoPrice())
                                             <span class="badge rounded-pill badge-status-red ms-1">Promo</span>
                                         @endif
