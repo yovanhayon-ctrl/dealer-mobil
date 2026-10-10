@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Account;
 
+use App\Http\Controllers\Account\Concerns\FiltersByStatusGroup;
 use App\Http\Controllers\Controller;
 use App\Models\TestDrive;
 use App\Notifications\Admin\AdminActivityNotification;
@@ -16,10 +17,21 @@ use Illuminate\View\View;
  */
 class TestDriveController extends Controller
 {
+    use FiltersByStatusGroup;
+
     public const PER_PAGE = 10;
+
+    /** Kelompok penyaring status di halaman riwayat. */
+    public const STATUS_GROUPS = [
+        'berjalan' => [TestDrive::STATUS_PENDING, TestDrive::STATUS_CONFIRMED],
+        'selesai' => [TestDrive::STATUS_COMPLETED],
+        'dibatalkan' => [TestDrive::STATUS_CANCELLED],
+    ];
 
     public function index(Request $request): View
     {
+        $group = $this->statusGroup($request);
+
         $testDrives = $request->user()->testDrives()
             ->with([
                 'car:id,brand_id,name,slug,year,is_active',
@@ -28,9 +40,15 @@ class TestDriveController extends Controller
             ])
             ->latest()
             ->orderByDesc('id')
-            ->paginate(self::PER_PAGE);
+            ->when($group, fn ($query, $group) => $query->whereIn('status', self::STATUS_GROUPS[$group]))
+            ->paginate(self::PER_PAGE)
+            ->withQueryString();
 
-        return view('pages.account.test-drives.index', ['testDrives' => $testDrives]);
+        return view('pages.account.test-drives.index', [
+            'testDrives' => $testDrives,
+            'statusGroup' => $group,
+            'statusCounts' => $this->statusGroupCounts($request->user()->testDrives()),
+        ]);
     }
 
     public function cancel(Request $request, TestDrive $testDrive): RedirectResponse

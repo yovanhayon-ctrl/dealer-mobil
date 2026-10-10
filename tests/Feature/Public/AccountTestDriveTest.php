@@ -69,7 +69,7 @@ class AccountTestDriveTest extends TestCase
 
         $this->actingAs($this->customer)->get(route('account.test-drives.index'))
             ->assertOk()
-            ->assertSee('<h1 class="h3 mb-0">Riwayat Test Drive</h1>', false)
+            ->assertSee('<h1 class="h3 mb-0">Test Drive Saya</h1>', false)
             ->assertSee('Toyota Avanza 2025')
             ->assertSee('01 Okt 2026')
             ->assertSee('10:00 WIB')
