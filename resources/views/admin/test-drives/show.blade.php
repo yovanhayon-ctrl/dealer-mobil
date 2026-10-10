@@ -15,21 +15,21 @@
 @endsection
 
 @section('content')
+    <x-admin.detail-header :title="'Test Drive #'.$testDrive->id" :subtitle="'Masuk '.$testDrive->created_at->translatedFormat('d F Y H:i').' WIB'"
+                           :back-url="route('admin.test-drives.index')" back-label="Test Drive">
+        <x-status-badge :status="$testDrive->status" />
+    </x-admin.detail-header>
+
     <div class="row g-4">
         <div class="col-xl-7">
             <div class="card mb-4">
                 <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-                        <h2 class="h5 mb-0">Test Drive #{{ $testDrive->id }}</h2>
-                        <x-status-badge :status="$testDrive->status" />
-                    </div>
+                    <dl class="admin-detail-list">
+                        <dt>Jadwal</dt>
+                        <dd>{{ $testDrive->preferred_date->translatedFormat('l, d F Y') }} · {{ $testDrive->timeLabel() }} WIB</dd>
 
-                    <dl class="row small mb-0">
-                        <dt class="col-sm-4 text-muted fw-normal">Jadwal</dt>
-                        <dd class="col-sm-8">{{ $testDrive->preferred_date->translatedFormat('l, d F Y') }} · {{ $testDrive->timeLabel() }} WIB</dd>
-
-                        <dt class="col-sm-4 text-muted fw-normal">Mobil</dt>
-                        <dd class="col-sm-8">
+                        <dt>Mobil</dt>
+                        <dd>
                             {{ $carLabel }}
                             <span class="text-muted">· {{ $car->condition_label }} · stok {{ $car->stock }}</span>
                             @unless ($car->is_active)
@@ -37,20 +37,21 @@
                             @endunless
                         </dd>
 
-                        <dt class="col-sm-4 text-muted fw-normal">Customer</dt>
-                        <dd class="col-sm-8">
+                        <dt>Customer</dt>
+                        <dd>
                             <a href="{{ route('admin.users.show', $testDrive->user) }}">{{ $testDrive->user->name }}</a>
-                            <span class="text-muted">· {{ $testDrive->user->email }}</span>
+                            <span class="text-muted">· <a href="mailto:{{ $testDrive->user->email }}" class="text-muted">{{ $testDrive->user->email }}</a></span>
                         </dd>
 
-                        <dt class="col-sm-4 text-muted fw-normal">Nomor HP</dt>
-                        <dd class="col-sm-8">{{ $testDrive->phone }}</dd>
+                        <dt>Nomor HP</dt>
+                        <dd>
+                            <a href="tel:{{ $testDrive->phone }}">{{ $testDrive->phone }}</a>
+                            <a href="https://wa.me/{{ preg_replace('/^0/', '62', preg_replace('/\D/', '', $testDrive->phone)) }}" target="_blank" rel="noopener"
+                               class="btn btn-sm btn-outline-success py-0 ms-2"><i class="bi bi-whatsapp"></i>WhatsApp</a>
+                        </dd>
 
-                        <dt class="col-sm-4 text-muted fw-normal">Catatan customer</dt>
-                        <dd class="col-sm-8">{{ $testDrive->notes ?: '—' }}</dd>
-
-                        <dt class="col-sm-4 text-muted fw-normal">Masuk</dt>
-                        <dd class="col-sm-8 mb-0">{{ $testDrive->created_at->translatedFormat('d M Y H:i') }} WIB</dd>
+                        <dt>Catatan customer</dt>
+                        <dd>{{ $testDrive->notes ?: '—' }}</dd>
                     </dl>
                 </div>
             </div>
@@ -63,9 +64,9 @@
         </div>
 
         <div class="col-xl-5">
-            <div class="card">
+            <div class="card admin-sticky-panel">
                 <div class="card-body p-4">
-                    <h3 class="h6 mb-3">Status & Catatan Admin</h3>
+                    <h3 class="admin-card-title">Status & Catatan Admin</h3>
                     @include('admin.partials.status-form', [
                         'action' => route('admin.test-drives.update-status', $testDrive),
                         'currentLabel' => $testDrive->statusLabel(),

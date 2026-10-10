@@ -67,7 +67,7 @@ class ProfileTest extends TestCase
             ->assertSee('value="budi@example.test"', false)
             ->assertSee('value="081211112222"', false)
             ->assertSee('Customer')
-            ->assertSeeInOrder(['Test Drive Saya', '1', 'Pengajuan Saya', '2', 'Servis Saya', '1'])
+            ->assertSeeInOrder(['account-nav', 'Pengajuan', '2', 'Test Drive', '1', 'Servis', '1'], false)
             ->assertDontSee('Dashboard Admin</a>', false);
     }
 

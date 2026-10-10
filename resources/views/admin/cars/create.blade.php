@@ -10,7 +10,7 @@
 @endsection
 
 @section('content')
-    <div class="card admin-form-card admin-form-card-wide">
+    <div class="card admin-form-card admin-form-card-xl">
         <div class="card-body p-4">
             <form method="POST" action="{{ route('admin.cars.store') }}" novalidate>
                 @include('admin.cars._form')

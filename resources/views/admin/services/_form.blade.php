@@ -24,7 +24,7 @@
 <x-form.checkbox name="is_active" label="Aktif" :checked="$service->is_active"
                  help="Layanan nonaktif tidak tampil dan tidak bisa dipilih customer saat booking." />
 
-<div class="d-flex gap-2 mt-4">
+<div class="admin-form-actions">
     <button type="submit" class="btn btn-primary">
         <i class="bi bi-check-lg"></i>Simpan
     </button>

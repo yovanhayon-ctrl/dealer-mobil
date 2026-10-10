@@ -5,109 +5,126 @@
     $formatNumber = fn ($value) => filled($value) ? number_format((int) $value, 0, ',', '.') : '';
 @endphp
 
-<h2 class="h6 text-uppercase text-muted mb-3">Data Utama</h2>
-<div class="row gx-3">
-    <div class="col-md-6">
-        <x-form.select name="brand_id" label="Merek" :options="$brands->pluck('name', 'id')" :value="$car->brand_id"
-                       placeholder="Pilih merek" required />
-    </div>
-    <div class="col-md-6">
-        <x-form.select name="category_id" label="Kategori" :options="$categories->pluck('name', 'id')" :value="$car->category_id"
-                       placeholder="Pilih kategori" required />
-    </div>
-    <div class="col-12">
-        <x-form.input name="name" label="Nama Mobil" :value="$car->name" required maxlength="150"
-                      placeholder="Contoh: Kicks e-Power VL"
-                      :help="$car->exists ? 'Slug URL: '.$car->slug.' (tidak berubah saat diedit).' : 'Slug URL dibuat otomatis dari merek, nama, dan tahun.'" />
-    </div>
-</div>
-
-<div class="row gx-3">
-    <div class="col-md-4 mb-3">
-        <span class="form-label d-block">Kondisi<span class="text-danger ms-1" aria-hidden="true">*</span></span>
-        @foreach (\App\Models\Car::CONDITIONS as $value => $label)
-            <div class="form-check form-check-inline">
-                <input class="form-check-input @error('vehicle_condition') is-invalid @enderror" type="radio"
-                       name="vehicle_condition" id="condition_{{ $value }}" value="{{ $value }}"
-                       data-condition-toggle @checked($condition === $value)>
-                <label class="form-check-label" for="condition_{{ $value }}">{{ $label }}</label>
+{{-- Layar lebar: data & spesifikasi di kiri, harga/stok/status di kanan. Tombol simpan menempel di bawah. --}}
+<div class="row g-4">
+    <div class="col-xl-8">
+        <section class="admin-form-section">
+            <h2 class="admin-form-section-title">Data Utama</h2>
+            <div class="row gx-3">
+                <div class="col-md-6">
+                    <x-form.select name="brand_id" label="Merek" :options="$brands->pluck('name', 'id')" :value="$car->brand_id"
+                                   placeholder="Pilih merek" required />
+                </div>
+                <div class="col-md-6">
+                    <x-form.select name="category_id" label="Kategori" :options="$categories->pluck('name', 'id')" :value="$car->category_id"
+                                   placeholder="Pilih kategori" required />
+                </div>
+                <div class="col-12">
+                    <x-form.input name="name" label="Nama Mobil" :value="$car->name" required maxlength="150"
+                                  placeholder="Contoh: Kicks e-Power VL"
+                                  :help="$car->exists ? 'Slug URL: '.$car->slug.' (tidak berubah saat diedit).' : 'Slug URL dibuat otomatis dari merek, nama, dan tahun.'" />
+                </div>
             </div>
-        @endforeach
-        @error('vehicle_condition')
-            <div class="invalid-feedback d-block">{{ $message }}</div>
-        @enderror
+            <div class="row gx-3">
+                <div class="col-md-4 mb-3">
+                    <span class="form-label d-block">Kondisi<span class="text-danger ms-1" aria-hidden="true">*</span></span>
+                    @foreach (\App\Models\Car::CONDITIONS as $value => $label)
+                        <div class="form-check form-check-inline">
+                            <input class="form-check-input @error('vehicle_condition') is-invalid @enderror" type="radio"
+                                   name="vehicle_condition" id="condition_{{ $value }}" value="{{ $value }}"
+                                   data-condition-toggle @checked($condition === $value)>
+                            <label class="form-check-label" for="condition_{{ $value }}">{{ $label }}</label>
+                        </div>
+                    @endforeach
+                    @error('vehicle_condition')
+                        <div class="invalid-feedback d-block">{{ $message }}</div>
+                    @enderror
+                </div>
+                <div class="col-md-4">
+                    <x-form.input name="year" label="Tahun" type="number" :value="$car->year" required
+                                  min="{{ \App\Models\Car::MIN_YEAR }}" :max="now()->year + 1" />
+                </div>
+                <div @class(['col-md-4', 'd-none' => $condition !== \App\Models\Car::CONDITION_USED]) data-mileage-field>
+                    <x-form.input name="mileage" label="Kilometer" :value="$formatNumber($car->mileage ?: null)"
+                                  inputmode="numeric" placeholder="Contoh: 45.000" help="Wajib untuk mobil bekas." />
+                </div>
+            </div>
+        </section>
+
+        <section class="admin-form-section">
+            <h2 class="admin-form-section-title">Spesifikasi</h2>
+            <div class="row gx-3">
+                <div class="col-md-4">
+                    <x-form.select name="transmission" label="Transmisi" :options="\App\Models\Car::TRANSMISSIONS" :value="$car->transmission"
+                                   placeholder="Pilih transmisi" required />
+                </div>
+                <div class="col-md-4">
+                    <x-form.select name="fuel_type" label="Bahan Bakar" :options="\App\Models\Car::FUEL_TYPES" :value="$car->fuel_type"
+                                   placeholder="Pilih bahan bakar" required />
+                </div>
+                <div class="col-md-4">
+                    <x-form.input name="seats" label="Jumlah Kursi" type="number" :value="$car->seats" required min="2" max="9" />
+                </div>
+                <div class="col-md-6">
+                    <x-form.input name="engine_cc" label="Kapasitas Mesin (cc)" type="number" :value="$car->engine_cc" min="500" max="10000"
+                                  help="Opsional. Kosongkan untuk mobil listrik." />
+                </div>
+                <div class="col-md-6">
+                    <x-form.input name="color" label="Warna" :value="$car->color" maxlength="50" placeholder="Opsional" />
+                </div>
+            </div>
+                <x-form.textarea name="description" label="Deskripsi" :value="$car->description" rows="5" maxlength="5000" />
+        </section>
     </div>
-    <div class="col-md-4">
-        <x-form.input name="year" label="Tahun" type="number" :value="$car->year" required
-                      min="{{ \App\Models\Car::MIN_YEAR }}" :max="now()->year + 1" />
-    </div>
-    <div @class(['col-md-4', 'd-none' => $condition !== \App\Models\Car::CONDITION_USED]) data-mileage-field>
-        <x-form.input name="mileage" label="Kilometer" :value="$formatNumber($car->mileage ?: null)"
-                      inputmode="numeric" placeholder="Contoh: 45.000" help="Wajib untuk mobil bekas." />
+
+    <div class="col-xl-4">
+        <section class="admin-form-section">
+            <h2 class="admin-form-section-title">Harga &amp; Stok</h2>
+            <div class="row gx-3">
+                <div class="col-12 mb-3">
+                    <label for="price" class="form-label">Harga<span class="text-danger ms-1" aria-hidden="true">*</span></label>
+                    <div class="input-group has-validation">
+                        <span class="input-group-text">Rp</span>
+                        <input type="text" id="price" name="price" inputmode="numeric" required
+                               value="{{ old('price', $formatNumber($car->price)) }}" placeholder="285.000.000"
+                               @class(['form-control', 'is-invalid' => $errors->has('price')])>
+                        @error('price')
+                            <div class="invalid-feedback">{{ $message }}</div>
+                        @enderror
+                    </div>
+                    <div class="form-text">Boleh memakai titik pemisah ribuan.</div>
+                </div>
+                <div class="col-12">
+                    <x-form.input name="stock" label="Stok" type="number" :value="$car->stock" required min="0" />
+                </div>
+            </div>
+        </section>
+
+        <section class="admin-form-section">
+            <h2 class="admin-form-section-title">Status</h2>
+            <x-form.checkbox name="is_active" label="Aktif (tampil di katalog)" :checked="$car->is_active" />
+            <x-form.checkbox name="is_featured" label="Jadikan unggulan di beranda" :checked="$car->is_featured"
+                             help="Tampil di kartu banner beranda (bila video latar tidak dipakai). Perlu mobil aktif dan punya foto; bila beberapa dicentang, yang terakhir diubah yang tampil." />
+        </section>
+
+        <section class="admin-form-section">
+            <h2 class="admin-form-section-title">Galeri</h2>
+            <div class="alert alert-light border small mb-0 d-flex flex-column gap-2">
+                <i class="bi bi-images"></i>
+                @if ($car->exists)
+                    <span>Foto mobil dikelola di halaman galeri (maks. {{ \App\Models\CarImage::MAX_PER_CAR }} gambar).</span>
+                    <a href="{{ route('admin.cars.images.index', $car) }}" class="btn btn-sm btn-outline-primary">
+                        <i class="bi bi-images"></i>Kelola Galeri
+                    </a>
+                @else
+                    <span>Foto mobil dapat diunggah setelah mobil disimpan.</span>
+                @endif
+            </div>
+        </section>
     </div>
 </div>
 
-<div class="row gx-3">
-    <div class="col-md-6 mb-3">
-        <label for="price" class="form-label">Harga<span class="text-danger ms-1" aria-hidden="true">*</span></label>
-        <div class="input-group has-validation">
-            <span class="input-group-text">Rp</span>
-            <input type="text" id="price" name="price" inputmode="numeric" required
-                   value="{{ old('price', $formatNumber($car->price)) }}" placeholder="285.000.000"
-                   @class(['form-control', 'is-invalid' => $errors->has('price')])>
-            @error('price')
-                <div class="invalid-feedback">{{ $message }}</div>
-            @enderror
-        </div>
-        <div class="form-text">Boleh memakai titik pemisah ribuan.</div>
-    </div>
-    <div class="col-md-6">
-        <x-form.input name="stock" label="Stok" type="number" :value="$car->stock" required min="0" />
-    </div>
-</div>
-
-<h2 class="h6 text-uppercase text-muted mt-2 mb-3">Spesifikasi</h2>
-<div class="row gx-3">
-    <div class="col-md-4">
-        <x-form.select name="transmission" label="Transmisi" :options="\App\Models\Car::TRANSMISSIONS" :value="$car->transmission"
-                       placeholder="Pilih transmisi" required />
-    </div>
-    <div class="col-md-4">
-        <x-form.select name="fuel_type" label="Bahan Bakar" :options="\App\Models\Car::FUEL_TYPES" :value="$car->fuel_type"
-                       placeholder="Pilih bahan bakar" required />
-    </div>
-    <div class="col-md-4">
-        <x-form.input name="seats" label="Jumlah Kursi" type="number" :value="$car->seats" required min="2" max="9" />
-    </div>
-    <div class="col-md-6">
-        <x-form.input name="engine_cc" label="Kapasitas Mesin (cc)" type="number" :value="$car->engine_cc" min="500" max="10000"
-                      help="Opsional. Kosongkan untuk mobil listrik." />
-    </div>
-    <div class="col-md-6">
-        <x-form.input name="color" label="Warna" :value="$car->color" maxlength="50" placeholder="Opsional" />
-    </div>
-    <div class="col-12">
-        <x-form.textarea name="description" label="Deskripsi" :value="$car->description" rows="5" maxlength="5000" />
-    </div>
-</div>
-
-<x-form.checkbox name="is_active" label="Aktif (tampil di katalog)" :checked="$car->is_active" />
-<x-form.checkbox name="is_featured" label="Jadikan unggulan di beranda" :checked="$car->is_featured"
-                 help="Tampil di kartu banner beranda (bila video latar tidak dipakai). Perlu mobil aktif dan punya foto; bila beberapa dicentang, yang terakhir diubah yang tampil." />
-
-<div class="alert alert-light border small mb-0 d-flex flex-wrap align-items-center gap-2">
-    <i class="bi bi-images"></i>
-    @if ($car->exists)
-        <span class="me-auto">Foto mobil dikelola di halaman galeri (maks. {{ \App\Models\CarImage::MAX_PER_CAR }} gambar).</span>
-        <a href="{{ route('admin.cars.images.index', $car) }}" class="btn btn-sm btn-outline-primary">
-            <i class="bi bi-images"></i>Kelola Galeri
-        </a>
-    @else
-        <span>Foto mobil dapat diunggah setelah mobil disimpan.</span>
-    @endif
-</div>
-
-<div class="d-flex gap-2 mt-4">
+<div class="admin-form-actions">
     <button type="submit" class="btn btn-primary">
         <i class="bi bi-check-lg"></i>Simpan
     </button>

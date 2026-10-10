@@ -902,6 +902,39 @@ main {
     max-width: 960px;
 }
 
+.admin-form-card-xl {
+    max-width: 1200px;
+}
+
+.admin-form-section + .admin-form-section {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--bs-border-color-translucent);
+}
+
+.admin-form-section-title {
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+/* Tombol Simpan/Batal menempel di bawah layar selama form digulir (kartu form memakai p-4 = 1.5rem). */
+.admin-form-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    gap: .5rem;
+    margin: 1.5rem -1.5rem -1.5rem;
+    padding: .9rem 1.5rem;
+    background-color: #fff;
+    border-top: 1px solid var(--bs-border-color-translucent);
+    border-radius: 0 0 var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius);
+}
+
 /* Thumbnail gambar utama mobil 16:9 di tabel admin (placeholder bila belum ada gambar). */
 .car-thumb {
     display: inline-flex;
@@ -1180,7 +1213,7 @@ main {
     vertical-align: bottom;
 }
 
-.dashboard-table tr[data-row-link] {
+tr[data-row-link] {
     cursor: pointer;
 }
 
@@ -1319,3 +1352,339 @@ main {
         display: block;
     }
 }
+
+/* ---------- Admin: halaman daftar (kepala, filter, tabel) ---------- */
+
+.admin-list-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: 1rem;
+}
+
+.admin-list-summary {
+    color: #6c757d;
+    font-size: .9rem;
+}
+
+.admin-filters-form .form-select,
+.admin-filters-form .form-control {
+    min-width: 8.5rem;
+}
+
+/* HP: filter dilipat di balik tombol; layar lebar: selalu tampil satu baris. */
+.admin-filters-form.show,
+.admin-filters-form.collapsing {
+    margin-top: .75rem;
+}
+
+@media (min-width: 992px) {
+    .admin-filters-form.collapse {
+        display: flex !important;
+        margin-top: 0;
+    }
+
+    .admin-filters-actions {
+        margin-left: auto;
+    }
+}
+
+/* Tombol aksi ikon di tabel. */
+.btn-icon {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon .bi {
+    margin: 0;
+}
+
+.admin-row-actions {
+    display: inline-flex;
+    gap: .35rem;
+}
+
+/* Teks panjang di sel tabel admin: satu baris, terpotong rapi. */
+.admin-truncate {
+    display: block;
+    max-width: 13rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* ---------- Admin: halaman detail ---------- */
+
+.admin-detail-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: .75rem 1rem;
+    margin-bottom: 1.25rem;
+}
+
+.admin-detail-back {
+    display: inline-block;
+    margin-bottom: .25rem;
+    font-size: .8rem;
+    color: #6c757d;
+    text-decoration: none;
+}
+
+.admin-detail-back:hover {
+    color: var(--dm-red);
+}
+
+.admin-detail-back .bi {
+    margin-right: .3rem;
+}
+
+.admin-card-title {
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+/* Daftar label | isi: dua kolom di layar sedang ke atas, bertumpuk di HP. */
+.admin-detail-list {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: .15rem 1.25rem;
+    margin: 0;
+    font-size: .9rem;
+}
+
+.admin-detail-list dt {
+    font-weight: 400;
+    color: #6c757d;
+    font-size: .8rem;
+}
+
+.admin-detail-list dd {
+    margin-bottom: .6rem;
+    overflow-wrap: anywhere;
+}
+
+@media (min-width: 576px) {
+    .admin-detail-list {
+        grid-template-columns: 9.5rem minmax(0, 1fr);
+        gap: .6rem 1.25rem;
+    }
+
+    .admin-detail-list dt {
+        font-size: .9rem;
+    }
+
+    .admin-detail-list dd {
+        margin-bottom: 0;
+    }
+}
+
+/* Panel status & catatan tetap terlihat saat halaman detail digulir. */
+@media (min-width: 1200px) {
+    .admin-sticky-panel {
+        position: sticky;
+        top: 5.5rem;
+    }
+}
+
+/* Daftar label/isi yang selalu bertumpuk (kartu sempit, mis. profil pengguna). */
+.admin-detail-list.admin-detail-list-stacked {
+    grid-template-columns: 1fr;
+    gap: .1rem;
+}
+
+.admin-detail-list-stacked dd {
+    margin-bottom: .75rem;
+}
+
+.admin-mini-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: .5rem;
+    margin-top: .5rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--bs-border-color-translucent);
+    text-align: center;
+    font-size: .8rem;
+    color: #6c757d;
+}
+
+/* Label lebih dulu di HTML (urutan baca), angka tampil di atas. */
+.admin-mini-stats > div {
+    display: flex;
+    flex-direction: column-reverse;
+    line-height: 1.25;
+}
+
+.admin-mini-stats span {
+    display: block;
+    font-family: var(--dm-font-heading);
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--bs-body-color);
+}
+
+/* ---------- Akun customer ---------- */
+
+/* Menu akun: daftar samping di desktop, tab geser di HP/tablet. */
+.account-nav {
+    display: flex;
+    gap: .35rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-bottom: .25rem;
+}
+
+.account-nav-link {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    flex: 0 0 auto;
+    padding: .5rem .85rem;
+    border-radius: 999px;
+    border: 1px solid var(--bs-border-color);
+    background-color: #fff;
+    color: var(--bs-body-color);
+    font-size: .9rem;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+.account-nav-link:hover {
+    color: var(--dm-red);
+}
+
+.account-nav-link.active {
+    background-color: var(--dm-navy);
+    border-color: var(--dm-navy);
+    color: #fff;
+}
+
+.account-nav-count {
+    font-size: .75rem;
+    padding: 0 .45rem;
+    border-radius: 999px;
+    background-color: rgba(0, 0, 0, .07);
+}
+
+.account-nav-link.active .account-nav-count {
+    background-color: rgba(255, 255, 255, .2);
+}
+
+@media (min-width: 992px) {
+    .account-nav {
+        flex-direction: column;
+        overflow: visible;
+        position: sticky;
+        top: 5rem;
+        padding: .5rem;
+        background-color: #fff;
+        border: 1px solid var(--bs-border-color-translucent);
+        border-radius: var(--bs-border-radius-lg);
+    }
+
+    .account-nav-link {
+        border: 0;
+        border-radius: .5rem;
+        padding: .6rem .75rem;
+    }
+
+    .account-nav-link.active {
+        box-shadow: inset 3px 0 0 var(--dm-red);
+    }
+}
+
+.account-page-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: 1rem;
+}
+
+/* Penyaring status (chip). */
+.account-status-filter {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin-bottom: 1rem;
+}
+
+.account-status-chip {
+    padding: .3rem .8rem;
+    border-radius: 999px;
+    border: 1px solid var(--bs-border-color);
+    background-color: #fff;
+    color: var(--bs-body-color);
+    font-size: .85rem;
+    text-decoration: none;
+}
+
+.account-status-chip span {
+    margin-left: .25rem;
+    color: #6c757d;
+}
+
+.account-status-chip.active {
+    border-color: var(--dm-red);
+    color: var(--dm-red);
+    font-weight: 600;
+}
+
+.account-status-chip.active span {
+    color: inherit;
+}
+
+/* Kartu riwayat ringkas: thumbnail kecil di samping judul (juga di HP). */
+.account-item-head {
+    display: flex;
+    gap: .85rem;
+    align-items: flex-start;
+}
+
+.account-item .test-drive-car-thumb {
+    flex-basis: 88px;
+    width: 88px;
+}
+
+@media (min-width: 768px) {
+    .account-item .test-drive-car-thumb {
+        flex-basis: 120px;
+        width: 120px;
+    }
+}
+
+.account-item-details {
+    margin-top: .75rem;
+}
+
+.account-item-details summary {
+    font-size: .85rem;
+    font-weight: 600;
+    color: var(--dm-navy);
+    cursor: pointer;
+}
+
+.account-item-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-top: .85rem;
+}
+
+.account-item-actions:empty {
+    display: none;
+}
+

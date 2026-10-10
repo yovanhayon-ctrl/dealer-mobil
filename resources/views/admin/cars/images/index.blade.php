@@ -17,15 +17,17 @@
 @endphp
 
 @section('content')
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
-        <div>
-            <div class="fw-semibold">{{ $altText }}</div>
-            <div class="small text-muted">{{ $car->images->count() }} dari {{ $max }} gambar</div>
-        </div>
-        <a href="{{ route('admin.cars.edit', $car) }}" class="btn btn-outline-secondary btn-sm">
-            <i class="bi bi-arrow-left"></i>Kembali ke Edit Mobil
+    <x-admin.detail-header :title="$altText" :subtitle="$car->images->count().' dari '.$max.' gambar'"
+                           :back-url="route('admin.cars.index')" back-label="Mobil">
+        <a href="{{ route('admin.cars.edit', $car) }}" class="btn btn-outline-primary btn-sm">
+            <i class="bi bi-pencil-square"></i>Edit Mobil
         </a>
-    </div>
+        @if ($car->is_active && Route::has('cars.show'))
+            <a href="{{ route('cars.show', $car) }}" target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
+                <i class="bi bi-box-arrow-up-right"></i>Lihat di Katalog
+            </a>
+        @endif
+    </x-admin.detail-header>
 
     <div class="card mb-3">
         <div class="card-body p-3 p-md-4">
