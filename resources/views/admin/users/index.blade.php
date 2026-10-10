@@ -6,38 +6,35 @@
     @include('partials.breadcrumb', ['items' => [['label' => 'Pengguna']]])
 @endsection
 
+@php
+    $activeFilters = ($filters['q'] !== null ? 1 : 0) + ($filters['role'] !== \App\Models\User::ROLE_CUSTOMER ? 1 : 0);
+@endphp
+
 @section('content')
-    <div class="card mb-3">
-        <div class="card-body p-3">
-            <form method="GET" action="{{ route('admin.users.index') }}" class="row g-2 align-items-end" role="search">
-                <div class="col-12 col-md-5">
-                    <label for="filter_q" class="form-label small mb-1">Kata kunci</label>
-                    <input type="search" id="filter_q" name="q" value="{{ $filters['q'] }}" class="form-control form-control-sm" placeholder="Nama, email, atau nomor HP…">
-                </div>
-                <div class="col-6 col-md-2">
-                    <label for="filter_role" class="form-label small mb-1">Role</label>
-                    <select id="filter_role" name="role" class="form-select form-select-sm">
-                        @foreach (\App\Http\Controllers\Admin\UserController::ROLE_FILTERS as $value => $label)
-                            <option value="{{ $value }}" @selected($filters['role'] === $value)>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-6 col-md-2">
-                    <label for="filter_urut" class="form-label small mb-1">Urutkan</label>
-                    <select id="filter_urut" name="urut" class="form-select form-select-sm">
-                        <option value="terbaru" @selected($filters['urut'] === 'terbaru')>Terbaru</option>
-                        <option value="nama" @selected($filters['urut'] === 'nama')>Nama (A–Z)</option>
-                    </select>
-                </div>
-                <div class="col-12 col-md-3 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-funnel"></i>Terapkan</button>
-                    @if ($hasFilters || $filters['urut'] !== 'terbaru')
-                        <a href="{{ route('admin.users.index') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
-                    @endif
-                </div>
-            </form>
+    <x-admin.list-header :summary="number_format($users->total(), 0, ',', '.').' pengguna'.($hasFilters ? ' ditemukan' : '')"></x-admin.list-header>
+
+    <x-admin.filters :action="route('admin.users.index')" :reset-url="route('admin.users.index')"
+                     :active="$activeFilters" :show-reset="$hasFilters || $filters['urut'] !== 'terbaru'">
+        <div class="col-12 col-lg">
+            <label for="filter_q" class="form-label small mb-1">Kata kunci</label>
+            <input type="search" id="filter_q" name="q" value="{{ $filters['q'] }}" class="form-control form-control-sm" placeholder="Nama, email, atau nomor HP…">
         </div>
-    </div>
+        <div class="col-6 col-md-4 col-lg-auto">
+            <label for="filter_role" class="form-label small mb-1">Role</label>
+            <select id="filter_role" name="role" class="form-select form-select-sm">
+                @foreach (\App\Http\Controllers\Admin\UserController::ROLE_FILTERS as $value => $label)
+                    <option value="{{ $value }}" @selected($filters['role'] === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-6 col-md-4 col-lg-auto">
+            <label for="filter_urut" class="form-label small mb-1">Urutkan</label>
+            <select id="filter_urut" name="urut" class="form-select form-select-sm">
+                <option value="terbaru" @selected($filters['urut'] === 'terbaru')>Terbaru</option>
+                <option value="nama" @selected($filters['urut'] === 'nama')>Nama (A–Z)</option>
+            </select>
+        </div>
+    </x-admin.filters>
 
     <div class="card">
         @if ($users->isEmpty())
@@ -64,11 +61,12 @@
                     </thead>
                     <tbody>
                         @foreach ($users as $user)
-                            <tr>
-                                <td class="fw-semibold">
-                                    <a href="{{ route('admin.users.show', $user) }}" class="text-reset text-decoration-none">{{ $user->name }}</a>
+                            @php($detailUrl = route('admin.users.show', $user))
+                            <tr data-row-link="{{ $detailUrl }}">
+                                <td class="fw-semibold text-nowrap">
+                                    <a href="{{ $detailUrl }}" class="text-reset text-decoration-none">{{ $user->name }}</a>
                                 </td>
-                                <td class="small">{{ $user->email }}</td>
+                                <td class="small"><span class="admin-truncate" title="{{ $user->email }}">{{ $user->email }}</span></td>
                                 <td class="text-nowrap">{{ $user->phone ?: '—' }}</td>
                                 <td>@include('admin.users._role-badge')</td>
                                 <td class="text-center">{{ $user->test_drives_count }}</td>
@@ -76,8 +74,8 @@
                                 <td class="text-center">{{ $user->service_bookings_count }}</td>
                                 <td class="text-nowrap small">{{ $user->created_at->translatedFormat('d M Y') }}</td>
                                 <td class="text-end">
-                                    <a href="{{ route('admin.users.show', $user) }}" class="btn btn-sm btn-outline-primary">
-                                        <i class="bi bi-eye"></i>Detail
+                                    <a href="{{ $detailUrl }}" class="btn btn-sm btn-outline-primary btn-icon" title="Detail" aria-label="Detail {{ $user->name }}">
+                                        <i class="bi bi-chevron-right"></i>
                                     </a>
                                 </td>
                             </tr>

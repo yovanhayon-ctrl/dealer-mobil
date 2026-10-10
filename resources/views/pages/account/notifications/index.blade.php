@@ -3,12 +3,10 @@
 @section('title', 'Notifikasi')
 
 @section('content')
-    <div class="container py-4">
-        @include('partials.public-breadcrumb', ['items' => [['label' => 'Notifikasi']]])
-
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
-            <h1 class="h3 mb-0">Notifikasi</h1>
-            @if ($hasUnread)
+    <x-account.layout title="Notifikasi" active="account.notifications.*"
+                      :summary="$notifications->total().' notifikasi'">
+        @if ($hasUnread)
+            <x-slot:actions>
                 <form method="POST" action="{{ route('account.notifications.read-all') }}" data-disable-on-submit>
                     @csrf
                     @method('PATCH')
@@ -16,8 +14,8 @@
                         <i class="bi bi-check2-all"></i>Tandai semua dibaca
                     </button>
                 </form>
-            @endif
-        </div>
+            </x-slot:actions>
+        @endif
 
         @if ($notifications->isEmpty())
             <div class="card">
@@ -58,5 +56,5 @@
                 </div>
             @endif
         @endif
-    </div>
+    </x-account.layout>
 @endsection

@@ -18,29 +18,25 @@
 @endsection
 
 @section('content')
+    <x-admin.detail-header :title="'Pengajuan #'.$purchaseRequest->id" :subtitle="$purchaseRequest->documentNumber().' · diajukan '.$purchaseRequest->created_at->translatedFormat('d F Y H:i').' WIB'"
+                           :back-url="route('admin.purchase-requests.index')" back-label="Pengajuan">
+        <x-status-badge :status="$purchaseRequest->status" />
+        @if (Route::has('admin.purchase-requests.pdf'))
+            <a href="{{ route('admin.purchase-requests.pdf', $purchaseRequest) }}" target="_blank" rel="noopener"
+               class="btn btn-outline-secondary btn-sm" title="Bukti {{ $purchaseRequest->documentNumber() }}">
+                <i class="bi bi-file-earmark-pdf"></i>Cetak PDF
+            </a>
+        @endif
+    </x-admin.detail-header>
+
     <div class="row g-4">
         <div class="col-xl-7">
             <div class="card mb-4">
                 <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-                        <h2 class="h5 mb-0">Pengajuan #{{ $purchaseRequest->id }}</h2>
-                        <div class="d-flex align-items-center gap-2">
-                            <x-status-badge :status="$purchaseRequest->status" />
-                            @if (Route::has('admin.purchase-requests.pdf'))
-                                <a href="{{ route('admin.purchase-requests.pdf', $purchaseRequest) }}" target="_blank" rel="noopener"
-                                   class="btn btn-outline-secondary btn-sm" title="Bukti {{ $purchaseRequest->documentNumber() }}">
-                                    <i class="bi bi-file-earmark-pdf"></i>Cetak PDF
-                                </a>
-                            @endif
-                        </div>
-                    </div>
+                    <dl class="admin-detail-list">
 
-                    <dl class="row small mb-0">
-                        <dt class="col-sm-4 text-muted fw-normal">Tanggal pengajuan</dt>
-                        <dd class="col-sm-8">{{ $purchaseRequest->created_at->translatedFormat('d F Y H:i') }} WIB</dd>
-
-                        <dt class="col-sm-4 text-muted fw-normal">Mobil</dt>
-                        <dd class="col-sm-8">
+                        <dt>Mobil</dt>
+                        <dd>
                             {{ $carLabel }}
                             <span class="text-muted">· {{ $car->condition_label }} · stok {{ $car->stock }}</span>
                             @unless ($car->is_active)
@@ -48,27 +44,31 @@
                             @endunless
                         </dd>
 
-                        <dt class="col-sm-4 text-muted fw-normal">Customer</dt>
-                        <dd class="col-sm-8">
+                        <dt>Customer</dt>
+                        <dd>
                             <a href="{{ route('admin.users.show', $purchaseRequest->user) }}">{{ $purchaseRequest->user->name }}</a>
-                            <span class="text-muted">· {{ $purchaseRequest->user->email }}</span>
+                            <span class="text-muted">· <a href="mailto:{{ $purchaseRequest->user->email }}" class="text-muted">{{ $purchaseRequest->user->email }}</a></span>
                         </dd>
 
-                        <dt class="col-sm-4 text-muted fw-normal">Nomor HP</dt>
-                        <dd class="col-sm-8">{{ $purchaseRequest->phone }}</dd>
+                        <dt>Nomor HP</dt>
+                        <dd>
+                            <a href="tel:{{ $purchaseRequest->phone }}">{{ $purchaseRequest->phone }}</a>
+                            <a href="https://wa.me/{{ preg_replace('/^0/', '62', preg_replace('/\D/', '', $purchaseRequest->phone)) }}" target="_blank" rel="noopener"
+                               class="btn btn-sm btn-outline-success py-0 ms-2"><i class="bi bi-whatsapp"></i>WhatsApp</a>
+                        </dd>
 
-                        <dt class="col-sm-4 text-muted fw-normal">Alamat</dt>
-                        <dd class="col-sm-8">{{ $purchaseRequest->address }}</dd>
+                        <dt>Alamat</dt>
+                        <dd>{{ $purchaseRequest->address }}</dd>
 
-                        <dt class="col-sm-4 text-muted fw-normal">Catatan customer</dt>
-                        <dd class="col-sm-8 mb-0">{{ $purchaseRequest->notes ?: '—' }}</dd>
+                        <dt>Catatan customer</dt>
+                        <dd>{{ $purchaseRequest->notes ?: '—' }}</dd>
                     </dl>
                 </div>
             </div>
 
             <div class="card mb-4">
                 <div class="card-body p-4">
-                    <h3 class="h6 mb-3">Rincian Harga · {{ $purchaseRequest->paymentMethodLabel() }}</h3>
+                    <h3 class="admin-card-title">Rincian Harga · {{ $purchaseRequest->paymentMethodLabel() }}</h3>
 
                     <dl class="row small mb-0">
                         <dt class="col-7 text-muted fw-normal">Harga mobil (saat pengajuan)</dt>
@@ -113,9 +113,9 @@
         </div>
 
         <div class="col-xl-5">
-            <div class="card">
+            <div class="card admin-sticky-panel">
                 <div class="card-body p-4">
-                    <h3 class="h6 mb-3">Status & Catatan Admin</h3>
+                    <h3 class="admin-card-title">Status & Catatan Admin</h3>
                     @include('admin.partials.status-form', [
                         'action' => route('admin.purchase-requests.update-status', $purchaseRequest),
                         'currentLabel' => $purchaseRequest->statusLabel(),

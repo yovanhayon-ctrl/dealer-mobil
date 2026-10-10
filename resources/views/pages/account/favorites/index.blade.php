@@ -3,15 +3,11 @@
 @section('title', 'Favorit Saya')
 
 @section('content')
-    <div class="container py-4">
-        @include('partials.public-breadcrumb', ['items' => [['label' => 'Favorit Saya']]])
-
-        <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-4">
-            <h1 class="h3 mb-0">Favorit Saya</h1>
-            @if ($cars->total())
-                <span class="text-muted small">{{ $cars->total() }} dari {{ \App\Http\Controllers\Account\FavoriteController::MAX_FAVORITES }} mobil</span>
-            @endif
-        </div>
+    <x-account.layout title="Favorit Saya" active="account.favorites.*"
+                      :summary="$cars->total().' dari '.\App\Http\Controllers\Account\FavoriteController::MAX_FAVORITES.' mobil'">
+        <x-slot:actions>
+            <a href="{{ route('cars.index') }}" class="btn btn-outline-primary btn-sm"><i class="bi bi-car-front"></i>Lihat Mobil</a>
+        </x-slot:actions>
 
         @if ($cars->isEmpty())
             <div class="card">
@@ -23,7 +19,7 @@
         @else
             <div class="row g-4">
                 @foreach ($cars as $car)
-                    <div class="col-12 col-sm-6 col-lg-4 col-xl-3">
+                    <div class="col-12 col-sm-6 col-xl-4">
                         @if ($car->is_active)
                             <x-car-card :car="$car" />
                         @else
@@ -49,5 +45,5 @@
                 </div>
             @endif
         @endif
-    </div>
+    </x-account.layout>
 @endsection

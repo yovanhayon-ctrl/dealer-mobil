@@ -68,7 +68,7 @@ Mengikuti *customer journey* di proposal: Temukan → Kenali → Pertimbangkan �
 | 7 | Customer | Klik **Ajukan dengan Simulasi Ini** → kirim | Nilai simulasi terbawa ke form pengajuan |
 | 8 | Customer → Admin | **Test Drive** → booking mobil lain → pindah ke jendela admin → lonceng 🔔 topbar & menu **Notifikasi** bertambah → klik notifikasi | Validasi jadwal & slot, **(v1.2.0)** notifikasi admin langsung membuka detail test drive |
 | 9 | Customer | **Servis** → booking servis (plat `b1234xyz`) | JAF Service, plat dirapikan otomatis |
-| 10 | Customer | Menu akun → **Pengajuan Saya / Test Drive Saya / Servis Saya** | Status *Menunggu*, tombol batal |
+| 10 | Customer | Menu akun → **Pengajuan Saya / Test Drive Saya / Servis Saya** → coba chip **Berjalan / Selesai** dan **Lihat rincian** | Status *Menunggu*, tombol batal, **(v1.6.0)** menu akun & penyaring status |
 | 11 | Admin | **Dashboard** → gulir ke **Tren 6 Bulan Terakhir** → buka *Lihat angka* | Kartu statistik, jadwal terdekat, **(v1.1.0)** grafik aktivitas & penjualan |
 | 12 | Admin | **Pengajuan** → buka pengajuan langkah 7 → *Diproses* → *Disetujui* + catatan | Stok mobil berkurang otomatis |
 | 13 | Customer | **(v1.1.0)** Muat ulang halaman → lonceng 🔔 di navbar menunjukkan angka → klik → klik notifikasi *Pengajuan Pembelian Disetujui* | Notifikasi status + catatan dealer, kartu pengajuan tersorot |

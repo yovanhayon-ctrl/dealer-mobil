@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Account;
 
+use App\Http\Controllers\Account\Concerns\FiltersByStatusGroup;
 use App\Http\Controllers\Controller;
 use App\Models\ServiceBooking;
 use App\Notifications\Admin\AdminActivityNotification;
@@ -16,17 +17,34 @@ use Illuminate\View\View;
  */
 class ServiceBookingController extends Controller
 {
+    use FiltersByStatusGroup;
+
     public const PER_PAGE = 10;
+
+    /** Kelompok penyaring status di halaman riwayat. */
+    public const STATUS_GROUPS = [
+        'berjalan' => [ServiceBooking::STATUS_PENDING, ServiceBooking::STATUS_CONFIRMED, ServiceBooking::STATUS_IN_PROGRESS],
+        'selesai' => [ServiceBooking::STATUS_COMPLETED],
+        'dibatalkan' => [ServiceBooking::STATUS_CANCELLED],
+    ];
 
     public function index(Request $request): View
     {
+        $group = $this->statusGroup($request);
+
         $bookings = $request->user()->serviceBookings()
             ->with('service:id,name')
             ->latest()
             ->orderByDesc('id')
-            ->paginate(self::PER_PAGE);
+            ->when($group, fn ($query, $group) => $query->whereIn('status', self::STATUS_GROUPS[$group]))
+            ->paginate(self::PER_PAGE)
+            ->withQueryString();
 
-        return view('pages.account.service-bookings.index', ['bookings' => $bookings]);
+        return view('pages.account.service-bookings.index', [
+            'bookings' => $bookings,
+            'statusGroup' => $group,
+            'statusCounts' => $this->statusGroupCounts($request->user()->serviceBookings()),
+        ]);
     }
 
     public function cancel(Request $request, ServiceBooking $serviceBooking): RedirectResponse

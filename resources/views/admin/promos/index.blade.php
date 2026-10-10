@@ -6,46 +6,39 @@
     @include('partials.breadcrumb', ['items' => [['label' => 'Promo']]])
 @endsection
 
-@section('content')
-    <div class="d-flex justify-content-end mb-3">
-        <a href="{{ route('admin.promos.create') }}" class="btn btn-accent">
-            <i class="bi bi-plus-lg"></i>Tambah Promo
-        </a>
-    </div>
+@php
+    $activeFilters = collect($filters)->except('urut')->filter(fn ($value) => $value !== null && $value !== '')->count();
+@endphp
 
-    <div class="card mb-3">
-        <div class="card-body p-3">
-            <form method="GET" action="{{ route('admin.promos.index') }}" class="row g-2 align-items-end" role="search">
-                <div class="col-12 col-md-5">
-                    <label for="filter_q" class="form-label small mb-1">Kata kunci</label>
-                    <input type="search" id="filter_q" name="q" value="{{ $filters['q'] }}" class="form-control form-control-sm" placeholder="Judul promo…">
-                </div>
-                <div class="col-6 col-md-3">
-                    <label for="filter_status" class="form-label small mb-1">Status</label>
-                    <select id="filter_status" name="status" class="form-select form-select-sm">
-                        <option value="">Semua</option>
-                        @foreach (\App\Models\Promo::STATUS_FILTERS as $value => [, $label])
-                            <option value="{{ $value }}" @selected($filters['status'] === $value)>{{ $label }}</option>
-                        @endforeach
-                    </select>
-                </div>
-                <div class="col-6 col-md-2">
-                    <label for="filter_jenis" class="form-label small mb-1">Jenis</label>
-                    <select id="filter_jenis" name="jenis" class="form-select form-select-sm">
-                        <option value="">Semua</option>
-                        <option value="mobil" @selected($filters['jenis'] === 'mobil')>Khusus mobil</option>
-                        <option value="umum" @selected($filters['jenis'] === 'umum')>Umum</option>
-                    </select>
-                </div>
-                <div class="col-12 col-md-2 d-flex gap-2">
-                    <button type="submit" class="btn btn-primary btn-sm"><i class="bi bi-funnel"></i>Terapkan</button>
-                    @if ($hasFilters)
-                        <a href="{{ route('admin.promos.index') }}" class="btn btn-outline-secondary btn-sm">Reset</a>
-                    @endif
-                </div>
-            </form>
+@section('content')
+    <x-admin.list-header :summary="number_format($promos->total(), 0, ',', '.').' promo'.($hasFilters ? ' ditemukan' : '')">
+        <a href="{{ route('admin.promos.create') }}" class="btn btn-accent btn-sm"><i class="bi bi-plus-lg"></i>Tambah Promo</a>
+    </x-admin.list-header>
+
+    <x-admin.filters :action="route('admin.promos.index')" :reset-url="route('admin.promos.index')"
+                     :active="$activeFilters" :show-reset="$hasFilters">
+        <div class="col-12 col-lg">
+            <label for="filter_q" class="form-label small mb-1">Kata kunci</label>
+            <input type="search" id="filter_q" name="q" value="{{ $filters['q'] }}" class="form-control form-control-sm" placeholder="Judul promo…">
         </div>
-    </div>
+        <div class="col-6 col-md-4 col-lg-auto">
+            <label for="filter_status" class="form-label small mb-1">Status</label>
+            <select id="filter_status" name="status" class="form-select form-select-sm">
+                <option value="">Semua</option>
+                @foreach (\App\Models\Promo::STATUS_FILTERS as $value => [, $label])
+                    <option value="{{ $value }}" @selected($filters['status'] === $value)>{{ $label }}</option>
+                @endforeach
+            </select>
+        </div>
+        <div class="col-6 col-md-4 col-lg-auto">
+            <label for="filter_jenis" class="form-label small mb-1">Jenis</label>
+            <select id="filter_jenis" name="jenis" class="form-select form-select-sm">
+                <option value="">Semua</option>
+                <option value="mobil" @selected($filters['jenis'] === 'mobil')>Khusus mobil</option>
+                <option value="umum" @selected($filters['jenis'] === 'umum')>Umum</option>
+            </select>
+        </div>
+    </x-admin.filters>
 
     <div class="card">
         @if ($promos->isEmpty())
