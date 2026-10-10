@@ -14,21 +14,21 @@
 @endsection
 
 @section('content')
+    <x-admin.detail-header :title="'Booking Servis #'.$booking->id" :subtitle="'Masuk '.$booking->created_at->translatedFormat('d F Y H:i').' WIB'"
+                           :back-url="route('admin.service-bookings.index')" back-label="Booking Servis">
+        <x-status-badge :status="$booking->status" />
+    </x-admin.detail-header>
+
     <div class="row g-4">
         <div class="col-xl-7">
             <div class="card mb-4">
                 <div class="card-body p-4">
-                    <div class="d-flex align-items-center justify-content-between gap-2 mb-3">
-                        <h2 class="h5 mb-0">Booking Servis #{{ $booking->id }}</h2>
-                        <x-status-badge :status="$booking->status" />
-                    </div>
+                    <dl class="admin-detail-list">
+                        <dt>Jadwal</dt>
+                        <dd>{{ $booking->preferred_date->translatedFormat('l, d F Y') }} · {{ $booking->timeLabel() }} WIB</dd>
 
-                    <dl class="row small mb-0">
-                        <dt class="col-sm-4 text-muted fw-normal">Jadwal</dt>
-                        <dd class="col-sm-8">{{ $booking->preferred_date->translatedFormat('l, d F Y') }} · {{ $booking->timeLabel() }} WIB</dd>
-
-                        <dt class="col-sm-4 text-muted fw-normal">Layanan</dt>
-                        <dd class="col-sm-8">
+                        <dt>Layanan</dt>
+                        <dd>
                             {{ $service->name }}
                             @if ($service->price_from)
                                 <span class="text-muted">· mulai Rp {{ number_format($service->price_from, 0, ',', '.') }}</span>
@@ -41,31 +41,32 @@
                             @endunless
                         </dd>
 
-                        <dt class="col-sm-4 text-muted fw-normal">Kendaraan</dt>
-                        <dd class="col-sm-8">
+                        <dt>Kendaraan</dt>
+                        <dd>
                             {{ $booking->vehicle_model }}@if ($booking->vehicle_year) ({{ $booking->vehicle_year }})@endif
                         </dd>
 
-                        <dt class="col-sm-4 text-muted fw-normal">Plat nomor</dt>
-                        <dd class="col-sm-8">{{ $booking->plate_number }}</dd>
+                        <dt>Plat nomor</dt>
+                        <dd>{{ $booking->plate_number }}</dd>
 
-                        <dt class="col-sm-4 text-muted fw-normal">Kilometer</dt>
-                        <dd class="col-sm-8">{{ $booking->mileage !== null ? number_format($booking->mileage, 0, ',', '.').' km' : '—' }}</dd>
+                        <dt>Kilometer</dt>
+                        <dd>{{ $booking->mileage !== null ? number_format($booking->mileage, 0, ',', '.').' km' : '—' }}</dd>
 
-                        <dt class="col-sm-4 text-muted fw-normal">Customer</dt>
-                        <dd class="col-sm-8">
+                        <dt>Customer</dt>
+                        <dd>
                             <a href="{{ route('admin.users.show', $booking->user) }}">{{ $booking->user->name }}</a>
-                            <span class="text-muted">· {{ $booking->user->email }}</span>
+                            <span class="text-muted">· <a href="mailto:{{ $booking->user->email }}" class="text-muted">{{ $booking->user->email }}</a></span>
                         </dd>
 
-                        <dt class="col-sm-4 text-muted fw-normal">Nomor HP</dt>
-                        <dd class="col-sm-8">{{ $booking->phone }}</dd>
+                        <dt>Nomor HP</dt>
+                        <dd>
+                            <a href="tel:{{ $booking->phone }}">{{ $booking->phone }}</a>
+                            <a href="https://wa.me/{{ preg_replace('/^0/', '62', preg_replace('/\D/', '', $booking->phone)) }}" target="_blank" rel="noopener"
+                               class="btn btn-sm btn-outline-success py-0 ms-2"><i class="bi bi-whatsapp"></i>WhatsApp</a>
+                        </dd>
 
-                        <dt class="col-sm-4 text-muted fw-normal">Keluhan</dt>
-                        <dd class="col-sm-8">{{ $booking->complaint ?: '—' }}</dd>
-
-                        <dt class="col-sm-4 text-muted fw-normal">Masuk</dt>
-                        <dd class="col-sm-8 mb-0">{{ $booking->created_at->translatedFormat('d M Y H:i') }} WIB</dd>
+                        <dt>Keluhan</dt>
+                        <dd>{{ $booking->complaint ?: '—' }}</dd>
                     </dl>
                 </div>
             </div>
@@ -78,9 +79,9 @@
         </div>
 
         <div class="col-xl-5">
-            <div class="card">
+            <div class="card admin-sticky-panel">
                 <div class="card-body p-4">
-                    <h3 class="h6 mb-3">Status & Catatan Admin</h3>
+                    <h3 class="admin-card-title">Status & Catatan Admin</h3>
                     @include('admin.partials.status-form', [
                         'action' => route('admin.service-bookings.update-status', $booking),
                         'currentLabel' => $booking->statusLabel(),
