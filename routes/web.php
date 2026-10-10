@@ -32,6 +32,7 @@ use App\Http\Controllers\HomeController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\PurchaseRequestController;
+use App\Http\Controllers\SeoController;
 use App\Http\Controllers\ServiceBookingController;
 use App\Http\Controllers\ServiceController;
 use App\Http\Controllers\TestDriveController;
@@ -60,6 +61,10 @@ Route::middleware('throttle:60,1')->controller(CompareController::class)->group(
 });
 Route::get('/tentang-kami', [PageController::class, 'about'])->name('about');
 Route::get('/kontak', [PageController::class, 'contact'])->name('contact');
+
+// Untuk mesin pencari (public/robots.txt sengaja tidak ada agar route ini yang dipakai).
+Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
+Route::get('/robots.txt', [SeoController::class, 'robots'])->name('robots');
 
 /*
 |--------------------------------------------------------------------------

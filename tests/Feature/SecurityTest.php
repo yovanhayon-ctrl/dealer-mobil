@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Http\Middleware\SecurityHeaders;
+use App\Models\Car;
 use App\Models\User;
 use App\Providers\AppServiceProvider;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -156,9 +157,12 @@ class SecurityTest extends TestCase
     public function test_view_tidak_memakai_script_inline(): void
     {
         // CSP script-src tanpa 'unsafe-inline': semua script harus file eksternal.
-        foreach (['/', '/mobil', '/simulasi-kredit', '/kontak'] as $path) {
+        // Pengecualian: data JSON-LD (type="application/ld+json") yang tidak dieksekusi browser.
+        $car = Car::factory()->create();
+
+        foreach (['/', '/mobil', '/simulasi-kredit', '/kontak', "/mobil/{$car->slug}"] as $path) {
             $html = $this->get($path)->getContent();
-            preg_match_all('/<script(?![^>]*\bsrc=)[^>]*>/i', $html, $inline);
+            preg_match_all('/<script(?![^>]*\b(?:src=|type="application\/ld\+json"))[^>]*>/i', $html, $inline);
             $this->assertSame([], $inline[0], "Script inline ditemukan di {$path}");
             $this->assertDoesNotMatchRegularExpression('/\son(click|change|submit|load|input)=/i', $html, "Event handler inline di {$path}");
         }

@@ -130,7 +130,7 @@ class CarDetailTest extends TestCase
         $this->detail($this->car())
             ->assertSee('aria-label="Belum ada foto Toyota Avanza 2025"', false)
             ->assertDontSee('id="carGallery"', false)
-            ->assertDontSee('og:image', false);
+            ->assertSee('<meta property="og:image" content="'.asset('images/og-default.jpg').'">', false);
     }
 
     public function test_harga_promo_dan_semua_promo_aktif(): void
@@ -349,7 +349,7 @@ class CarDetailTest extends TestCase
 
         $html = $this->detail($car)
             ->assertSee('<meta property="og:image" content="'.$car->images()->first()->url.'">', false)
-            ->assertSee('<meta property="og:title" content="Toyota Avanza 2025">', false)
+            ->assertSee('<meta property="og:title" content="Toyota Avanza 2025 — '.config('dealer.name').'">', false)
             ->assertSee('<link rel="canonical" href="'.route('cars.show', $car).'">', false)
             ->getContent();
 
