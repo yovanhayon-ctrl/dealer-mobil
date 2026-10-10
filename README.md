@@ -496,7 +496,7 @@ Wajib saat production (Phase 19):
 
 - **Demo lokal / presentasi:** [docs/DEMO.md](docs/DEMO.md) — persiapan, akun demo, alur demo ±15 menit, dan solusi masalah saat demo.
 - **Shared hosting (cPanel):** [docs/DEPLOY-CPANEL.md](docs/DEPLOY-CPANEL.md) — syarat hosting (**PHP ≥ 8.4**), upload, document root, database, `.env` production, HTTPS, dan pembaruan.
-- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md), [docs/RELEASE-v1.1.0.md](docs/RELEASE-v1.1.0.md), [docs/RELEASE-v1.2.0.md](docs/RELEASE-v1.2.0.md), [docs/RELEASE-v1.3.0.md](docs/RELEASE-v1.3.0.md), [docs/RELEASE-v1.4.0.md](docs/RELEASE-v1.4.0.md).
+- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md), [docs/RELEASE-v1.1.0.md](docs/RELEASE-v1.1.0.md), [docs/RELEASE-v1.2.0.md](docs/RELEASE-v1.2.0.md), [docs/RELEASE-v1.3.0.md](docs/RELEASE-v1.3.0.md), [docs/RELEASE-v1.4.0.md](docs/RELEASE-v1.4.0.md), [docs/RELEASE-v1.5.0.md](docs/RELEASE-v1.5.0.md).
 
 ## Performa
 
@@ -548,6 +548,7 @@ php artisan optimize
 | +     | Fitur tambahan v1.2.0          | ✅ Selesai (notifikasi admin, notifikasi lewat email; 731 test) |
 | +     | Fitur tambahan v1.3.0          | ✅ Selesai (ulasan customer + moderasi admin, Kata Pelanggan di beranda; 749 test) |
 | +     | Fitur tambahan v1.4.0          | ✅ Selesai (cetak bukti pengajuan PDF untuk customer & admin; 756 test) |
+| +     | Tampilan v1.5.0                | ✅ Selesai (banner beranda + video latar, mobil unggulan pilihan admin, perapian beranda/navbar/footer/dashboard; 765 test) |
 
 > **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`. Promo berjalan tampil di `/promo` (filter Semua/Khusus Mobil/Promo Umum) dan detailnya di `/promo/{slug}`. Simulasi kredit bunga flat di `/simulasi-kredit` (tanpa login; pilih mobil atau isi harga, DP, tenor). Customer mengajukan pembelian cash/kredit di `/mobil/{slug}/ajukan` (hasil simulasi bisa ikut terbawa) dan memantau/membatalkan di `/akun/pengajuan`. Halaman `/tentang-kami` dan `/kontak` (alamat, telepon, WhatsApp, email, jam operasional, Google Maps) membaca data dealer dari `.env` (`DEALER_*`). Setiap akun bisa mengubah data diri dan kata sandi di `/akun/profil`.
 
@@ -560,6 +561,8 @@ php artisan optimize
 > **Fitur tambahan v1.3.0:** customer yang pembeliannya **Selesai** bisa memberi ulasan (rating + komentar) dari Pengajuan Saya; admin memoderasi di `/admin/ulasan` (setujui / tolak dengan alasan); ulasan yang disetujui tampil di bagian **Kata Pelanggan** di beranda dengan nama disingkat. Setelah pull, jalankan `php artisan migrate` (tabel `testimonials`). Detail: [docs/RELEASE-v1.3.0.md](docs/RELEASE-v1.3.0.md).
 
 > **Fitur tambahan v1.4.0:** tombol **Cetak PDF** di Pengajuan Saya dan detail pengajuan admin menghasilkan bukti pengajuan pembelian (A4, nomor `PB-{tahun}-{id}`, data customer, mobil, rincian cash/kredit). Memakai `dompdf/dompdf`, jadi setelah pull **wajib** `composer install`. Tidak ada migration baru. Detail: [docs/RELEASE-v1.4.0.md](docs/RELEASE-v1.4.0.md).
+
+> **Tampilan v1.5.0:** banner beranda dengan video latar (`DEALER_HERO_VIDEOS`, hanya layar lebar) atau kartu mobil unggulan; admin bisa memilih mobil unggulan lewat checkbox **Jadikan unggulan di beranda** di form mobil. Beranda, navbar, footer, dan dashboard admin dirapikan; Mobil Terbaru di HP bisa digeser. Setelah pull, jalankan `php artisan migrate` (kolom `cars.is_featured`). Detail: [docs/RELEASE-v1.5.0.md](docs/RELEASE-v1.5.0.md).
 
 > **Urutan kerja:** semua halaman **admin** dikerjakan dulu (sudah selesai), lalu halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 
