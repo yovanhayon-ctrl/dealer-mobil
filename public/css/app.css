@@ -902,6 +902,39 @@ main {
     max-width: 960px;
 }
 
+.admin-form-card-xl {
+    max-width: 1200px;
+}
+
+.admin-form-section + .admin-form-section {
+    margin-top: 1.25rem;
+    padding-top: 1.25rem;
+    border-top: 1px solid var(--bs-border-color-translucent);
+}
+
+.admin-form-section-title {
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+/* Tombol Simpan/Batal menempel di bawah layar selama form digulir (kartu form memakai p-4 = 1.5rem). */
+.admin-form-actions {
+    position: sticky;
+    bottom: 0;
+    z-index: 5;
+    display: flex;
+    gap: .5rem;
+    margin: 1.5rem -1.5rem -1.5rem;
+    padding: .9rem 1.5rem;
+    background-color: #fff;
+    border-top: 1px solid var(--bs-border-color-translucent);
+    border-radius: 0 0 var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius);
+}
+
 /* Thumbnail gambar utama mobil 16:9 di tabel admin (placeholder bila belum ada gambar). */
 .car-thumb {
     display: inline-flex;
@@ -1180,7 +1213,7 @@ main {
     vertical-align: bottom;
 }
 
-.dashboard-table tr[data-row-link] {
+tr[data-row-link] {
     cursor: pointer;
 }
 
@@ -1318,4 +1351,70 @@ main {
     .car-scroller-hint {
         display: block;
     }
+}
+
+/* ---------- Admin: halaman daftar (kepala, filter, tabel) ---------- */
+
+.admin-list-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .75rem;
+    margin-bottom: 1rem;
+}
+
+.admin-list-summary {
+    color: #6c757d;
+    font-size: .9rem;
+}
+
+.admin-filters-form .form-select,
+.admin-filters-form .form-control {
+    min-width: 8.5rem;
+}
+
+/* HP: filter dilipat di balik tombol; layar lebar: selalu tampil satu baris. */
+.admin-filters-form.show,
+.admin-filters-form.collapsing {
+    margin-top: .75rem;
+}
+
+@media (min-width: 992px) {
+    .admin-filters-form.collapse {
+        display: flex !important;
+        margin-top: 0;
+    }
+
+    .admin-filters-actions {
+        margin-left: auto;
+    }
+}
+
+/* Tombol aksi ikon di tabel. */
+.btn-icon {
+    width: 2rem;
+    height: 2rem;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-icon .bi {
+    margin: 0;
+}
+
+.admin-row-actions {
+    display: inline-flex;
+    gap: .35rem;
+}
+
+/* Teks panjang di sel tabel admin: satu baris, terpotong rapi. */
+.admin-truncate {
+    display: block;
+    max-width: 13rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
