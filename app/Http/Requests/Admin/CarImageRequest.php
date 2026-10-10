@@ -9,6 +9,8 @@ use Illuminate\Validation\Rules\File;
 
 class CarImageRequest extends FormRequest
 {
+    public const MAX_KILOBYTES = 8192;
+
     private ?int $remainingSlots = null;
 
     /**
@@ -31,8 +33,9 @@ class CarImageRequest extends FormRequest
                 'required',
                 File::image()
                     ->types(['jpg', 'jpeg', 'png', 'webp'])
-                    ->max(2048)
-                    ->dimensions(Rule::dimensions()->minWidth(600)->minHeight(400)),
+                    // Foto langsung dari HP (3–6 MB) diterima; disimpan ulang kecil (WebP, maks. 1600 px).
+                    ->max(self::MAX_KILOBYTES)
+                    ->dimensions(Rule::dimensions()->minWidth(600)->minHeight(400)->maxWidth(8000)->maxHeight(8000)),
             ],
         ];
     }
@@ -56,8 +59,8 @@ class CarImageRequest extends FormRequest
             'images.*.file' => 'Gambar ke-:position gagal diunggah.',
             'images.*.image' => 'Gambar ke-:position harus berupa JPG, JPEG, PNG, atau WEBP.',
             'images.*.mimes' => 'Gambar ke-:position harus berupa JPG, JPEG, PNG, atau WEBP.',
-            'images.*.max' => 'Ukuran gambar ke-:position maksimal 2 MB.',
-            'images.*.dimensions' => 'Gambar ke-:position minimal berukuran 600×400 piksel.',
+            'images.*.max' => 'Ukuran gambar ke-:position maksimal 8 MB.',
+            'images.*.dimensions' => 'Gambar ke-:position minimal berukuran 600×400 piksel dan maksimal 8000×8000 piksel.',
         ];
     }
 

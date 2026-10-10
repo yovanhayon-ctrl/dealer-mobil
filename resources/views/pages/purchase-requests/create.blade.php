@@ -30,7 +30,7 @@
                 <div class="card test-drive-car-summary mb-4">
                     <div class="card-body d-flex align-items-center gap-3 p-3">
                         @if ($car->primaryImage)
-                            <img src="{{ $car->primaryImage->url }}" alt="{{ $title }}" class="test-drive-car-thumb">
+                            <img src="{{ $car->primaryImage->thumb_url }}" alt="{{ $title }}" class="test-drive-car-thumb">
                         @else
                             <span class="test-drive-car-thumb car-card-img-empty" aria-hidden="true"><i class="bi bi-car-front"></i></span>
                         @endif

@@ -36,7 +36,7 @@ class TestDriveController extends Controller
             ->with([
                 'car:id,brand_id,name,slug,year,is_active',
                 'car.brand:id,name',
-                'car.primaryImage:id,car_id,path',
+                'car.primaryImage:id,car_id,path,thumb_path',
             ])
             ->latest()
             ->orderByDesc('id')

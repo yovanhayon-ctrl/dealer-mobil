@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CarImageRequest;
 use App\Models\Car;
 use App\Models\CarImage;
+use App\Support\CarImageProcessor;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
@@ -27,13 +28,13 @@ class CarImageController extends Controller
         ]);
     }
 
-    public function store(CarImageRequest $request, Car $car): RedirectResponse
+    public function store(CarImageRequest $request, Car $car, CarImageProcessor $processor): RedirectResponse
     {
         $files = $request->file('images');
         $paths = [];
 
         try {
-            DB::transaction(function () use ($car, $files, &$paths) {
+            DB::transaction(function () use ($car, $files, $processor, &$paths) {
                 // Kunci baris mobil agar dua upload bersamaan tidak melewati batas atau membuat dua gambar utama.
                 Car::whereKey($car->id)->lockForUpdate()->first();
 
@@ -49,18 +50,20 @@ class CarImageController extends Controller
                 $sortOrder = (int) $images->clone()->max('sort_order');
 
                 foreach ($files as $file) {
-                    // store() memakai hashName(): nama file acak, bukan nama asli dari pengguna.
-                    $path = $file->store(CarImage::directory($car->id), CarImage::DISK);
-
-                    if ($path === false) {
-                        throw new RuntimeException('Gagal menyimpan file gambar.');
+                    // Dikecilkan & disimpan sebagai WebP + thumbnail; nama file acak, bukan nama asli dari pengguna.
+                    try {
+                        $stored = $processor->store($file->getRealPath(), CarImage::directory($car->id), CarImage::DISK);
+                    } catch (RuntimeException) {
+                        throw ValidationException::withMessages([
+                            'images' => "Gambar \"{$file->getClientOriginalName()}\" tidak bisa diproses. Coba simpan ulang sebagai JPG lalu unggah lagi.",
+                        ]);
                     }
-
-                    $paths[] = $path;
+                    array_push($paths, $stored['path'], $stored['thumb_path']);
 
                     CarImage::create([
                         'car_id' => $car->id,
-                        'path' => $path,
+                        'path' => $stored['path'],
+                        'thumb_path' => $stored['thumb_path'],
                         'is_primary' => $needsPrimary,
                         'sort_order' => ++$sortOrder,
                     ]);
@@ -127,7 +130,7 @@ class CarImageController extends Controller
         });
 
         // File dihapus hanya setelah data berhasil dihapus.
-        Storage::disk(CarImage::DISK)->delete($image->path);
+        Storage::disk(CarImage::DISK)->delete($image->files());
 
         $message = $image->is_primary && $car->images()->exists()
             ? 'Gambar berhasil dihapus. Gambar berikutnya dijadikan gambar utama.'

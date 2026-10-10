@@ -44,7 +44,7 @@
                         <div class="card test-drive-car-summary mb-4">
                             <div class="card-body d-flex align-items-center gap-3 p-3">
                                 @if ($selectedCar->primaryImage)
-                                    <img src="{{ $selectedCar->primaryImage->url }}" alt="{{ $selectedCar->brand->name }} {{ $selectedCar->name }} {{ $selectedCar->year }}"
+                                    <img src="{{ $selectedCar->primaryImage->thumb_url }}" alt="{{ $selectedCar->brand->name }} {{ $selectedCar->name }} {{ $selectedCar->year }}"
                                          class="test-drive-car-thumb">
                                 @else
                                     <span class="test-drive-car-thumb car-card-img-empty" aria-hidden="true"><i class="bi bi-car-front"></i></span>
