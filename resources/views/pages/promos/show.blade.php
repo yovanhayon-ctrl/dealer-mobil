@@ -6,7 +6,12 @@
 @php
     $car = $promo->car;
     $remaining = $promo->remainingLabel();
+    $shareImage = $promo->image_url ?? $car?->primaryImage?->url;
 @endphp
+
+@if ($shareImage)
+    @section('og_image', $shareImage)
+@endif
 
 @section('content')
     <div class="container py-4">

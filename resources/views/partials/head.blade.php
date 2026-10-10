@@ -3,6 +3,25 @@
 <meta name="csrf-token" content="{{ csrf_token() }}">
 <title>@hasSection('title')@yield('title') — @endif{{ config('dealer.name') }}</title>
 <meta name="description" content="@yield('meta_description', config('dealer.tagline') ?: config('dealer.name').' — jual mobil baru dan bekas, promo, dan simulasi kredit.')">
+@php
+    // Admin, akun, login/daftar, dan bandingkan tidak perlu muncul di mesin pencari.
+    $noindex = ($noindex ?? false) || request()->is('admin', 'admin/*', 'akun', 'akun/*', 'bandingkan');
+@endphp
+@if ($noindex)
+    <meta name="robots" content="noindex, nofollow">
+@else
+    {{-- Canonical tanpa query string: katalog yang difilter/diurutkan tidak dianggap halaman ganda. --}}
+    <link rel="canonical" href="{{ url()->current() }}">
+    <meta property="og:site_name" content="{{ config('dealer.name') }}">
+    <meta property="og:locale" content="id_ID">
+    <meta property="og:type" content="@yield('og_type', 'website')">
+    <meta property="og:title" content="@hasSection('title')@yield('title') — @endif{{ config('dealer.name') }}">
+    <meta property="og:description" content="@yield('meta_description', config('dealer.tagline') ?: config('dealer.name').' — jual mobil baru dan bekas, promo, dan simulasi kredit.')">
+    <meta property="og:url" content="{{ url()->current() }}">
+    {{-- Gambar pratinjau saat tautan dibagikan; halaman tanpa foto memakai gambar bawaan 1200×630. --}}
+    <meta property="og:image" content="@yield('og_image', asset('images/og-default.jpg'))">
+    <meta name="twitter:card" content="summary_large_image">
+@endif
 @stack('meta')
 
 <link rel="preconnect" href="https://fonts.googleapis.com">

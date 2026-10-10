@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
 <head>
-    @include('partials.head')
+    @include('partials.head', ['noindex' => true])
 </head>
 <body class="auth-wrapper">
     <main class="d-flex align-items-center justify-content-center py-5 px-3">

@@ -15,15 +15,38 @@
 @section('title', $title)
 @section('meta_description', $metaDescription)
 
+@section('og_type', 'product')
+@if ($images->isNotEmpty())
+    @section('og_image', $images->first()->url)
+@endif
+
+@php
+    // Data terstruktur (schema.org) untuk hasil pencarian Google.
+    $structuredData = array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'Car',
+        'name' => $title,
+        'brand' => ['@type' => 'Brand', 'name' => $car->brand->name],
+        'model' => $car->name,
+        'vehicleModelDate' => (string) $car->year,
+        'itemCondition' => $car->isNew() ? 'https://schema.org/NewCondition' : 'https://schema.org/UsedCondition',
+        'description' => $metaDescription,
+        'image' => $images->map(fn ($image) => $image->url)->values()->all() ?: null,
+        'url' => $detailUrl,
+        'offers' => [
+            '@type' => 'Offer',
+            'price' => $finalPrice,
+            'priceCurrency' => 'IDR',
+            'availability' => $car->inStock() ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            'url' => $detailUrl,
+            'seller' => ['@type' => 'AutoDealer', 'name' => config('dealer.name')],
+        ],
+    ]);
+@endphp
+
 @push('meta')
-    <link rel="canonical" href="{{ $detailUrl }}">
-    <meta property="og:type" content="product">
-    <meta property="og:title" content="{{ $title }}">
-    <meta property="og:description" content="{{ $metaDescription }}">
-    <meta property="og:url" content="{{ $detailUrl }}">
-    @if ($images->isNotEmpty())
-        <meta property="og:image" content="{{ $images->first()->url }}">
-    @endif
+    {{-- JSON-LD tidak dieksekusi browser, jadi aman untuk CSP; JSON_HEX_TAG mencegah teks keluar dari tag script. --}}
+    <script type="application/ld+json">{!! json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
 @endpush
 
 @section('content')
