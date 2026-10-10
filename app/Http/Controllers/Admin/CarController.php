@@ -33,7 +33,7 @@ class CarController extends Controller
 
         $cars = Car::query()
             ->with([
-                'brand:id,name', 'category:id,name', 'primaryImage:id,car_id,path',
+                'brand:id,name', 'category:id,name', 'primaryImage:id,car_id,path,thumb_path',
                 'activePromos:id,car_id,discount_amount',
             ])
             ->withCount(Car::DELETION_BLOCKERS)

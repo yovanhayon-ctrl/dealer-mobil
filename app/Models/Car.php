@@ -61,7 +61,7 @@ class Car extends Model
 
     /** Relasi yang dipakai x-car-card; di-eager load agar tidak terjadi N+1. */
     public const CARD_RELATIONS = [
-        'brand:id,name,slug', 'category:id,name,slug', 'primaryImage:id,car_id,path',
+        'brand:id,name,slug', 'category:id,name,slug', 'primaryImage:id,car_id,path,thumb_path',
         'activePromos:id,car_id,discount_amount',
     ];
 

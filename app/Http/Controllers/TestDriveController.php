@@ -28,7 +28,7 @@ class TestDriveController extends Controller
         // Label "Merek Nama Tahun"; diurutkan di PHP (satu query + eager load).
         $cars = Car::query()
             ->testDrivable()
-            ->with(['brand:id,name', 'primaryImage:id,car_id,path'])
+            ->with(['brand:id,name', 'primaryImage:id,car_id,path,thumb_path'])
             ->get()
             ->sortBy(fn (Car $car) => mb_strtolower("{$car->brand->name} {$car->name} {$car->year}"))
             ->values();

@@ -60,7 +60,7 @@
                                     @php($car = $row['car'])
                                     <th scope="col" class="compare-col">
                                         @if ($car->primaryImage)
-                                            <img src="{{ $car->primaryImage->url }}" alt="{{ $car->brand->name }} {{ $car->name }} {{ $car->year }}" class="compare-img mb-2" loading="lazy">
+                                            <img src="{{ $car->primaryImage->thumb_url }}" alt="{{ $car->brand->name }} {{ $car->name }} {{ $car->year }}" class="compare-img mb-2" loading="lazy">
                                         @else
                                             <span class="compare-img car-card-img-empty mb-2" aria-hidden="true"><i class="bi bi-car-front"></i></span>
                                         @endif

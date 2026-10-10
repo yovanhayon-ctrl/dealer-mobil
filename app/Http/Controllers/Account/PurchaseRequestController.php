@@ -39,7 +39,7 @@ class PurchaseRequestController extends Controller
             ->with([
                 'car:id,brand_id,name,slug,year,is_active',
                 'car.brand:id,name',
-                'car.primaryImage:id,car_id,path',
+                'car.primaryImage:id,car_id,path,thumb_path',
                 'testimonial:id,purchase_request_id,rating,comment,status,admin_note',
             ])
             ->latest()

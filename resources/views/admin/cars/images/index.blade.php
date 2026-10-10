@@ -79,7 +79,7 @@
                                 <div class="position-relative">
                                     {{-- Badge di luar .ratio karena setiap anak .ratio dibuat memenuhi kotak. --}}
                                     <div class="ratio ratio-16x9">
-                                        <img src="{{ $image->url }}" alt="{{ $altText }}" loading="lazy"
+                                        <img src="{{ $image->thumb_url }}" alt="{{ $altText }}" loading="lazy"
                                              class="object-fit-cover rounded-top">
                                     </div>
                                     @if ($image->is_primary)

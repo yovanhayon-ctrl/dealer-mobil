@@ -70,7 +70,7 @@
                                     <button type="button" data-bs-target="#carGallery" data-bs-slide-to="{{ $loop->index }}"
                                             aria-label="Tampilkan foto {{ $loop->iteration }}"
                                             @if ($loop->first) class="active" aria-current="true" @endif>
-                                        <img src="{{ $image->url }}" alt="" loading="lazy">
+                                        <img src="{{ $image->thumb_url }}" alt="" loading="lazy">
                                     </button>
                                 @endforeach
                             </div>
