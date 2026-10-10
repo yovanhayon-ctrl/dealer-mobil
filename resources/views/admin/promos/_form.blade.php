@@ -56,7 +56,7 @@
 <x-form.checkbox name="is_active" label="Aktif" :checked="$promo->is_active"
                  help="Promo berjalan jika aktif dan hari ini berada di antara tanggal mulai dan selesai." />
 
-<div class="d-flex gap-2 mt-4">
+<div class="admin-form-actions">
     <button type="submit" class="btn btn-primary">
         <i class="bi bi-check-lg"></i>Simpan
     </button>
