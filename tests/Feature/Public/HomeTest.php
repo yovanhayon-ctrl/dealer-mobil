@@ -165,7 +165,9 @@ class HomeTest extends TestCase
             ->assertSee('aria-label="Mobil unggulan: Nissan Skyline GT-R 2025"', false)
             ->assertSee('hero-feature-badge', false)
             ->assertDontSee('Mobil unggulan: Subaru', false)
-            ->assertDontSee('Mobil unggulan: Nissan Livina Tanpa Foto', false);
+            ->assertDontSee('Mobil unggulan: Nissan Livina Tanpa Foto', false)
+            // Tanpa video, unggulan sudah di hero: bagian scroll tidak ditampilkan dobel.
+            ->assertDontSee('scroll-showcase', false);
     }
 
     public function test_hero_memakai_merek_lain_bila_tidak_ada_nissan_berfoto(): void
@@ -250,7 +252,11 @@ class HomeTest extends TestCase
 
         $response->assertSee('class="home-hero py-5 has-video"', false)
             ->assertDontSee('hero-video-toggle', false)
-            ->assertDontSee('hero-feature', false);
+            ->assertDontSee('hero-feature', false)
+            // Mobil unggulan pindah ke bagian scroll di bawah "Mobil Terbaru".
+            ->assertSee('aria-labelledby="showcase-title"', false)
+            ->assertSee('aria-label="Lihat detail Nissan Skyline GT-R 2025"', false)
+            ->assertSee('loading="lazy" class="scroll-showcase-img"', false);
 
         preg_match("/data-hero-videos='([^']+)'/", $response->getContent(), $match);
         $sources = json_decode(html_entity_decode($match[1]), true, flags: JSON_THROW_ON_ERROR);
