@@ -373,4 +373,13 @@ class CarImageManagementTest extends TestCase
 
         $this->assertSame($queriesWithOneCar, $count());
     }
+
+    public function test_petunjuk_upload_memakai_batas_ukuran_yang_berlaku(): void
+    {
+        $car = Car::factory()->create();
+
+        $this->actingAs($this->admin)->get(route('admin.cars.images.index', $car))->assertOk()
+            ->assertSee('maks. 8 MB per file')
+            ->assertDontSee('maks. 2 MB');
+    }
 }
