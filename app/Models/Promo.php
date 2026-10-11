@@ -26,6 +26,9 @@ class Promo extends Model
 
     public const IMAGE_DIRECTORY = 'promos';
 
+    /** Banner disimpan sebagai WebP dengan lebar maksimal ini (tinggi menyesuaikan). */
+    public const BANNER_MAX_WIDTH = 1600;
+
     /** Status dihitung dari is_active + tanggal hari ini (nilai = kunci x-status-badge). */
     public const STATUS_RUNNING = 'running';
 

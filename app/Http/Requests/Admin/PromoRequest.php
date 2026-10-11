@@ -12,6 +12,8 @@ use Illuminate\Validation\Validator;
 
 class PromoRequest extends FormRequest
 {
+    public const MAX_KILOBYTES = 8192;
+
     use NormalizesDigits;
 
     /**
@@ -48,8 +50,9 @@ class PromoRequest extends FormRequest
                 'nullable',
                 File::image()
                     ->types(['jpg', 'jpeg', 'png', 'webp'])
-                    ->max(2048)
-                    ->dimensions(Rule::dimensions()->minWidth(1200)->minHeight(400)),
+                    // Diterima sampai 8 MB; disimpan ulang kecil (WebP, lebar maks. 1600 px).
+                    ->max(self::MAX_KILOBYTES)
+                    ->dimensions(Rule::dimensions()->minWidth(1200)->minHeight(400)->maxWidth(8000)->maxHeight(8000)),
             ],
             'remove_image' => ['nullable', 'boolean'],
             // Diskon hanya untuk promo khusus mobil; promo umum bersifat informasi.
@@ -117,8 +120,8 @@ class PromoRequest extends FormRequest
         return [
             'image.image' => 'Banner harus berupa gambar JPG, JPEG, PNG, atau WEBP.',
             'image.mimes' => 'Banner harus berupa gambar JPG, JPEG, PNG, atau WEBP.',
-            'image.max' => 'Ukuran banner maksimal 2 MB.',
-            'image.dimensions' => 'Banner minimal berukuran 1200×400 piksel.',
+            'image.max' => 'Ukuran banner maksimal '.intdiv(self::MAX_KILOBYTES, 1024).' MB.',
+            'image.dimensions' => 'Banner minimal berukuran 1200×400 piksel dan maksimal 8000×8000 piksel.',
             'discount_amount.required' => 'Diskon wajib diisi untuk promo khusus mobil.',
             'discount_amount.min' => 'Diskon minimal Rp 1.',
             'discount_amount.prohibited' => 'Diskon hanya untuk promo khusus mobil. Kosongkan untuk promo umum.',
