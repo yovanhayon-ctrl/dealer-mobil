@@ -109,7 +109,7 @@ class PurchaseRequestSubmitTest extends TestCase
 
         $this->actingAs($this->customer)->get(route('purchase-requests.create', $this->car))
             ->assertOk()
-            ->assertSee('<title>Ajukan Pembelian Nissan Kicks e-Power VL 2025 — ', false)
+            ->assertSee('<title>Ajukan Pembelian Nissan Kicks e-Power VL 2025 | ', false)
             ->assertSeeInOrder(['Rp 520.000.000', 'Rp 505.000.000'])
             ->assertSee('data-price="505000000"', false)
             // Default cash, DP minimal 20% dari harga promo, tenor 36.

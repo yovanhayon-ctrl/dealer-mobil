@@ -37,7 +37,7 @@
         @if ($rows->isEmpty())
             <div class="card">
                 <x-empty-state icon="bi-layout-three-columns" title="Belum ada mobil yang dibandingkan"
-                               message="Tekan tombol Bandingkan pada kartu mobil untuk memilih 2–{{ $max }} mobil.">
+                               message="Tekan tombol Bandingkan pada kartu mobil untuk memilih 2-{{ $max }} mobil.">
                     <a href="{{ route('cars.index') }}" class="btn btn-primary btn-sm">Lihat Mobil</a>
                 </x-empty-state>
             </div>
@@ -141,7 +141,7 @@
                             <tr>
                                 <th scope="row" class="compare-label">Kapasitas mesin</th>
                                 @foreach ($rows as $row)
-                                    <td>{{ $row['car']->engine_cc ? number_format($row['car']->engine_cc, 0, ',', '.').' cc' : '–' }}</td>
+                                    <td>{{ $row['car']->engine_cc ? number_format($row['car']->engine_cc, 0, ',', '.').' cc' : '-' }}</td>
                                 @endforeach
                             </tr>
                             <tr>
@@ -155,7 +155,7 @@
                                 @foreach ($rows as $row)
                                     <td>
                                         @if ($row['car']->isNew())
-                                            <span class="text-muted">– (baru)</span>
+                                            <span class="text-muted">- (baru)</span>
                                         @else
                                             {{ number_format($row['car']->mileage, 0, ',', '.') }} km
                                             @if ($best['mileage'] === $row['car']->mileage)
@@ -168,7 +168,7 @@
                             <tr>
                                 <th scope="row" class="compare-label">Warna</th>
                                 @foreach ($rows as $row)
-                                    <td>{{ $row['car']->color ?: '–' }}</td>
+                                    <td>{{ $row['car']->color ?: '-' }}</td>
                                 @endforeach
                             </tr>
                             <tr>

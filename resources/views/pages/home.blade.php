@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Beranda')
-@section('meta_description', config('dealer.name').' — Nissan Heritage & Performance: mobil Nissan baru, koleksi klasik Jepang, promo, cicilan ringan, dan layanan servis.')
+@section('meta_description', config('dealer.name').', Nissan Heritage & Performance: mobil Nissan baru, koleksi klasik Jepang, promo, cicilan ringan, dan layanan servis.')
 
 @php
     $dealer = config('dealer');
@@ -202,26 +202,28 @@
                 <p class="mb-0 text-muted">
                     <i class="bi bi-star-fill text-warning me-1" aria-hidden="true"></i>
                     <span class="fw-semibold text-body">{{ number_format((float) $ratingSummary->average, 1, ',', '.') }}</span> dari 5
-                    · {{ $ratingSummary->total }} ulasan
+                    ({{ $ratingSummary->total }} ulasan)
                 </p>
             </div>
-            <div class="row g-4">
+            {{-- Kutipan pertama lebih besar, sisanya di samping; di HP digeser ke samping. Kutipan dipotong maks. 3-4 baris (CSS). --}}
+            <div class="testimonial-grid" tabindex="0" role="region" aria-label="Ulasan pelanggan">
                 @foreach ($testimonials as $testimonial)
                     @php($car = $testimonial->purchaseRequest->car)
-                    <div class="col-md-6 col-lg-4">
-                        <figure class="card h-100 testimonial-card mb-0">
-                            <div class="card-body p-4 d-flex flex-column">
-                                <x-rating-stars :rating="$testimonial->rating" class="mb-2" />
-                                <blockquote class="mb-3 flex-grow-1">
-                                    <p class="mb-0 text-break">{{ \Illuminate\Support\Str::limit($testimonial->comment, 220) }}</p>
-                                </blockquote>
-                                <figcaption class="small">
-                                    <span class="fw-semibold">{{ \App\Models\Testimonial::publicName($testimonial->user->name) }}</span>
-                                    <span class="text-muted d-block">Membeli {{ $car->brand->name }} {{ $car->name }} {{ $car->year }} · {{ $testimonial->approved_at?->translatedFormat('M Y') }}</span>
-                                </figcaption>
-                            </div>
-                        </figure>
-                    </div>
+                    <figure @class(['card testimonial-card mb-0', 'testimonial-card-lead' => $loop->first])>
+                        <div class="card-body p-4 d-flex flex-column">
+                            @if ($loop->first)
+                                <i class="bi bi-quote testimonial-mark" aria-hidden="true"></i>
+                            @endif
+                            <x-rating-stars :rating="$testimonial->rating" class="mb-2" />
+                            <blockquote class="mb-3 flex-grow-1">
+                                <p class="testimonial-quote mb-0 text-break">{{ \Illuminate\Support\Str::limit($testimonial->comment, 220) }}</p>
+                            </blockquote>
+                            <figcaption class="small">
+                                <span class="fw-semibold">{{ \App\Models\Testimonial::publicName($testimonial->user->name) }}</span>
+                                <span class="text-muted d-block">Membeli {{ $car->brand->name }} {{ $car->name }} {{ $car->year }}, {{ $testimonial->approved_at?->translatedFormat('M Y') }}</span>
+                            </figcaption>
+                        </div>
+                    </figure>
                 @endforeach
             </div>
             </div>
@@ -237,7 +239,7 @@
                 </div>
                 <div class="d-flex flex-wrap gap-2">
                     @if ($creditUrl)
-                        <a href="{{ $creditUrl }}" class="btn btn-accent"><i class="bi bi-calculator"></i>Hitung Cicilan</a>
+                        <a href="{{ $creditUrl }}" class="btn btn-accent"><i class="bi bi-calculator"></i>Simulasi Kredit</a>
                     @endif
                     @if ($dealer['whatsapp'])
                         <a href="https://wa.me/{{ $dealer['whatsapp'] }}" target="_blank" rel="noopener" class="btn btn-success">

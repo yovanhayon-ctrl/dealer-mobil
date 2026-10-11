@@ -24,6 +24,14 @@
     --bs-body-font-family: var(--dm-font-body);
     --bs-body-color: #212529;
     --bs-border-radius: .5rem;
+
+    /*
+     * Aturan sudut (satu sistem untuk seluruh situs):
+     * kartu & panel besar 1rem (--dm-radius-panel, = rounded-4), tombol/input/kotak di dalam kartu .5rem
+     * (--dm-radius-control, = rounded-3), chip & badge pill (999px).
+     */
+    --dm-radius-panel: 1rem;
+    --dm-radius-control: .5rem;
 }
 
 body {
@@ -124,7 +132,7 @@ main {
 
 .card {
     border: 0;
-    border-radius: 1rem;
+    border-radius: var(--dm-radius-panel);
     box-shadow: 0 .125rem .5rem rgba(28, 28, 30, .08);
 }
 
@@ -387,7 +395,7 @@ main {
     width: 100%;
     aspect-ratio: 16 / 10;
     object-fit: cover;
-    border-radius: .65rem;
+    border-radius: var(--dm-radius-control);
 }
 
 .hero-feature-badge {
@@ -763,7 +771,7 @@ main {
     justify-content: center;
     width: 3rem;
     height: 3rem;
-    border-radius: .75rem;
+    border-radius: var(--dm-radius-control);
     background-color: rgba(28, 28, 30, .08);
     color: var(--dm-navy);
     font-size: 1.35rem;
@@ -1017,7 +1025,7 @@ main {
     flex: 0 0 48px;
     width: 48px;
     height: 48px;
-    border-radius: .75rem;
+    border-radius: var(--dm-radius-control);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1688,3 +1696,109 @@ tr[data-row-link] {
     display: none;
 }
 
+/* ---------- Testimoni beranda ---------- */
+
+/* Kutipan dibatasi agar tetap sekilas baca; teks lengkap ada di halaman moderasi admin. */
+.testimonial-quote {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+}
+
+.testimonial-grid {
+    display: grid;
+    gap: 1.5rem;
+}
+
+.testimonial-card-lead {
+    box-shadow: inset 4px 0 0 var(--dm-red), 0 .125rem .5rem rgba(28, 28, 30, .08);
+}
+
+/* Isi kartu utama di tengah agar tidak ada ruang kosong saat kutipannya pendek. */
+.testimonial-card-lead .card-body {
+    justify-content: center;
+}
+
+.testimonial-card-lead blockquote {
+    flex-grow: 0 !important;
+    font-family: var(--dm-font-heading);
+    font-size: 1.3rem;
+    font-weight: 500;
+    line-height: 1.5;
+}
+
+.testimonial-mark {
+    font-size: 3rem;
+    line-height: 1;
+    color: var(--dm-red);
+    margin-bottom: .25rem;
+}
+
+.testimonial-card-lead .testimonial-quote {
+    -webkit-line-clamp: 4;
+    line-clamp: 4;
+}
+
+@media (min-width: 768px) {
+    .testimonial-grid {
+        grid-template-columns: 1.35fr 1fr;
+    }
+
+    /* Tiga ulasan: yang utama setinggi dua kartu di sebelahnya. */
+    .testimonial-card-lead:nth-last-child(3) {
+        grid-row: span 2;
+    }
+
+    .testimonial-card-lead:only-child {
+        grid-column: 1 / -1;
+    }
+}
+
+/* HP: satu baris yang bisa digeser, sama seperti "Mobil Terbaru". */
+@media (max-width: 575.98px) {
+    .testimonial-grid {
+        grid-auto-flow: column;
+        grid-auto-columns: 85%;
+        overflow-x: auto;
+        scroll-snap-type: x mandatory;
+        padding-bottom: .5rem;
+        scrollbar-width: thin;
+    }
+
+    .testimonial-grid > * {
+        scroll-snap-align: start;
+    }
+
+    .testimonial-grid:focus-visible {
+        outline: 2px solid var(--dm-red);
+        outline-offset: 4px;
+    }
+}
+
+/* ---------- Gerakan ---------- */
+
+/* Umpan balik saat tombol ditekan. */
+@media (prefers-reduced-motion: no-preference) {
+    .btn:active {
+        transform: scale(.98);
+    }
+}
+
+/* Pengguna yang memilih "kurangi gerakan": tanpa animasi, transisi, atau efek naik saat hover. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .card-hover:hover,
+    .hero-feature:hover {
+        transform: none;
+    }
+}

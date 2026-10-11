@@ -68,7 +68,7 @@
                             <div class="carousel-inner rounded-4">
                                 @foreach ($images as $image)
                                     <div @class(['carousel-item', 'active' => $loop->first])>
-                                        <img src="{{ $image->url }}" alt="{{ $title }} — foto {{ $loop->iteration }} dari {{ $loop->count }}"
+                                        <img src="{{ $image->url }}" alt="{{ $title }}, foto {{ $loop->iteration }} dari {{ $loop->count }}"
                                              class="car-gallery-img" loading="{{ $loop->first ? 'eager' : 'lazy' }}">
                                     </div>
                                 @endforeach
@@ -144,7 +144,7 @@
                                         @endif
                                         <br>
                                         <span class="text-muted">
-                                            {{ $promo->start_date->translatedFormat('d M Y') }} – {{ $promo->end_date->translatedFormat('d M Y') }}
+                                            {{ $promo->start_date->translatedFormat('d M Y') }} - {{ $promo->end_date->translatedFormat('d M Y') }}
                                             @if ($promo->discount_amount)
                                                 · hemat <x-price :amount="$promo->discount_amount" />
                                             @endif
@@ -212,10 +212,10 @@
                                 <tr><th scope="row">Bahan bakar</th><td>{{ $car->fuel_type_label }}</td></tr>
                                 <tr>
                                     <th scope="row">Kapasitas mesin</th>
-                                    <td>{{ $car->engine_cc ? number_format($car->engine_cc, 0, ',', '.').' cc' : '–' }}</td>
+                                    <td>{{ $car->engine_cc ? number_format($car->engine_cc, 0, ',', '.').' cc' : '-' }}</td>
                                 </tr>
                                 <tr><th scope="row">Jumlah kursi</th><td>{{ $car->seats }} kursi</td></tr>
-                                <tr><th scope="row">Warna</th><td>{{ $car->color ?: '–' }}</td></tr>
+                                <tr><th scope="row">Warna</th><td>{{ $car->color ?: '-' }}</td></tr>
                                 @unless ($car->isNew())
                                     <tr><th scope="row">Kilometer</th><td>{{ number_format($car->mileage, 0, ',', '.') }} km</td></tr>
                                 @endunless

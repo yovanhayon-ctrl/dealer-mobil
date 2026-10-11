@@ -98,7 +98,7 @@
                     </div>
 
                     <ul class="small text-muted mt-3 mb-0">
-                        <li>Jadwal dapat dipilih mulai besok sampai 30 hari ke depan, pukul 09.00–16.00 WIB.</li>
+                        <li>Jadwal dapat dipilih mulai besok sampai 30 hari ke depan, pukul 09.00-16.00 WIB.</li>
                         <li>Status booking "Menunggu" sampai dikonfirmasi dealer; Anda bisa membatalkannya selama belum dikonfirmasi.</li>
                     </ul>
                 @endif

@@ -38,7 +38,7 @@
         </h3>
         <p class="small text-muted mb-2">
             <i class="bi bi-calendar-event"></i>
-            {{ $promo->start_date->translatedFormat('d M Y') }} – {{ $promo->end_date->translatedFormat('d M Y') }}
+            {{ $promo->start_date->translatedFormat('d M Y') }} - {{ $promo->end_date->translatedFormat('d M Y') }}
         </p>
         @if ($showRemaining && ($remaining = $promo->remainingLabel()))
             <p class="small fw-semibold text-accent mb-2"><i class="bi bi-hourglass-split"></i> {{ $remaining }}</p>

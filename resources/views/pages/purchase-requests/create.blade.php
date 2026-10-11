@@ -35,7 +35,7 @@
                             <span class="test-drive-car-thumb car-card-img-empty" aria-hidden="true"><i class="bi bi-car-front"></i></span>
                         @endif
                         <div class="min-w-0">
-                            <p class="small text-muted mb-0">{{ $car->brand->name }} · {{ $car->category->name }} · {{ $car->condition_label }}</p>
+                            <p class="small text-muted mb-0">{{ $car->brand->name }} · {{ $car->category->name }} ({{ $car->condition_label }})</p>
                             <p class="fw-semibold font-heading mb-0">{{ $car->name }} {{ $car->year }}</p>
                             <p class="mb-0">
                                 @if ($car->hasPromoPrice())
@@ -121,8 +121,8 @@
                                         <p class="small text-uppercase fw-semibold mb-1">Perkiraan cicilan</p>
                                         <p class="h4 fw-bold text-accent mb-1"><span data-preview="monthly_installment"></span><span class="fs-6 text-muted fw-normal">/bulan</span></p>
                                         <p class="small text-muted mb-0">
-                                            selama <span data-preview="tenor_months"></span> bulan · pokok <span data-preview="principal"></span>
-                                            · total <span data-preview="total_payment"></span>
+                                            selama <span data-preview="tenor_months"></span> bulan, pokok <span data-preview="principal"></span>,
+                                            total <span data-preview="total_payment"></span>
                                         </p>
                                     </div>
                                 </div>

@@ -19,8 +19,8 @@ class ErrorPageTest extends TestCase
     {
         $this->get('/halaman-tidak-ada')
             ->assertNotFound()
-            ->assertSee('<title>Halaman Tidak Ditemukan — ', false)
-            ->assertSee('404 — Halaman Tidak Ditemukan')
+            ->assertSee('<title>Halaman Tidak Ditemukan | ', false)
+            ->assertSeeInOrder(['Error 404', 'Halaman Tidak Ditemukan'])
             ->assertSee('href="'.route('cars.index').'"', false);
 
         $this->get('/mobil/slug-tidak-ada')->assertNotFound()->assertSee('Halaman Tidak Ditemukan');
@@ -32,10 +32,10 @@ class ErrorPageTest extends TestCase
     public static function views(): array
     {
         return [
-            '419 sesi berakhir' => ['errors.419', '419 — Sesi Berakhir'],
-            '429 terlalu banyak' => ['errors.429', '429 — Terlalu Banyak Permintaan'],
-            '500 kesalahan server' => ['errors.500', '500 — Terjadi Kesalahan'],
-            '503 pemeliharaan' => ['errors.503', '503 — Sedang Pemeliharaan'],
+            '419 sesi berakhir' => ['errors.419', 'Sesi Berakhir'],
+            '429 terlalu banyak' => ['errors.429', 'Terlalu Banyak Permintaan'],
+            '500 kesalahan server' => ['errors.500', 'Terjadi Kesalahan'],
+            '503 pemeliharaan' => ['errors.503', 'Sedang Pemeliharaan'],
         ];
     }
 
@@ -44,7 +44,9 @@ class ErrorPageTest extends TestCase
     {
         $html = view($view)->render();
 
-        $this->assertStringContainsString($heading, $html);
+        $this->assertStringContainsString('<h1 class="h2">'.$heading.'</h1>', $html);
+        $this->assertStringContainsString('Error '.substr($view, -3), $html);
+        $this->assertStringNotContainsString('—', $html);
         $this->assertStringContainsString('Kembali ke Beranda', $html);
     }
 

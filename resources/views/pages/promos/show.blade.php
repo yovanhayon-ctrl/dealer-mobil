@@ -46,7 +46,7 @@
                         <h1 class="h3 mb-2">{{ $promo->title }}</h1>
                         <p class="text-muted mb-3">
                             <i class="bi bi-calendar-event me-1"></i>
-                            {{ $promo->start_date->translatedFormat('d F Y') }} – {{ $promo->end_date->translatedFormat('d F Y') }}
+                            {{ $promo->start_date->translatedFormat('d F Y') }} - {{ $promo->end_date->translatedFormat('d F Y') }}
                             @if ($remaining)
                                 <span class="fw-semibold text-accent ms-2"><i class="bi bi-hourglass-split"></i> {{ $remaining }}</span>
                             @endif
