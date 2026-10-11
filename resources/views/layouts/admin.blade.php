@@ -1,7 +1,7 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" data-bs-theme="light">
 <head>
-    @include('partials.head', ['noindex' => true])
+    @include('partials.head', ['noindex' => true, 'forceLight' => true])
 </head>
 <body class="admin-body">
     {{-- Dihitung sekali; dipakai lonceng topbar & menu sidebar. --}}
