@@ -12,7 +12,7 @@ use Illuminate\View\View;
 
 class HomeController extends Controller
 {
-    public const LATEST_CARS = 8;
+    public const LATEST_CARS = 4;
 
     public const RUNNING_PROMOS = 3;
 
@@ -62,6 +62,15 @@ class HomeController extends Controller
                 ->whereHas('primaryImage')
                 ->with(Car::CARD_RELATIONS)
                 ->latest('updated_at')
+                ->orderByDesc('id')
+                ->first(),
+            // Cadangan bila admin belum memilih: Nissan berfoto terbaru, lalu mobil berfoto terbaru lainnya.
+            'autoFeaturedCar' => Car::query()
+                ->active()
+                ->whereHas('primaryImage')
+                ->with(Car::CARD_RELATIONS)
+                ->orderByRaw('CASE WHEN brand_id IN (SELECT id FROM brands WHERE slug = ?) THEN 0 ELSE 1 END', ['nissan'])
+                ->latest()
                 ->orderByDesc('id')
                 ->first(),
             'testimonials' => Testimonial::query()
