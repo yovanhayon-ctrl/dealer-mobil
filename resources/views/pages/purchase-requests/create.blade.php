@@ -117,8 +117,8 @@
                                         </div>
                                     </div>
 
-                                    <div class="promo-box rounded-3 p-3 d-none" data-purchase-preview>
-                                        <p class="small text-uppercase fw-semibold mb-1">Perkiraan cicilan</p>
+                                    <div class="bg-section rounded-3 p-3 d-none" data-purchase-preview>
+                                        <p class="small fw-semibold mb-1">Perkiraan cicilan</p>
                                         <p class="h4 fw-bold text-accent mb-1"><span data-preview="monthly_installment"></span><span class="fs-6 text-muted fw-normal">/bulan</span></p>
                                         <p class="small text-muted mb-0">
                                             selama <span data-preview="tenor_months"></span> bulan, pokok <span data-preview="principal"></span>,
