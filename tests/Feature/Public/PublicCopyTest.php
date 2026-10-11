@@ -46,15 +46,17 @@ class PublicCopyTest extends TestCase
             ->assertDontSee('Hitung Cicilan');
     }
 
-    public function test_testimoni_beranda_kutipan_utama_hanya_yang_pertama(): void
+    public function test_testimoni_beranda_berupa_daftar_dengan_ringkasan_rating(): void
     {
-        Testimonial::factory()->approved()->count(3)->create();
+        Testimonial::factory()->approved()->count(3)->create(['rating' => 4]);
 
         $html = $this->get('/')->assertOk()->getContent();
 
-        $this->assertSame(1, substr_count($html, 'testimonial-card-lead'));
-        $this->assertSame(3, substr_count($html, 'class="testimonial-quote'));
-        $this->assertStringContainsString('class="testimonial-grid"', $html);
-        $this->assertStringContainsString('(3 ulasan)', $html);
+        // Tanpa kartu, ikon kutip, atau kutipan utama yang dibesarkan.
+        $this->assertSame(3, substr_count($html, '<li class="testimonial-item">'));
+        $this->assertStringNotContainsString('bi-quote', $html);
+        $this->assertStringNotContainsString('testimonial-card', $html);
+        $this->assertStringContainsString('4,0<span class="testimonial-score-max">/5</span>', $html);
+        $this->assertStringContainsString('Dari 3 ulasan pembeli', $html);
     }
 }

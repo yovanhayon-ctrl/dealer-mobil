@@ -394,7 +394,38 @@ main {
     isolation: isolate;
     background: linear-gradient(135deg, var(--dm-navy) 0%, var(--dm-navy-dark) 100%);
     color: rgba(255, 255, 255, .85);
-    padding-bottom: 6rem !important;
+}
+
+.home-hero-inner {
+    display: flex;
+    align-items: flex-end;
+    min-height: min(78svh, 760px);
+    padding-top: 5rem;
+    padding-bottom: 4rem;
+}
+
+.hero-kicker {
+    margin-bottom: .75rem;
+    font-size: .95rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, .7);
+}
+
+.hero-title {
+    max-width: 21ch;
+    margin-bottom: 1rem;
+    font-size: clamp(2.25rem, 4.2vw, 3.6rem);
+    font-weight: 700;
+    line-height: 1.06;
+    letter-spacing: -.02em;
+    color: #fff;
+}
+
+.hero-lead {
+    max-width: 32rem;
+    margin-bottom: 1.75rem;
+    font-size: 1.15rem;
+    color: rgba(255, 255, 255, .8);
 }
 
 /* Garis diagonal ala livery balap Nissan di sisi kanan hero (dekoratif, di belakang konten). */
@@ -406,9 +437,9 @@ main {
     pointer-events: none;
     background: linear-gradient(110deg,
         transparent 0 28%,
-        rgba(195, 0, 47, .95) 28% 31%,
-        transparent 31% 33.5%,
-        rgba(195, 0, 47, .5) 33.5% 34.8%,
+        rgba(195, 0, 47, .85) 28% 29.6%,
+        transparent 29.6% 31.6%,
+        rgba(195, 0, 47, .45) 31.6% 32.3%,
         transparent 34.8% 58%,
         rgba(255, 255, 255, .07) 58% 58.6%,
         transparent 58.6% 63%,
@@ -449,6 +480,25 @@ main {
 @media (max-width: 991.98px) {
     .hero-video {
         display: none;
+    }
+
+    /* HP: foto mobil unggulan sebagai latar, digelapkan agar teks tetap terbaca. */
+    .home-hero.has-photo {
+        background: linear-gradient(180deg, rgba(11, 11, 12, .45) 0%, rgba(11, 11, 12, .92) 70%), var(--hero-photo) center / cover no-repeat;
+    }
+
+    .home-hero.has-photo::before {
+        display: none;
+    }
+
+    .home-hero-inner {
+        min-height: min(72svh, 620px);
+        padding-top: 4rem;
+        padding-bottom: 2.5rem;
+    }
+
+    .hero-lead {
+        font-size: 1.05rem;
     }
 
     /* Layar kecil: teks memenuhi lebar, garis digeser ke tepi kanan agar tidak menabrak tagline. */
@@ -509,11 +559,6 @@ main {
 }
 
 /* Kartu pencarian cepat menumpang di bawah hero. */
-.home-search {
-    margin-top: -4rem;
-    position: relative;
-}
-
 .home-cta {
     background-color: var(--dm-navy);
     color: rgba(255, 255, 255, .85);
@@ -1218,10 +1263,6 @@ main {
     border-left: 3px solid #f5a524;
 }
 
-.testimonial-card blockquote {
-    font-size: .95rem;
-}
-
 /* ---------- Admin: dashboard ---------- */
 
 .dashboard-section-title {
@@ -1400,11 +1441,9 @@ tr[data-row-link] {
 
 /* Jelajahi mobil: dua kartu (merek & kategori). */
 .shortcut-card-title {
-    font-size: .8rem;
+    font-size: 1rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    color: #6c757d;
+    color: var(--dm-navy);
     margin-bottom: .85rem;
 }
 
@@ -1782,83 +1821,70 @@ tr[data-row-link] {
 
 /* ---------- Testimoni beranda ---------- */
 
-/* Kutipan dibatasi agar tetap sekilas baca; teks lengkap ada di halaman moderasi admin. */
+.testimonial-score {
+    font-family: var(--dm-font-heading);
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--dm-navy);
+}
+
+.testimonial-score-max {
+    margin-left: .15rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.testimonial-item {
+    padding: 1.5rem 0;
+    border-top: 1px solid rgba(28, 28, 30, .1);
+}
+
+.testimonial-item:first-child {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.testimonial-item:last-child {
+    padding-bottom: 0;
+}
+
+/* Kutipan dibatasi 3 baris agar tetap sekilas baca. */
 .testimonial-quote {
     display: -webkit-box;
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
     line-clamp: 3;
     overflow: hidden;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--dm-navy);
 }
 
-.testimonial-grid {
-    display: grid;
-    gap: 1.5rem;
+.testimonial-stars {
+    font-size: .75rem;
 }
 
-.testimonial-card-lead {
-    box-shadow: inset 4px 0 0 var(--dm-red), 0 .125rem .5rem rgba(28, 28, 30, .08);
+/* ---------- Beranda: pita bantuan (menyambung ke footer) ---------- */
+
+.home-cta-band {
+    margin-bottom: -3rem;
+    padding: 3.5rem 0;
+    background-color: var(--dm-navy-dark);
+    color: rgba(255, 255, 255, .75);
 }
 
-/* Isi kartu utama di tengah agar tidak ada ruang kosong saat kutipannya pendek. */
-.testimonial-card-lead .card-body {
-    justify-content: center;
+.home-cta-phone {
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
 }
 
-.testimonial-card-lead blockquote {
-    flex-grow: 0 !important;
-    font-family: var(--dm-font-heading);
-    font-size: 1.3rem;
-    font-weight: 500;
-    line-height: 1.5;
-}
-
-.testimonial-mark {
-    font-size: 3rem;
-    line-height: 1;
-    color: var(--dm-red);
-    margin-bottom: .25rem;
-}
-
-.testimonial-card-lead .testimonial-quote {
-    -webkit-line-clamp: 4;
-    line-clamp: 4;
-}
-
-@media (min-width: 768px) {
-    .testimonial-grid {
-        grid-template-columns: 1.35fr 1fr;
-    }
-
-    /* Tiga ulasan: yang utama setinggi dua kartu di sebelahnya. */
-    .testimonial-card-lead:nth-last-child(3) {
-        grid-row: span 2;
-    }
-
-    .testimonial-card-lead:only-child {
-        grid-column: 1 / -1;
-    }
-}
-
-/* HP: satu baris yang bisa digeser, sama seperti "Mobil Terbaru". */
-@media (max-width: 575.98px) {
-    .testimonial-grid {
-        grid-auto-flow: column;
-        grid-auto-columns: 85%;
-        overflow-x: auto;
-        scroll-snap-type: x mandatory;
-        padding-bottom: .5rem;
-        scrollbar-width: thin;
-    }
-
-    .testimonial-grid > * {
-        scroll-snap-align: start;
-    }
-
-    .testimonial-grid:focus-visible {
-        outline: 2px solid var(--dm-red);
-        outline-offset: 4px;
-    }
+.home-cta-phone:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }
 
 /* ---------- Beranda: mobil unggulan dengan efek scroll ---------- */
