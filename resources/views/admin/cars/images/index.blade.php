@@ -57,7 +57,7 @@
                     @if ($isFull)
                         Galeri sudah penuh. Hapus gambar lain untuk mengunggah yang baru.
                     @else
-                        JPG, JPEG, PNG, atau WEBP · maks. 2 MB per file · minimal 600×400 piksel ·
+                        JPG, JPEG, PNG, atau WEBP · maks. {{ intdiv(\App\Http\Requests\Admin\CarImageRequest::MAX_KILOBYTES, 1024) }} MB per file · minimal 600×400 piksel ·
                         bisa pilih beberapa file (sisa {{ $max - $car->images->count() }} slot).
                         Gambar pertama otomatis menjadi gambar utama.
                     @endif

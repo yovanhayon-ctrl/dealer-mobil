@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
+use Illuminate\Support\Facades\Storage;
 use RuntimeException;
 
 abstract class TestCase extends BaseTestCase
@@ -26,5 +27,9 @@ abstract class TestCase extends BaseTestCase
                 .'Jalankan "php artisan optimize:clear" lalu gunakan phpunit.xml atau phpunit.mysql.xml.'
             );
         }
+
+        // Pengaman file: disk "public" selalu palsu di test. Id mobil di database test mulai dari 1, jadi tanpa ini
+        // test hapus mobil/gambar ikut menghapus folder foto asli (storage/app/public/cars/{id}) di komputer lokal.
+        Storage::fake('public');
     }
 }

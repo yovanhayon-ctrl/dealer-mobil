@@ -37,8 +37,6 @@
                     <article class="card test-drive-item account-item" id="servis-{{ $booking->id }}">
                         <div class="card-body p-3">
                             <div class="account-item-head">
-                                <span class="service-card-icon flex-shrink-0" aria-hidden="true"><i class="bi bi-tools"></i></span>
-
                                 <div class="min-w-0 flex-grow-1">
                                     <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
                                         <h2 class="h6 mb-0">{{ $booking->service->name }}</h2>
