@@ -324,4 +324,70 @@ class HomeTest extends TestCase
 
         $this->assertSame($queriesWithLittleData, $count());
     }
+
+    // ---------- Beberapa mobil unggulan (slider) ----------
+
+    public function test_beberapa_mobil_unggulan_bergantian_maksimal_5(): void
+    {
+        $this->withTemporaryVideos(['videos-uji/satu.mp4'], function () {
+            config(['dealer.hero_videos' => ['videos-uji/satu.mp4']]);
+
+            // Enam unggulan; yang terakhir diubah tampil duluan, yang paling lama (Unggulan1) tidak muat.
+            foreach (range(1, 6) as $i) {
+                $this->withPhoto($this->car('Nissan', 'Sport', "Unggulan{$i}", ['is_featured' => true, 'updated_at' => now()->subDays(10 - $i)]));
+            }
+            $this->withPhoto($this->car('Nissan', 'MPV', 'Bukan Unggulan'));
+
+            $html = $this->get(route('home'))->assertOk()
+                ->assertSee('5 mobil pilihan Dealer Maju.')
+                ->assertSeeInOrder(['Lihat detail Nissan Unggulan6 2025', 'Lihat detail Nissan Unggulan5 2025',
+                    'Lihat detail Nissan Unggulan4 2025', 'Lihat detail Nissan Unggulan3 2025', 'Lihat detail Nissan Unggulan2 2025'])
+                ->assertDontSee('Lihat detail Nissan Unggulan1 2025')
+                ->assertDontSee('Lihat detail Nissan Bukan Unggulan 2025')
+                ->getContent();
+
+            $this->assertSame(5, substr_count($html, 'aria-roledescription="slide"'));
+            $this->assertSame(1, substr_count($html, 'class="carousel-item active"'));
+            $this->assertSame(5, substr_count($html, 'data-bs-slide-to='));
+            $this->assertStringContainsString('data-bs-slide="prev"', $html);
+            $this->assertStringContainsString('data-bs-slide="next"', $html);
+            // Tanpa autoplay.
+            $this->assertStringContainsString('data-bs-interval="false"', $html);
+            $this->assertStringNotContainsString('data-bs-ride', $html);
+        });
+    }
+
+    public function test_satu_mobil_unggulan_tanpa_tombol_slider(): void
+    {
+        $this->withTemporaryVideos(['videos-uji/satu.mp4'], function () {
+            config(['dealer.hero_videos' => ['videos-uji/satu.mp4']]);
+            $this->withPhoto($this->car('Toyota', 'Sport', 'Supra RZ', ['is_featured' => true]));
+
+            $this->get(route('home'))->assertOk()
+                ->assertSee('Toyota Supra RZ 2025, baru.')
+                ->assertSee('aria-label="Lihat detail Toyota Supra RZ 2025"', false)
+                ->assertDontSee('featuredCarousel', false)
+                ->assertDontSee('data-bs-slide', false);
+        });
+    }
+
+    public function test_jumlah_query_tetap_walau_mobil_unggulan_bertambah(): void
+    {
+        $count = function (): int {
+            DB::enableQueryLog();
+            DB::flushQueryLog();
+            $this->get(route('home'))->assertOk();
+
+            return count(DB::getQueryLog());
+        };
+
+        $this->withPhoto($this->car('Nissan', 'Sport', 'Unggulan A', ['is_featured' => true]));
+        $before = $count();
+
+        foreach (range(1, 4) as $i) {
+            $this->withPhoto($this->car("Merek {$i}", 'Sport', "Unggulan {$i}", ['is_featured' => true]));
+        }
+
+        $this->assertSame($before, $count());
+    }
 }
