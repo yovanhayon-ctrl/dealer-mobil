@@ -55,15 +55,14 @@ class HomeController extends Controller
                 ->orderBy('name')
                 ->get(),
             // Ulasan yang disetujui admin + ringkasan rating (1 query agregat).
-            // Mobil unggulan pilihan admin (aktif + punya foto), terakhir diubah; null = pilihan otomatis di view.
-            'chosenFeaturedCar' => Car::query()
-                ->active()
-                ->where('is_featured', true)
-                ->whereHas('primaryImage')
+            // Mobil unggulan pilihan admin (aktif + punya foto, maks. 5), terakhir diubah duluan; kosong = pilihan otomatis.
+            'chosenFeaturedCars' => Car::query()
+                ->featuredOnHome()
                 ->with(Car::CARD_RELATIONS)
                 ->latest('updated_at')
                 ->orderByDesc('id')
-                ->first(),
+                ->limit(Car::MAX_FEATURED_ON_HOME)
+                ->get(),
             // Cadangan bila admin belum memilih: Nissan berfoto terbaru, lalu mobil berfoto terbaru lainnya.
             'autoFeaturedCar' => Car::query()
                 ->active()
