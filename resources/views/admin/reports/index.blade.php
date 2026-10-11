@@ -43,13 +43,15 @@
                     </a>
                 @endforeach
 
-                <div class="ms-auto d-flex gap-2">
+                <div class="ms-auto d-flex align-items-center gap-2">
                     <button type="button" class="btn btn-sm btn-outline-secondary" data-print>
                         <i class="bi bi-printer"></i>Cetak
                     </button>
-                    <a href="{{ route('admin.reports.export', $period->query()) }}" class="btn btn-sm btn-outline-success">
-                        <i class="bi bi-filetype-csv"></i>Export CSV
+                    <a href="{{ route('admin.reports.export-excel', $period->query()) }}" class="btn btn-sm btn-outline-success">
+                        <i class="bi bi-file-earmark-excel"></i>Export Excel
                     </a>
+                    <a href="{{ route('admin.reports.export', $period->query()) }}" class="btn btn-sm btn-link text-muted px-1"
+                       title="Data mentah untuk diolah ulang">atau CSV</a>
                 </div>
             </div>
 
