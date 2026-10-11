@@ -132,6 +132,36 @@
         </section>
     @endif
 
+    {{-- Mobil unggulan saat hero memakai video (tanpa video, mobil unggulan sudah tampil di hero). --}}
+    @if ($featuredCar && $heroVideos->isNotEmpty())
+        @php($showcaseTitle = "{$featuredCar->brand->name} {$featuredCar->name} {$featuredCar->year}")
+        <section class="container home-section scroll-showcase" aria-labelledby="showcase-title">
+            <div class="scroll-showcase-head text-center mx-auto">
+                <h2 id="showcase-title" class="h4 mb-1">Mobil Unggulan</h2>
+                <p class="text-muted mb-0">{{ $showcaseTitle }}, {{ strtolower($featuredCar->condition_label) }}.</p>
+            </div>
+
+            {{-- Bingkai miring 3D lalu tegak saat discroll: animasi CSS murni (app.css), tanpa JavaScript. --}}
+            <div class="scroll-showcase-stage">
+                <a href="{{ route('cars.show', $featuredCar) }}" class="scroll-showcase-card d-block text-decoration-none"
+                   aria-label="Lihat detail {{ $showcaseTitle }}">
+                    <img src="{{ $featuredCar->primaryImage->url }}" alt="{{ $showcaseTitle }}"
+                         width="1600" height="900" loading="lazy" class="scroll-showcase-img">
+                    <span class="scroll-showcase-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <span class="min-w-0">
+                            <span class="d-block fw-semibold font-heading text-white text-truncate">{{ $showcaseTitle }}</span>
+                            @if ($featuredCar->hasPromoPrice())
+                                <del class="small d-block scroll-showcase-old"><x-price :amount="$featuredCar->price" /></del>
+                            @endif
+                            <x-price :amount="$featuredCar->finalPrice()" class="fs-5 fw-bold text-white" />
+                        </span>
+                        <span class="btn btn-accent">Lihat Detail<i class="bi bi-arrow-right ms-1 me-0"></i></span>
+                    </span>
+                </a>
+            </div>
+        </section>
+    @endif
+
     @if ($promos->isNotEmpty())
         <section class="bg-section home-section" aria-labelledby="promo-title">
             <div class="container">
