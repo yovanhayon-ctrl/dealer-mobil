@@ -4,6 +4,7 @@ namespace Tests\Feature\Public;
 
 use App\Models\Car;
 use App\Models\Promo;
+use App\Models\Service;
 use App\Models\Testimonial;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -66,7 +67,9 @@ class PublicCopyTest extends TestCase
         $car = Car::factory()->create();
         $promo = Promo::factory()->forCar($car)->create();
 
-        foreach (["/mobil/{$car->slug}", "/promo/{$promo->slug}", '/kontak'] as $path) {
+        Service::factory()->create();
+
+        foreach (["/mobil/{$car->slug}", "/promo/{$promo->slug}", '/kontak', '/servis', "/simulasi-kredit?mobil={$car->slug}"] as $path) {
             $html = $this->get($path)->assertOk()->getContent();
 
             // Satu warna aksen: tidak ada tombol hijau (btn-success) selain di footer.
@@ -98,5 +101,31 @@ class PublicCopyTest extends TestCase
         $this->assertStringContainsString('car-card card-hover h-100 h-auto', $html);
         $this->assertStringContainsString('promo-card card-hover h-100 overflow-hidden h-auto', $html);
         $this->assertStringNotContainsString('promo-card-img-empty', $html);
+    }
+
+    public function test_tentang_kami_tanpa_kartu_ikon_dan_nomor_langkah(): void
+    {
+        config()->set('dealer.whatsapp', '6281234567890');
+
+        $html = $this->get('/tentang-kami')->assertOk()
+            ->assertSee('<dl class="about-stats mb-0">', false)
+            ->assertSee('<ol class="about-steps list-unstyled mb-5">', false)
+            ->assertSee('Siap menemukan Nissan impian Anda?')
+            ->assertSee('class="home-cta-band"', false)
+            ->getContent();
+
+        $this->assertStringNotContainsString('service-card-icon', $html);
+        $this->assertDoesNotMatchRegularExpression('/>0[1-6]</', $html, 'Nomor langkah 01-06 tidak dipakai lagi.');
+        $this->assertSame(3, substr_count($html, '<li class="about-offer">'));
+    }
+
+    public function test_kartu_layanan_servis_tanpa_ikon_kembar(): void
+    {
+        Service::factory()->count(3)->create();
+
+        $html = $this->get('/servis')->assertOk()->getContent();
+
+        $this->assertStringNotContainsString('service-card-icon', $html);
+        $this->assertSame(3, substr_count($html, 'class="btn btn-outline-primary btn-sm"'));
     }
 }

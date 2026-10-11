@@ -131,27 +131,30 @@
                             </dl>
 
                             @if ($car)
-                                <div class="d-flex flex-wrap gap-2 mt-4" data-credit-car-actions>
+                                {{-- Satu tombol utama; detail mobil, test drive, dan WhatsApp berupa tautan teks. --}}
+                                <div class="mt-4" data-credit-car-actions>
                                     @if ($result && $car->canBePurchased() && Route::has('purchase-requests.create'))
                                         <a href="{{ route('purchase-requests.create', ['car' => $car, 'metode' => 'kredit', 'dp' => $result['down_payment'], 'tenor' => $result['tenor_months']]) }}"
-                                           class="btn btn-accent btn-sm" data-credit-apply>
+                                           class="btn btn-accent mb-3" data-credit-apply>
                                             <i class="bi bi-cart-check"></i>Ajukan dengan Simulasi Ini
                                         </a>
                                     @endif
-                                    <a href="{{ route('cars.show', $car) }}" class="btn btn-outline-primary btn-sm">
-                                        <i class="bi bi-car-front"></i>Lihat Detail Mobil
-                                    </a>
-                                    @if ($car->canBeTestDriven() && Route::has('test-drives.create'))
-                                        <a href="{{ route('test-drives.create', ['mobil' => $car->slug]) }}" class="btn btn-outline-primary btn-sm">
-                                            <i class="bi bi-calendar-check"></i>Test Drive
+                                    <div class="d-flex flex-wrap gap-3">
+                                        <a href="{{ route('cars.show', $car) }}" class="car-detail-link">
+                                            <i class="bi bi-car-front me-1"></i>Lihat Detail Mobil
                                         </a>
-                                    @endif
-                                    @if ($whatsapp && $result)
-                                        <a href="https://wa.me/{{ $whatsapp }}?text={{ rawurlencode("Halo, saya ingin konsultasi kredit {$carTitle}: DP {$rupiah($result['down_payment'])}, tenor {$result['tenor_months']} bulan, cicilan {$rupiah($result['monthly_installment'])}/bulan.") }}"
-                                           target="_blank" rel="noopener" class="btn btn-success btn-sm">
-                                            <i class="bi bi-whatsapp"></i>Konsultasi via WhatsApp
-                                        </a>
-                                    @endif
+                                        @if ($car->canBeTestDriven() && Route::has('test-drives.create'))
+                                            <a href="{{ route('test-drives.create', ['mobil' => $car->slug]) }}" class="car-detail-link">
+                                                <i class="bi bi-calendar-check me-1"></i>Booking Test Drive
+                                            </a>
+                                        @endif
+                                        @if ($whatsapp && $result)
+                                            <a href="https://wa.me/{{ $whatsapp }}?text={{ rawurlencode("Halo, saya ingin konsultasi kredit {$carTitle}: DP {$rupiah($result['down_payment'])}, tenor {$result['tenor_months']} bulan, cicilan {$rupiah($result['monthly_installment'])}/bulan.") }}"
+                                               target="_blank" rel="noopener" class="car-detail-link">
+                                                <i class="bi bi-whatsapp me-1"></i>Konsultasi via WhatsApp
+                                            </a>
+                                        @endif
+                                    </div>
                                 </div>
                             @endif
                         </div>

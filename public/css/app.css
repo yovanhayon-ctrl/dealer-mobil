@@ -2096,6 +2096,88 @@ tr[data-row-link] {
     }
 }
 
+/* ---------- Tentang Kami ---------- */
+
+.about-stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 1rem;
+}
+
+.about-stats > div {
+    display: flex;
+    flex-direction: column;
+    padding-left: 1rem;
+    border-left: 1px solid rgba(28, 28, 30, .12);
+}
+
+.about-stats dt {
+    order: 2;
+    font-size: .85rem;
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.about-stats dd {
+    order: 1;
+    margin: 0;
+    font-family: var(--dm-font-heading);
+    font-size: 2.5rem;
+    font-weight: 700;
+    line-height: 1.1;
+    color: var(--dm-navy);
+}
+
+/* Penawaran: baris judul | penjelasan | tautan, dipisah garis tipis (bukan 3 kartu sama besar). */
+.about-offer {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: .25rem;
+    padding: 1.25rem 0;
+    border-top: 1px solid rgba(28, 28, 30, .1);
+}
+
+.about-offer:last-child {
+    border-bottom: 1px solid rgba(28, 28, 30, .1);
+}
+
+@media (min-width: 768px) {
+    .about-offer {
+        grid-template-columns: 16rem minmax(0, 1fr) auto;
+        align-items: baseline;
+        gap: 1.5rem;
+    }
+}
+
+/* Langkah: satu baris bersambung garis, tanpa nomor & kartu. */
+.about-steps {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem 1rem;
+}
+
+.about-steps li {
+    padding-top: .9rem;
+    border-top: 2px solid rgba(28, 28, 30, .12);
+}
+
+.about-steps li:first-child {
+    border-top-color: var(--dm-red);
+}
+
+@media (min-width: 768px) {
+    .about-steps {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+}
+
+@media (min-width: 1200px) {
+    .about-steps {
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 1rem;
+    }
+}
+
 /* ---------- Gerakan ---------- */
 
 /* Umpan balik saat tombol ditekan. */
