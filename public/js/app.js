@@ -72,6 +72,62 @@ document.addEventListener('DOMContentLoaded', function () {
         window.addEventListener('scroll', syncNavbar, { passive: true });
     }
 
+    // Menu "tubelight" (desktop ≥1200px): satu lampu meluncur ke menu yang disorot, lalu kembali ke menu aktif.
+    // Tanpa JavaScript, CSS sudah menandai menu aktif; di HP menu tetap hamburger biasa.
+    var tubelight = document.querySelector('[data-tubelight]');
+
+    if (tubelight) {
+        var lamp = document.createElement('li');
+        lamp.className = 'tubelight-lamp';
+        lamp.setAttribute('aria-hidden', 'true');
+        tubelight.appendChild(lamp);
+        tubelight.classList.add('is-enhanced');
+
+        var activeLink = tubelight.querySelector('.nav-link.active');
+
+        var moveLamp = function (link) {
+            if (!link) {
+                lamp.classList.remove('is-visible');
+
+                return;
+            }
+
+            lamp.style.setProperty('--lamp-x', link.offsetLeft + 'px');
+            lamp.style.setProperty('--lamp-w', link.offsetWidth + 'px');
+            lamp.classList.add('is-visible');
+        };
+
+        tubelight.querySelectorAll('.nav-link').forEach(function (link) {
+            link.addEventListener('mouseenter', function () {
+                moveLamp(link);
+            });
+            link.addEventListener('focus', function () {
+                moveLamp(link);
+            });
+        });
+
+        tubelight.addEventListener('mouseleave', function () {
+            moveLamp(activeLink);
+        });
+        tubelight.addEventListener('focusout', function (event) {
+            if (!tubelight.contains(event.relatedTarget)) {
+                moveLamp(activeLink);
+            }
+        });
+
+        // Posisi awal tanpa animasi; dihitung ulang bila lebar menu berubah (font selesai dimuat, ukuran layar).
+        lamp.style.transition = 'none';
+        moveLamp(activeLink);
+        lamp.getBoundingClientRect();
+        lamp.style.transition = '';
+
+        if ('ResizeObserver' in window) {
+            new ResizeObserver(function () {
+                moveLamp(tubelight.contains(document.activeElement) ? document.activeElement : activeLink);
+            }).observe(tubelight);
+        }
+    }
+
     // Video latar hero: hanya layar lebar (≥992px), tanpa "reduce motion", dan tidak dalam mode hemat data.
     // Satu video diputar berulang; beberapa video diputar bergantian.
     var heroVideo = document.querySelector('[data-hero-videos]');

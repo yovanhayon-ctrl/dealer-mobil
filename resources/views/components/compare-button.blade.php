@@ -23,7 +23,7 @@
                 ])
                 aria-pressed="{{ $selected ? 'true' : 'false' }}"
                 aria-label="{{ $selected ? 'Batal bandingkan' : 'Bandingkan' }}: {{ $title }}">
-            <i class="bi {{ $selected ? 'bi-check2-square' : 'bi-layout-three-columns' }}"></i>{{ $selected ? 'Dibandingkan' : 'Bandingkan' }}
+            <i class="bi {{ $selected ? 'bi-check2-square' : 'bi-arrow-left-right icon-flip-x' }}"></i>{{ $selected ? 'Dibandingkan' : 'Bandingkan' }}
         </button>
     </form>
 @endif

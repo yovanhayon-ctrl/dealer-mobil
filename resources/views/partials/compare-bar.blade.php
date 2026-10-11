@@ -5,7 +5,7 @@
     <div class="compare-bar" role="region" aria-label="Perbandingan mobil">
         <div class="container d-flex flex-wrap align-items-center justify-content-between gap-2 py-2">
             <span class="small">
-                <i class="bi bi-layout-three-columns me-1"></i>
+                <i class="bi bi-arrow-left-right icon-flip-x me-1"></i>
                 <strong>{{ $compareCount }}</strong> dari {{ \App\Support\CarComparison::MAX_CARS }} mobil dipilih
             </span>
             <div class="d-flex gap-2">
@@ -15,7 +15,7 @@
                     <button type="submit" class="btn btn-outline-light btn-sm">Kosongkan</button>
                 </form>
                 <a href="{{ route('compare.index') }}" class="btn btn-accent btn-sm">
-                    <i class="bi bi-arrow-right-circle"></i>Bandingkan
+                    <i class="bi bi-arrow-left-right icon-flip-x"></i>Bandingkan
                 </a>
             </div>
         </div>

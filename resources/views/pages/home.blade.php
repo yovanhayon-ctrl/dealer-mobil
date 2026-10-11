@@ -1,17 +1,13 @@
 @extends('layouts.app')
 
 @section('title', 'Beranda')
-@section('meta_description', config('dealer.name').' — Nissan Heritage & Performance: mobil Nissan baru, koleksi klasik Jepang, promo, cicilan ringan, dan layanan servis.')
+@section('meta_description', config('dealer.name').', Nissan Heritage & Performance: mobil Nissan baru, koleksi klasik Jepang, promo, cicilan ringan, dan layanan servis.')
 
 @php
     $dealer = config('dealer');
     $creditUrl = Route::has('credit.index') ? route('credit.index') : null;
-    // Mobil unggulan di hero: pilihan admin ("Jadikan unggulan"); bila tidak ada, Nissan terbaru yang punya foto,
-    // lalu mobil terbaru lain yang punya foto (dari $latestCars).
-    $withPhoto = $latestCars->filter(fn ($car) => $car->primaryImage !== null);
-    $featuredCar = $chosenFeaturedCar
-        ?? $withPhoto->first(fn ($car) => $car->brand->slug === 'nissan')
-        ?? $withPhoto->first();
+    // Mobil unggulan: pilihan admin ("Jadikan unggulan"); bila tidak ada, Nissan berfoto terbaru (lihat HomeController).
+    $featuredCar = $chosenFeaturedCar ?? $autoFeaturedCar;
     // Video latar hero (DEALER_HERO_VIDEOS): hanya file .mp4 yang benar-benar ada di folder public.
     $heroVideos = collect(config('dealer.hero_videos', []))
         ->filter(fn ($path) => is_string($path) && str_ends_with(strtolower($path), '.mp4')
@@ -21,20 +17,24 @@
 @endphp
 
 @section('content')
-    <section @class(['home-hero py-5', 'has-video' => $heroVideos->isNotEmpty()]) aria-labelledby="hero-title">
+    @php($heroPhoto = $featuredCar?->primaryImage?->url)
+    {{--
+        Hero: judul nilai jual + 2 tombol, rata kiri di bagian bawah.
+        Latar: video (layar lebar), foto mobil unggulan (HP / tanpa video), atau gradien + garis livery.
+    --}}
+    <section @class(['home-hero', 'has-video' => $heroVideos->isNotEmpty(), 'has-photo' => $heroPhoto]) aria-labelledby="hero-title"
+             @if ($heroPhoto) style="--hero-photo: url('{{ $heroPhoto }}')" @endif>
         @if ($heroVideos->isNotEmpty())
             {{-- Dekoratif: diputar app.js hanya di layar lebar & tanpa "reduce motion"; di HP tidak diunduh. --}}
             <video class="hero-video" muted playsinline preload="none" aria-hidden="true" tabindex="-1"
                    data-hero-videos='@json($heroVideos)'></video>
         @endif
-        <div class="container py-lg-4">
-            <div class="row align-items-center g-4">
-                <div class="col-lg-7">
-                    <p class="text-uppercase small fw-semibold mb-2 opacity-75">Nissan Heritage &amp; Performance</p>
-                    <h1 id="hero-title" class="display-5 fw-bold text-white mb-3">{{ $dealer['name'] }}</h1>
-                    <p class="lead mb-4">
-                        {{ $dealer['tagline'] ?: 'Temukan mobil impian Anda dengan proses yang mudah dan transparan.' }}
-                    </p>
+        <div class="container home-hero-inner">
+            <div class="row align-items-end g-4 w-100 mx-0">
+                <div class="col-lg-7 px-0">
+                    <p class="hero-kicker">{{ $dealer['tagline'] ?: 'Nissan Heritage & Performance' }}</p>
+                    <h1 id="hero-title" class="hero-title">Nissan pilihan, dari klasik sampai terbaru.</h1>
+                    <p class="hero-lead">Lihat stok, hitung cicilan, dan jadwalkan test drive langsung dari sini.</p>
                     <div class="d-flex flex-wrap gap-2">
                         <a href="{{ route('cars.index') }}" class="btn btn-accent btn-lg">
                             <i class="bi bi-car-front"></i>Lihat Mobil
@@ -49,8 +49,8 @@
 
                 @if ($featuredCar && $heroVideos->isEmpty())
                     @php($featuredTitle = "{$featuredCar->brand->name} {$featuredCar->name} {$featuredCar->year}")
-                    {{-- Hanya layar lebar: di HP hero tetap ringkas, mobil terbaru ada tepat di bawahnya. --}}
-                    <div class="col-lg-5 d-none d-lg-block">
+                    {{-- Hanya layar lebar: di HP foto mobil unggulan sudah menjadi latar hero. --}}
+                    <div class="col-lg-5 d-none d-lg-block pe-0">
                         <a href="{{ route('cars.show', $featuredCar) }}" class="hero-feature d-block text-decoration-none"
                            aria-label="Mobil unggulan: {{ $featuredTitle }}">
                             <span class="hero-feature-badge"><i class="bi bi-star-fill"></i>Unggulan</span>
@@ -69,41 +69,6 @@
                         </a>
                     </div>
                 @endif
-            </div>
-        </div>
-    </section>
-
-    <section class="container home-search" aria-labelledby="search-title">
-        <div class="card">
-            <div class="card-body p-3 p-lg-4">
-                <h2 id="search-title" class="h5 mb-3">Cari Mobil</h2>
-                <form method="GET" action="{{ route('cars.index') }}" class="row g-2 align-items-end" role="search">
-                    <div class="col-12 col-md-5">
-                        <label for="home_q" class="form-label small mb-1">Kata kunci</label>
-                        <input type="search" id="home_q" name="q" class="form-control" placeholder="Nama mobil atau merek…" maxlength="100">
-                    </div>
-                    <div class="col-6 col-md-3">
-                        <label for="home_merek" class="form-label small mb-1">Merek</label>
-                        <select id="home_merek" name="merek" class="form-select">
-                            <option value="">Semua merek</option>
-                            @foreach ($brands as $brand)
-                                <option value="{{ $brand->slug }}">{{ $brand->name }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-6 col-md-2">
-                        <label for="home_kondisi" class="form-label small mb-1">Kondisi</label>
-                        <select id="home_kondisi" name="kondisi" class="form-select">
-                            <option value="">Semua</option>
-                            @foreach (\App\Models\Car::CONDITIONS as $value => $label)
-                                <option value="{{ $value }}">{{ $label }}</option>
-                            @endforeach
-                        </select>
-                    </div>
-                    <div class="col-12 col-md-2">
-                        <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i>Cari</button>
-                    </div>
-                </form>
             </div>
         </div>
     </section>
@@ -129,6 +94,36 @@
             @if ($latestCars->count() > 1)
                 <p class="car-scroller-hint small text-muted mb-0 mt-2"><i class="bi bi-arrow-left-right me-1"></i>Geser untuk melihat mobil lainnya</p>
             @endif
+        </section>
+    @endif
+
+    {{-- Mobil unggulan saat hero memakai video (tanpa video, mobil unggulan sudah tampil di hero). --}}
+    @if ($featuredCar && $heroVideos->isNotEmpty())
+        @php($showcaseTitle = "{$featuredCar->brand->name} {$featuredCar->name} {$featuredCar->year}")
+        <section class="container home-section scroll-showcase" aria-labelledby="showcase-title">
+            <div class="scroll-showcase-head text-center mx-auto">
+                <h2 id="showcase-title" class="h4 mb-1">Mobil Unggulan</h2>
+                <p class="text-muted mb-0">{{ $showcaseTitle }}, {{ strtolower($featuredCar->condition_label) }}.</p>
+            </div>
+
+            {{-- Bingkai miring 3D lalu tegak saat discroll: animasi CSS murni (app.css), tanpa JavaScript. --}}
+            <div class="scroll-showcase-stage">
+                <a href="{{ route('cars.show', $featuredCar) }}" class="scroll-showcase-card d-block text-decoration-none"
+                   aria-label="Lihat detail {{ $showcaseTitle }}">
+                    <img src="{{ $featuredCar->primaryImage->url }}" alt="{{ $showcaseTitle }}"
+                         width="1600" height="900" loading="lazy" class="scroll-showcase-img">
+                    <span class="scroll-showcase-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+                        <span class="min-w-0">
+                            <span class="d-block fw-semibold font-heading text-white text-truncate">{{ $showcaseTitle }}</span>
+                            @if ($featuredCar->hasPromoPrice())
+                                <del class="small d-block scroll-showcase-old"><x-price :amount="$featuredCar->price" /></del>
+                            @endif
+                            <x-price :amount="$featuredCar->finalPrice()" class="fs-5 fw-bold text-white" />
+                        </span>
+                        <span class="btn btn-accent">Lihat Detail<i class="bi bi-arrow-right ms-1 me-0"></i></span>
+                    </span>
+                </a>
+            </div>
         </section>
     @endif
 
@@ -162,7 +157,7 @@
                     <div class="col-lg-6">
                         <div class="card h-100 shortcut-card">
                             <div class="card-body p-3 p-lg-4">
-                        <h3 class="shortcut-card-title"><i class="bi bi-tags"></i>Berdasarkan merek</h3>
+                        <h3 class="shortcut-card-title">Berdasarkan merek</h3>
                         <div class="d-flex flex-wrap gap-2">
                             @foreach ($brands as $brand)
                                 <a href="{{ route('cars.index', ['merek' => $brand->slug]) }}" class="shortcut-chip">
@@ -178,7 +173,7 @@
                     <div class="col-lg-6">
                         <div class="card h-100 shortcut-card">
                             <div class="card-body p-3 p-lg-4">
-                        <h3 class="shortcut-card-title"><i class="bi bi-grid"></i>Berdasarkan kategori</h3>
+                        <h3 class="shortcut-card-title">Berdasarkan kategori</h3>
                         <div class="d-flex flex-wrap gap-2">
                             @foreach ($categories as $category)
                                 <a href="{{ route('cars.index', ['kategori' => $category->slug]) }}" class="shortcut-chip">
@@ -195,57 +190,68 @@
     @endif
 
     @if ($testimonials->isNotEmpty())
+        {{-- Ringkasan rating di kiri, ulasan berupa daftar bergaris tipis di kanan (tanpa kartu & ikon kutip). --}}
         <section class="bg-section home-section" aria-labelledby="testimonial-title">
             <div class="container">
-            <div class="home-section-head flex-wrap">
-                <h2 id="testimonial-title" class="h4 mb-0">Kata Pelanggan</h2>
-                <p class="mb-0 text-muted">
-                    <i class="bi bi-star-fill text-warning me-1" aria-hidden="true"></i>
-                    <span class="fw-semibold text-body">{{ number_format((float) $ratingSummary->average, 1, ',', '.') }}</span> dari 5
-                    · {{ $ratingSummary->total }} ulasan
-                </p>
-            </div>
-            <div class="row g-4">
-                @foreach ($testimonials as $testimonial)
-                    @php($car = $testimonial->purchaseRequest->car)
-                    <div class="col-md-6 col-lg-4">
-                        <figure class="card h-100 testimonial-card mb-0">
-                            <div class="card-body p-4 d-flex flex-column">
-                                <x-rating-stars :rating="$testimonial->rating" class="mb-2" />
-                                <blockquote class="mb-3 flex-grow-1">
-                                    <p class="mb-0 text-break">{{ \Illuminate\Support\Str::limit($testimonial->comment, 220) }}</p>
-                                </blockquote>
-                                <figcaption class="small">
-                                    <span class="fw-semibold">{{ \App\Models\Testimonial::publicName($testimonial->user->name) }}</span>
-                                    <span class="text-muted d-block">Membeli {{ $car->brand->name }} {{ $car->name }} {{ $car->year }} · {{ $testimonial->approved_at?->translatedFormat('M Y') }}</span>
-                                </figcaption>
-                            </div>
-                        </figure>
+                <div class="row g-4 g-lg-5">
+                    <div class="col-lg-4">
+                        <h2 id="testimonial-title" class="h4 mb-3">Kata Pelanggan</h2>
+                        <p class="testimonial-score mb-1">
+                            {{ number_format((float) $ratingSummary->average, 1, ',', '.') }}<span class="testimonial-score-max">/5</span>
+                        </p>
+                        <x-rating-stars :rating="round((float) $ratingSummary->average)" class="mb-2" />
+                        <p class="text-muted small mb-0">Dari {{ $ratingSummary->total }} ulasan pembeli yang sudah menerima mobilnya.</p>
                     </div>
-                @endforeach
-            </div>
+                    <div class="col-lg-8">
+                        <ul class="testimonial-list list-unstyled mb-0">
+                            @foreach ($testimonials as $testimonial)
+                                @php($car = $testimonial->purchaseRequest->car)
+                                <li class="testimonial-item">
+                                    <figure class="mb-0">
+                                        <blockquote class="mb-2">
+                                            <p class="testimonial-quote mb-0 text-break">{{ \Illuminate\Support\Str::limit($testimonial->comment, 220) }}</p>
+                                        </blockquote>
+                                        <figcaption class="small d-flex flex-wrap align-items-center gap-2">
+                                            <span class="fw-semibold">{{ \App\Models\Testimonial::publicName($testimonial->user->name) }}</span>
+                                            <span class="text-muted">membeli {{ $car->brand->name }} {{ $car->name }} {{ $car->year }}</span>
+                                            <x-rating-stars :rating="$testimonial->rating" class="testimonial-stars" />
+                                        </figcaption>
+                                    </figure>
+                                </li>
+                            @endforeach
+                        </ul>
+                    </div>
+                </div>
             </div>
         </section>
     @endif
 
-    @if ($creditUrl || $dealer['whatsapp'])
-        <section class="container home-section" aria-labelledby="cta-title">
-            <div class="home-cta rounded-4 p-4 p-lg-5 d-lg-flex align-items-center justify-content-between gap-4">
-                <div class="mb-3 mb-lg-0">
-                    <h2 id="cta-title" class="h4 text-white mb-1">Butuh bantuan memilih mobil?</h2>
-                    <p class="mb-0">Hitung cicilan atau tanyakan langsung ke tim kami.</p>
-                </div>
-                <div class="d-flex flex-wrap gap-2">
-                    @if ($creditUrl)
-                        <a href="{{ $creditUrl }}" class="btn btn-accent"><i class="bi bi-calculator"></i>Hitung Cicilan</a>
+    @php($ctaPhoneHref = $dealer['phone'] ? 'tel:'.preg_replace('/[^0-9+]/', '', $dealer['phone']) : null)
+    {{-- Pita penutup selebar layar, menyambung ke footer; satu tombol utama (WhatsApp, atau Kontak bila kosong). --}}
+    <section class="home-cta-band" aria-labelledby="cta-title">
+        <div class="container d-lg-flex align-items-center justify-content-between gap-4">
+            <div class="mb-4 mb-lg-0">
+                <h2 id="cta-title" class="h3 text-white mb-2">Butuh bantuan memilih mobil?</h2>
+                <p class="mb-0">
+                    @if ($dealer['hours'])
+                        Tim kami siap membantu {{ $dealer['hours'] }}.
+                    @else
+                        Tim kami siap membantu lewat WhatsApp atau telepon.
                     @endif
-                    @if ($dealer['whatsapp'])
-                        <a href="https://wa.me/{{ $dealer['whatsapp'] }}" target="_blank" rel="noopener" class="btn btn-success">
-                            <i class="bi bi-whatsapp"></i>Tanya via WhatsApp
-                        </a>
-                    @endif
-                </div>
+                </p>
             </div>
-        </section>
-    @endif
+            <div class="d-flex flex-wrap align-items-center gap-3 gap-lg-4 flex-shrink-0">
+                @if ($dealer['whatsapp'])
+                    <a href="https://wa.me/{{ $dealer['whatsapp'] }}" target="_blank" rel="noopener" class="btn btn-accent btn-lg">
+                        <i class="bi bi-whatsapp"></i>Chat WhatsApp
+                    </a>
+                @elseif (Route::has('contact'))
+                    <a href="{{ route('contact') }}" class="btn btn-accent btn-lg">Hubungi Kami</a>
+                @endif
+                @if ($ctaPhoneHref)
+                    <a href="{{ $ctaPhoneHref }}" class="home-cta-phone"><i class="bi bi-telephone me-2"></i>{{ $dealer['phone'] }}</a>
+                @endif
+            </div>
+        </div>
+    </section>
 @endsection

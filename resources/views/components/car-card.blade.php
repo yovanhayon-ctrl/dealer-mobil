@@ -19,7 +19,7 @@
     <div class="car-card-media">
         @if ($detailUrl)<a href="{{ $detailUrl }}" tabindex="-1" aria-hidden="true">@endif
             @if ($car->primaryImage)
-                <img src="{{ $car->primaryImage->url }}" alt="{{ $title }}" class="car-card-img" loading="lazy">
+                <img src="{{ $car->primaryImage->thumb_url }}" alt="{{ $title }}" class="car-card-img" loading="lazy">
             @else
                 <div class="car-card-img car-card-img-empty" role="img" aria-label="Belum ada foto {{ $title }}">
                     <i class="bi bi-car-front"></i>

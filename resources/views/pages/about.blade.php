@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Tentang Kami')
-@section('meta_description', config('dealer.name').' — Nissan Heritage & Performance: dealer mobil Nissan baru, koleksi klasik Jepang, dan layanan servis JAF Service.')
+@section('meta_description', config('dealer.name').', Nissan Heritage & Performance: dealer mobil Nissan baru, koleksi klasik Jepang, dan layanan servis JAF Service.')
 
 @php
     $dealer = config('dealer');

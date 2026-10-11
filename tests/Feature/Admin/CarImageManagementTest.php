@@ -171,7 +171,7 @@ class CarImageManagementTest extends TestCase
     public static function invalidFileProvider(): array
     {
         $wrongType = 'Gambar ke-1 harus berupa JPG, JPEG, PNG, atau WEBP.';
-        $tooSmall = 'Gambar ke-1 minimal berukuran 600×400 piksel.';
+        $tooSmall = 'Gambar ke-1 minimal berukuran 600×400 piksel dan maksimal 8000×8000 piksel.';
 
         return [
             'svg' => [fn () => UploadedFile::fake()->createWithContent(
@@ -179,7 +179,7 @@ class CarImageManagementTest extends TestCase
             ), $wrongType],
             'pdf' => [fn () => UploadedFile::fake()->create('brosur.pdf', 100, 'application/pdf'), $wrongType],
             'gif' => [fn () => UploadedFile::fake()->image('animasi.gif', 800, 600), $wrongType],
-            'lebih dari 2 MB' => [fn (self $test) => $test->photo('besar.png')->size(2049), 'Ukuran gambar ke-1 maksimal 2 MB.'],
+            'lebih dari 8 MB' => [fn (self $test) => $test->photo('besar.png')->size(8193), 'Ukuran gambar ke-1 maksimal 8 MB.'],
             'lebar 599 px' => [fn (self $test) => $test->photo('sempit.jpg', 599, 400), $tooSmall],
             'tinggi 399 px' => [fn (self $test) => $test->photo('pendek.jpg', 600, 399), $tooSmall],
         ];
@@ -199,7 +199,7 @@ class CarImageManagementTest extends TestCase
     public function test_satu_file_tidak_valid_menggagalkan_seluruh_upload(): void
     {
         $this->upload([$this->photo(), $this->photo('sempit.jpg', 500, 300)])
-            ->assertSessionHasErrors(['images.1' => 'Gambar ke-2 minimal berukuran 600×400 piksel.'])
+            ->assertSessionHasErrors(['images.1' => 'Gambar ke-2 minimal berukuran 600×400 piksel dan maksimal 8000×8000 piksel.'])
             ->assertSessionDoesntHaveErrors('images.0');
 
         $this->assertSame(0, CarImage::count());
@@ -208,7 +208,7 @@ class CarImageManagementTest extends TestCase
 
     public function test_ukuran_pas_batas_diterima(): void
     {
-        $this->upload([$this->photo('pas.jpg', 600, 400)->size(2048)])->assertSessionHasNoErrors();
+        $this->upload([$this->photo('pas.jpg', 600, 400)->size(8192)])->assertSessionHasNoErrors();
 
         $this->assertSame(1, CarImage::count());
     }

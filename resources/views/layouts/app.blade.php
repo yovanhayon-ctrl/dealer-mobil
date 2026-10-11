@@ -9,7 +9,7 @@
     <main>
         {{-- Wadah pesan hanya dirender bila ada pesan, agar hero beranda menempel ke navbar. --}}
         @if (collect(['success', 'status', 'warning', 'error'])->contains(fn ($key) => session()->has($key)))
-            <div class="container pt-3">
+            <div class="container pt-3 flash-wrapper">
                 @include('partials.flash')
             </div>
         @endif
