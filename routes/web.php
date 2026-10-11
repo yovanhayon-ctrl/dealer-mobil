@@ -236,9 +236,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::patch('{testimonial}/tolak', 'reject')->name('reject');
     });
 
-    // Laporan (hanya baca) + export CSV dengan periode yang sama.
+    // Laporan (hanya baca) + export Excel (rapi) / CSV (data mentah) dengan periode yang sama.
     Route::get('laporan', [ReportController::class, 'index'])->name('reports.index');
     Route::get('laporan/export', [ReportController::class, 'export'])->name('reports.export');
+    Route::get('laporan/export/excel', [ReportController::class, 'exportExcel'])->name('reports.export-excel');
 
     // Hanya baca: hapus user akan ikut menghapus riwayat test drive & pengajuan (cascade).
     Route::resource('pengguna', UserController::class)
