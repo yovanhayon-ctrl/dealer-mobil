@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\PromoRequest;
 use App\Models\Car;
 use App\Models\Promo;
+use App\Support\CarImageProcessor;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
+use RuntimeException;
 
 class PromoController extends Controller
 {
@@ -47,15 +50,16 @@ class PromoController extends Controller
         ]);
     }
 
-    public function store(PromoRequest $request): RedirectResponse
+    public function store(PromoRequest $request, CarImageProcessor $processor): RedirectResponse
     {
         $data = $request->promoData();
+        $image = $this->storeBanner($request, $processor);
 
         // Slug dibuat sekali saat tambah dan tidak berubah saat edit (URL publik /promo/{slug}).
         $promo = Promo::create([
             ...$data,
             'slug' => Promo::uniqueSlug($data['title']),
-            'image' => $request->file('image')?->store(Promo::IMAGE_DIRECTORY, Promo::IMAGE_DISK),
+            'image' => $image,
         ]);
 
         return redirect()->route('admin.promos.index')
@@ -70,13 +74,13 @@ class PromoController extends Controller
         ]);
     }
 
-    public function update(PromoRequest $request, Promo $promo): RedirectResponse
+    public function update(PromoRequest $request, Promo $promo, CarImageProcessor $processor): RedirectResponse
     {
         $data = $request->promoData();
         $oldImage = $promo->image;
 
         if ($request->hasFile('image')) {
-            $data['image'] = $request->file('image')->store(Promo::IMAGE_DIRECTORY, Promo::IMAGE_DISK);
+            $data['image'] = $this->storeBanner($request, $processor);
         } elseif ($request->boolean('remove_image')) {
             $data['image'] = null;
         }
@@ -102,6 +106,26 @@ class PromoController extends Controller
 
         return redirect()->route('admin.promos.index')
             ->with('success', "Promo \"{$promo->title}\" berhasil dihapus.");
+    }
+
+    /**
+     * Simpan banner yang diunggah sebagai WebP (lebar maks. 1600 px, nama file acak); null bila tidak ada upload.
+     */
+    private function storeBanner(PromoRequest $request, CarImageProcessor $processor): ?string
+    {
+        if (! $request->hasFile('image')) {
+            return null;
+        }
+
+        try {
+            return $processor->storeSingle(
+                $request->file('image')->getRealPath(), Promo::IMAGE_DIRECTORY, Promo::BANNER_MAX_WIDTH, PHP_INT_MAX, Promo::IMAGE_DISK
+            );
+        } catch (RuntimeException) {
+            throw ValidationException::withMessages([
+                'image' => 'Banner tidak bisa diproses. Coba simpan ulang sebagai JPG lalu unggah lagi.',
+            ]);
+        }
     }
 
     /**

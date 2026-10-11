@@ -42,7 +42,7 @@
     @error('image')
         <div class="invalid-feedback">{{ $message }}</div>
     @else
-        <div class="form-text">JPG, JPEG, PNG, atau WEBP. Maksimal 2 MB, minimal 1200×400 piksel.</div>
+        <div class="form-text">JPG, JPEG, PNG, atau WEBP. Maksimal {{ intdiv(\App\Http\Requests\Admin\PromoRequest::MAX_KILOBYTES, 1024) }} MB, minimal 1200×400 piksel. Disimpan otomatis sebagai WebP (lebar maks. {{ \App\Models\Promo::BANNER_MAX_WIDTH }} px).</div>
     @enderror
 
     @if ($promo->image)
