@@ -24,7 +24,7 @@
     <div class="container pt-5 pb-4">
         <div class="row g-4">
             <div class="col-lg-4">
-                <h2 class="h5 mb-2"><i class="bi bi-car-front-fill text-accent"></i> {{ $dealer['name'] }}</h2>
+                <h2 class="h5 mb-2 d-flex align-items-center gap-2"><x-brand-logo :size="40" /> {{ $dealer['name'] }}</h2>
                 @if ($dealer['tagline'])
                     <p class="mb-3">{{ $dealer['tagline'] }}</p>
                 @endif
