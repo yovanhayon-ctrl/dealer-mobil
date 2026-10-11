@@ -15,8 +15,8 @@
 {{-- 8 menu publik: navbar baru melebar di layar ≥1200px (xl) agar label tidak terpotong. --}}
 <nav class="navbar navbar-expand-xl navbar-dark navbar-dealer sticky-top" aria-label="Menu utama" data-navbar>
     <div class="container">
-        <a class="navbar-brand" href="{{ route('home') }}">
-            <i class="bi bi-car-front-fill"></i> {{ config('dealer.name') }}
+        <a class="navbar-brand d-inline-flex align-items-center gap-2" href="{{ route('home') }}">
+            <x-brand-logo :size="36" /> {{ config('dealer.name') }}
         </a>
 
         <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mainNavbar"

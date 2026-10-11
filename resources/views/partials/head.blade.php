@@ -1,6 +1,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<link rel="icon" type="image/png" href="{{ asset('images/favicon-64.png') }}">
 <title>@hasSection('title')@yield('title') | @endif{{ config('dealer.name') }}</title>
 <meta name="description" content="@yield('meta_description', config('dealer.tagline') ?: config('dealer.name').': jual mobil baru dan bekas, promo, dan simulasi kredit.')">
 @php

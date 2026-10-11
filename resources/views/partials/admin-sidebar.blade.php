@@ -21,15 +21,15 @@
     {{-- offcanvas-lg: menu tetap di layar besar, jadi offcanvas di bawah breakpoint lg. --}}
     <aside class="offcanvas-lg offcanvas-start admin-sidebar-panel" tabindex="-1" id="adminSidebar" aria-labelledby="adminSidebarLabel">
         <div class="offcanvas-header">
-            <span class="offcanvas-title text-white fw-bold font-heading fs-5" id="adminSidebarLabel">
-                <i class="bi bi-car-front-fill text-accent"></i> {{ config('dealer.name') }}
+            <span class="offcanvas-title text-white fw-bold font-heading fs-5 d-inline-flex align-items-center gap-2" id="adminSidebarLabel">
+                <x-brand-logo :size="32" /> {{ config('dealer.name') }}
             </span>
             <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" data-bs-target="#adminSidebar" aria-label="Tutup"></button>
         </div>
 
         <div class="offcanvas-body flex-column p-3">
-            <a href="{{ route('admin.dashboard') }}" class="d-none d-lg-block text-white text-decoration-none fw-bold font-heading fs-5 mb-4 px-2">
-                <i class="bi bi-car-front-fill text-accent"></i> {{ config('dealer.name') }}
+            <a href="{{ route('admin.dashboard') }}" class="d-none d-lg-flex align-items-center gap-2 text-white text-decoration-none fw-bold font-heading fs-5 mb-4 px-2">
+                <x-brand-logo :size="36" /> {{ config('dealer.name') }}
             </a>
 
             <nav class="nav flex-column gap-1" aria-label="Menu admin">

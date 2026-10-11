@@ -231,8 +231,11 @@ main {
     color: #fff;
 }
 
-.navbar-dealer .navbar-brand .bi {
-    color: var(--dm-red);
+/* Logo JAF (x-brand-logo): gambar bulat, sudut hitam file aslinya dipotong. */
+.brand-logo {
+    flex-shrink: 0;
+    border-radius: 50%;
+    object-fit: cover;
 }
 
 .site-footer {

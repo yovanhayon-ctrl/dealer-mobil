@@ -7,7 +7,7 @@
     <main class="d-flex align-items-center justify-content-center py-5 px-3">
         <div class="auth-card">
             <a href="{{ route('home') }}" class="d-block text-center text-decoration-none mb-4">
-                <span class="h3 fw-bold"><i class="bi bi-car-front-fill text-accent"></i> {{ config('dealer.name') }}</span>
+                <span class="h3 fw-bold d-inline-flex align-items-center gap-2"><x-brand-logo :size="52" /> {{ config('dealer.name') }}</span>
             </a>
 
             @include('partials.flash')
