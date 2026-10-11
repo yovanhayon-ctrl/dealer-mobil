@@ -147,6 +147,11 @@ main {
 
 /* ---------- Navbar & footer public ---------- */
 
+/* Wadah pesan (layout publik) ikut hilang setelah pesannya ditutup, agar hero kembali menempel ke navbar. */
+.flash-wrapper:not(:has(.alert)) {
+    display: none;
+}
+
 .navbar-dealer {
     background-color: var(--dm-navy);
     transition: box-shadow .2s ease;
@@ -302,71 +307,78 @@ main {
     object-fit: cover;
 }
 
+/* Footer gelap: logo + tagline di kiri, kolom tautan berjudul tebal, baris hak cipta di bawah garis. */
 .site-footer {
     background-color: var(--dm-navy);
-    color: rgba(255, 255, 255, .75);
+    color: rgba(255, 255, 255, .7);
     border-top: 3px solid var(--dm-red);
 }
 
-.site-footer .footer-title {
-    font-size: .8rem;
+.footer-brand {
+    font-family: var(--dm-font-heading);
+    font-size: 1.35rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    margin-bottom: 1rem;
+    color: #fff !important;
 }
 
-.footer-links,
-.footer-contact {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.footer-tagline {
+    margin: 1rem 0 .5rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.footer-address {
+    max-width: 22rem;
     font-size: .875rem;
 }
 
+.site-footer .footer-title {
+    margin-bottom: 1.1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 .footer-links li {
-    margin-bottom: .6rem;
-}
-
-.footer-contact li {
-    display: flex;
-    gap: .65rem;
-    margin-bottom: .75rem;
-}
-
-.footer-contact .bi {
-    flex: 0 0 1rem;
-    color: var(--dm-red);
-    line-height: 1.5;
+    margin-bottom: .85rem;
 }
 
 .footer-muted {
-    color: rgba(255, 255, 255, .5);
     font-size: .8rem;
+    color: rgba(255, 255, 255, .55);
 }
 
 .footer-bottom {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: .5rem 1rem;
-    margin-top: 2rem;
-    padding-top: 1.25rem;
+    align-items: center;
+    gap: .75rem 1.5rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
     border-top: 1px solid rgba(255, 255, 255, .12);
-    font-size: .8rem;
-}
-
-.site-footer h2 {
-    color: #fff;
+    font-size: .875rem;
 }
 
 .site-footer a {
-    color: rgba(255, 255, 255, .85);
+    color: rgba(255, 255, 255, .75);
     text-decoration: none;
+    transition: color .15s ease;
 }
 
 .site-footer a:hover {
     color: #fff;
+}
+
+.site-footer .footer-bottom-link {
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }
 
 /* ---------- Publik: beranda ---------- */
