@@ -25,9 +25,12 @@
                 <article class="card overflow-hidden">
                     @if ($promo->image_url)
                         <img src="{{ $promo->image_url }}" alt="{{ $promo->title }}" class="promo-card-img">
+                    @elseif ($car?->primaryImage)
+                        <img src="{{ $car->primaryImage->url }}" alt="{{ $car->brand->name }} {{ $car->name }} {{ $car->year }}" class="promo-card-img promo-detail-car-img">
                     @else
-                        <div class="promo-card-img promo-card-img-empty" role="img" aria-label="Banner {{ $promo->title }}">
-                            <i class="bi bi-percent"></i>
+                        <div class="promo-card-img promo-card-placeholder" role="img" aria-label="Banner {{ $promo->title }}">
+                            <span class="promo-card-placeholder-label"><i class="bi bi-percent"></i>Promo</span>
+                            <span class="promo-card-placeholder-value">{{ \Illuminate\Support\Str::limit($promo->title, 40) }}</span>
                         </div>
                     @endif
 
@@ -64,16 +67,14 @@
                         @endif
 
                         @if ($car)
-                            <div class="promo-box rounded-3 p-3 mt-4">
-                                <p class="small text-uppercase fw-semibold mb-1">Potongan harga</p>
-                                <p class="mb-0">
-                                    {{ $car->brand->name }} {{ $car->name }} {{ $car->year }}:
-                                    <span class="fw-bold text-accent">hemat <x-price :amount="$promo->discount_amount" /></span>
-                                </p>
-                            </div>
+                            <p class="mt-4 mb-0">
+                                <span class="fw-semibold">Potongan harga</span> untuk {{ $car->brand->name }} {{ $car->name }} {{ $car->year }}:
+                                <span class="fw-bold text-accent">hemat <x-price :amount="$promo->discount_amount" /></span>
+                            </p>
                         @endif
 
                         @unless ($isEnded)
+                            {{-- Dua tombol utama; test drive, simulasi kredit, dan WhatsApp berupa tautan teks. --}}
                             <div class="d-flex flex-wrap gap-2 mt-4">
                                 @if ($car)
                                     @if ($car->canBePurchased() && Route::has('purchase-requests.create'))
@@ -84,24 +85,27 @@
                                     <a href="{{ route('cars.show', $car) }}" class="btn btn-outline-primary">
                                         <i class="bi bi-car-front"></i>Lihat Detail Mobil
                                     </a>
-                                    @if ($car->canBeTestDriven() && Route::has('test-drives.create'))
-                                        <a href="{{ route('test-drives.create', ['mobil' => $car->slug]) }}" class="btn btn-outline-primary">
-                                            <i class="bi bi-calendar-check"></i>Test Drive
-                                        </a>
-                                    @endif
-                                    @if (Route::has('credit.index'))
-                                        <a href="{{ route('credit.index', ['mobil' => $car->slug]) }}" class="btn btn-outline-primary">
-                                            <i class="bi bi-calculator"></i>Simulasi Kredit
-                                        </a>
-                                    @endif
                                 @else
                                     <a href="{{ route('cars.index') }}" class="btn btn-accent">
                                         <i class="bi bi-car-front"></i>Lihat Semua Mobil
                                     </a>
                                 @endif
+                            </div>
+
+                            <div class="d-flex flex-wrap gap-3 mt-3">
+                                @if ($car && $car->canBeTestDriven() && Route::has('test-drives.create'))
+                                    <a href="{{ route('test-drives.create', ['mobil' => $car->slug]) }}" class="car-detail-link">
+                                        <i class="bi bi-calendar-check me-1"></i>Booking Test Drive
+                                    </a>
+                                @endif
+                                @if ($car && Route::has('credit.index'))
+                                    <a href="{{ route('credit.index', ['mobil' => $car->slug]) }}" class="car-detail-link">
+                                        <i class="bi bi-calculator me-1"></i>Simulasi Kredit
+                                    </a>
+                                @endif
                                 @if ($whatsappUrl)
-                                    <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener" class="btn btn-success">
-                                        <i class="bi bi-whatsapp"></i>Tanya via WhatsApp
+                                    <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener" class="car-detail-link">
+                                        <i class="bi bi-whatsapp me-1"></i>Tanya via WhatsApp
                                     </a>
                                 @endif
                             </div>
@@ -112,13 +116,13 @@
 
             <div class="col-lg-4">
                 @if ($car)
-                    <h2 class="h6 text-muted text-uppercase mb-3">Mobil promo</h2>
-                    <x-car-card :car="$car" class="mb-4" />
+                    <h2 class="h5 mb-3">Mobil promo</h2>
+                    <x-car-card :car="$car" class="h-auto mb-4" />
                 @endif
 
-                <h2 class="h6 text-muted text-uppercase mb-3">Promo lainnya</h2>
+                <h2 class="h5 mb-3">Promo lainnya</h2>
                 @forelse ($otherPromos as $other)
-                    <x-promo-card :promo="$other" :show-remaining="true" class="mb-3" />
+                    <x-promo-card :promo="$other" :show-remaining="true" class="h-auto mb-3" />
                 @empty
                     <p class="small text-muted">Belum ada promo lain yang sedang berjalan.</p>
                 @endforelse

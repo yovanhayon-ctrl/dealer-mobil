@@ -133,21 +133,20 @@
                     </p>
 
                     @if ($car->activePromos->isNotEmpty())
-                        <div class="promo-box rounded-3 p-3 mb-3">
-                            <p class="fw-semibold small text-uppercase mb-2"><i class="bi bi-percent me-1"></i>Promo berlaku</p>
+                        <div class="car-detail-promos mb-4">
+                            <p class="small fw-semibold mb-2">Promo berlaku</p>
                             <ul class="list-unstyled small mb-0">
                                 @foreach ($car->activePromos as $promo)
-                                    <li @class(['mb-2' => ! $loop->last])>
-                                        <span class="fw-semibold">{{ $promo->title }}</span>
-                                        @if ($bestPromo?->is($promo))
-                                            <span class="badge rounded-pill badge-status-red ms-1">Dipakai di harga</span>
-                                        @endif
-                                        <br>
-                                        <span class="text-muted">
-                                            {{ $promo->start_date->translatedFormat('d M Y') }} - {{ $promo->end_date->translatedFormat('d M Y') }}
-                                            @if ($promo->discount_amount)
-                                                · hemat <x-price :amount="$promo->discount_amount" />
+                                    <li @class(['d-flex gap-2', 'mb-2' => ! $loop->last])>
+                                        <i class="bi bi-tag text-accent" aria-hidden="true"></i>
+                                        <span>
+                                            <span class="fw-semibold">{{ $promo->title }}</span>
+                                            @if ($bestPromo?->is($promo))
+                                                <span class="text-accent">(Dipakai di harga)</span>
                                             @endif
+                                            <span class="d-block text-muted">
+                                                {{ $promo->start_date->translatedFormat('d M Y') }} - {{ $promo->end_date->translatedFormat('d M Y') }}@if ($promo->discount_amount), hemat <x-price :amount="$promo->discount_amount" />@endif
+                                            </span>
                                         </span>
                                     </li>
                                 @endforeach
@@ -155,7 +154,8 @@
                         </div>
                     @endif
 
-                    <div class="d-grid gap-2">
+                    {{-- Dua aksi utama berdampingan; favorit, bandingkan, dan WhatsApp di baris kecil di bawahnya. --}}
+                    <div class="car-detail-actions">
                         @if ($purchaseRoute)
                             @if ($car->canBePurchased())
                                 <a href="{{ route('purchase-requests.create', $car) }}" class="btn btn-accent btn-lg">
@@ -165,31 +165,39 @@
                                 <span class="btn btn-accent btn-lg disabled" aria-disabled="true">
                                     <i class="bi bi-cart-x"></i>Ajukan Pembelian
                                 </span>
-                                <p class="small text-muted mb-0">Stok habis, pengajuan belum bisa dilakukan.</p>
                             @endif
                         @endif
 
-                        @if ($testDriveRoute)
-                            @if (auth()->user()?->isAdmin())
-                                <p class="small text-muted mb-0"><i class="bi bi-info-circle me-1"></i>Booking test drive hanya untuk akun customer.</p>
-                            @elseif ($car->canBeTestDriven())
-                                <a href="{{ route('test-drives.create', ['mobil' => $car->slug]) }}" class="btn btn-outline-primary">
+                        @if ($testDriveRoute && ! auth()->user()?->isAdmin())
+                            @if ($car->canBeTestDriven())
+                                <a href="{{ route('test-drives.create', ['mobil' => $car->slug]) }}" class="btn btn-outline-primary btn-lg">
                                     <i class="bi bi-calendar-check"></i>Booking Test Drive
                                 </a>
                             @else
-                                <span class="btn btn-outline-primary disabled" aria-disabled="true">
+                                <span class="btn btn-outline-primary btn-lg disabled" aria-disabled="true">
                                     <i class="bi bi-calendar-x"></i>Booking Test Drive
                                 </span>
-                                <p class="small text-muted mb-0">Unit bekas ini sudah terjual, test drive tidak tersedia.</p>
                             @endif
                         @endif
+                    </div>
 
-                        <x-favorite-button :car="$car" variant="full" />
-                        <x-compare-button :car="$car" variant="full" />
+                    @if ($purchaseRoute && ! $car->canBePurchased())
+                        <p class="small text-muted mt-2 mb-0">Stok habis, pengajuan belum bisa dilakukan.</p>
+                    @endif
+                    @if ($testDriveRoute)
+                        @if (auth()->user()?->isAdmin())
+                            <p class="small text-muted mt-2 mb-0"><i class="bi bi-info-circle me-1"></i>Booking test drive hanya untuk akun customer.</p>
+                        @elseif (! $car->canBeTestDriven())
+                            <p class="small text-muted mt-2 mb-0">Unit bekas ini sudah terjual, test drive tidak tersedia.</p>
+                        @endif
+                    @endif
 
+                    <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+                        <x-favorite-button :car="$car" variant="small" />
+                        <x-compare-button :car="$car" />
                         @if ($whatsappUrl)
-                            <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener" class="btn btn-success">
-                                <i class="bi bi-whatsapp"></i>Tanya via WhatsApp
+                            <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener" class="car-detail-link ms-sm-auto">
+                                <i class="bi bi-whatsapp me-1"></i>Tanya via WhatsApp
                             </a>
                         @endif
                     </div>
@@ -202,26 +210,29 @@
                 <section class="card mb-4" aria-labelledby="spec-title">
                     <div class="card-body p-3 p-lg-4">
                         <h2 id="spec-title" class="h5 mb-3">Spesifikasi</h2>
-                        <table class="table spec-table mb-0">
-                            <tbody>
-                                <tr><th scope="row">Merek</th><td>{{ $car->brand->name }}</td></tr>
-                                <tr><th scope="row">Kategori</th><td>{{ $car->category->name }}</td></tr>
-                                <tr><th scope="row">Kondisi</th><td>{{ $car->condition_label }}</td></tr>
-                                <tr><th scope="row">Tahun</th><td>{{ $car->year }}</td></tr>
-                                <tr><th scope="row">Transmisi</th><td>{{ $car->transmission_label }}</td></tr>
-                                <tr><th scope="row">Bahan bakar</th><td>{{ $car->fuel_type_label }}</td></tr>
-                                <tr>
-                                    <th scope="row">Kapasitas mesin</th>
-                                    <td>{{ $car->engine_cc ? number_format($car->engine_cc, 0, ',', '.').' cc' : '-' }}</td>
-                                </tr>
-                                <tr><th scope="row">Jumlah kursi</th><td>{{ $car->seats }} kursi</td></tr>
-                                <tr><th scope="row">Warna</th><td>{{ $car->color ?: '-' }}</td></tr>
-                                @unless ($car->isNew())
-                                    <tr><th scope="row">Kilometer</th><td>{{ number_format($car->mileage, 0, ',', '.') }} km</td></tr>
-                                @endunless
-                                <tr><th scope="row">Stok</th><td>{{ $car->inStock() ? "{$car->stock} unit" : 'Habis' }}</td></tr>
-                            </tbody>
-                        </table>
+                        @php
+                            $specs = array_filter([
+                                'Merek' => $car->brand->name,
+                                'Kategori' => $car->category->name,
+                                'Kondisi' => $car->condition_label,
+                                'Tahun' => $car->year,
+                                'Transmisi' => $car->transmission_label,
+                                'Bahan bakar' => $car->fuel_type_label,
+                                'Kapasitas mesin' => $car->engine_cc ? number_format($car->engine_cc, 0, ',', '.').' cc' : '-',
+                                'Jumlah kursi' => "{$car->seats} kursi",
+                                'Warna' => $car->color ?: '-',
+                                'Kilometer' => $car->isNew() ? null : number_format($car->mileage, 0, ',', '.').' km',
+                                'Stok' => $car->inStock() ? "{$car->stock} unit" : 'Habis',
+                            ], fn ($value) => $value !== null);
+                        @endphp
+                        <dl class="spec-grid mb-0">
+                            @foreach ($specs as $label => $value)
+                                <div class="spec-grid-item">
+                                    <dt>{{ $label }}</dt>
+                                    <dd>{{ $value }}</dd>
+                                </div>
+                            @endforeach
+                        </dl>
                     </div>
                 </section>
 
