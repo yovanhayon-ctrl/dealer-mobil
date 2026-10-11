@@ -496,7 +496,7 @@ Wajib saat production (Phase 19):
 
 - **Demo lokal / presentasi:** [docs/DEMO.md](docs/DEMO.md) — persiapan, akun demo, alur demo ±15 menit, dan solusi masalah saat demo.
 - **Shared hosting (cPanel):** [docs/DEPLOY-CPANEL.md](docs/DEPLOY-CPANEL.md) — syarat hosting (**PHP ≥ 8.4**), upload, document root, database, `.env` production, HTTPS, dan pembaruan.
-- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md), [docs/RELEASE-v1.1.0.md](docs/RELEASE-v1.1.0.md), [docs/RELEASE-v1.2.0.md](docs/RELEASE-v1.2.0.md), [docs/RELEASE-v1.3.0.md](docs/RELEASE-v1.3.0.md), [docs/RELEASE-v1.4.0.md](docs/RELEASE-v1.4.0.md), [docs/RELEASE-v1.5.0.md](docs/RELEASE-v1.5.0.md), [docs/RELEASE-v1.6.0.md](docs/RELEASE-v1.6.0.md), [docs/RELEASE-v1.7.0.md](docs/RELEASE-v1.7.0.md), [docs/RELEASE-v1.7.1.md](docs/RELEASE-v1.7.1.md), [docs/RELEASE-v1.7.2.md](docs/RELEASE-v1.7.2.md).
+- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md), [docs/RELEASE-v1.1.0.md](docs/RELEASE-v1.1.0.md), [docs/RELEASE-v1.2.0.md](docs/RELEASE-v1.2.0.md), [docs/RELEASE-v1.3.0.md](docs/RELEASE-v1.3.0.md), [docs/RELEASE-v1.4.0.md](docs/RELEASE-v1.4.0.md), [docs/RELEASE-v1.5.0.md](docs/RELEASE-v1.5.0.md), [docs/RELEASE-v1.6.0.md](docs/RELEASE-v1.6.0.md), [docs/RELEASE-v1.7.0.md](docs/RELEASE-v1.7.0.md), [docs/RELEASE-v1.7.1.md](docs/RELEASE-v1.7.1.md), [docs/RELEASE-v1.7.2.md](docs/RELEASE-v1.7.2.md), [docs/RELEASE-v1.7.3.md](docs/RELEASE-v1.7.3.md).
 
 ## Performa
 
@@ -553,6 +553,7 @@ php artisan optimize
 | +     | Rilis v1.7.0                   | ✅ Selesai (optimasi foto WebP + thumbnail, SEO & pratinjau tautan, logo JAF, navbar/footer/beranda baru; 799 test) |
 | +     | Rilis v1.7.1                   | ✅ Selesai (beberapa mobil unggulan bergantian, perapian detail mobil/promo/kontak; 806 test) |
 | +     | Rilis v1.7.2                   | ✅ Selesai (perapian Tentang Kami, Servis, Simulasi Kredit, form booking/pengajuan; 808 test) |
+| +     | Rilis v1.7.3                   | ✅ Selesai (test tidak lagi menghapus foto asli, petunjuk upload 8 MB, perapian halaman akun & login/daftar; 814 test) |
 
 > **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`. Promo berjalan tampil di `/promo` (filter Semua/Khusus Mobil/Promo Umum) dan detailnya di `/promo/{slug}`. Simulasi kredit bunga flat di `/simulasi-kredit` (tanpa login; pilih mobil atau isi harga, DP, tenor). Customer mengajukan pembelian cash/kredit di `/mobil/{slug}/ajukan` (hasil simulasi bisa ikut terbawa) dan memantau/membatalkan di `/akun/pengajuan`. Halaman `/tentang-kami` dan `/kontak` (alamat, telepon, WhatsApp, email, jam operasional, Google Maps) membaca data dealer dari `.env` (`DEALER_*`). Setiap akun bisa mengubah data diri dan kata sandi di `/akun/profil`.
 
@@ -575,6 +576,8 @@ php artisan optimize
 > **Rilis v1.7.1:** beberapa mobil unggulan (maks. 5) tampil bergantian di bagian Mobil Unggulan beranda (tanpa autoplay); detail mobil, detail promo, dan kontak dirapikan (dua tombol utama, WhatsApp sebagai tautan, spesifikasi dalam grid); pagination dan filter memakai warna JAF. Tidak ada migration baru. Detail: [docs/RELEASE-v1.7.1.md](docs/RELEASE-v1.7.1.md).
 
 > **Rilis v1.7.2:** Tentang Kami, Servis, Simulasi Kredit, dan form booking/pengajuan dirapikan (tanpa kartu ikon dan nomor langkah, satu tombol utama, WhatsApp sebagai tautan); pita bantuan beranda kini dipakai juga di Tentang Kami (`partials/help-band`). Tidak ada migration baru. Detail: [docs/RELEASE-v1.7.2.md](docs/RELEASE-v1.7.2.md).
+
+> **Rilis v1.7.3:** perbaikan: test otomatis tidak lagi menghapus foto asli di `storage/app/public` (disk `public` selalu palsu di test) dan petunjuk upload galeri menulis batas 8 MB; halaman akun customer serta login/daftar dirapikan (kotak catatan netral, label "Baru" di notifikasi, inisial nama di profil, foto rusak tidak tumpah, tombol utama merah). Tidak ada migration baru. Detail: [docs/RELEASE-v1.7.3.md](docs/RELEASE-v1.7.3.md).
 
 > **Urutan kerja:** semua halaman **admin** dikerjakan dulu (sudah selesai), lalu halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 
