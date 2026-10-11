@@ -12,6 +12,7 @@ use RuntimeException;
  * - putar sesuai orientasi EXIF (foto HP), lalu kecilkan ke sisi terpanjang maks. 1600 px;
  * - simpan sebagai WebP (latar transparan tetap terjaga); metadata EXIF, termasuk lokasi GPS, ikut terbuang;
  * - buat thumbnail lebar 480 px di subfolder "thumbs" untuk kartu & daftar.
+ * storeSingle() memakai aturan yang sama untuk satu gambar tanpa thumbnail (banner promo).
  */
 class CarImageProcessor
 {
@@ -46,6 +47,21 @@ class CarImageProcessor
         } finally {
             unset($image, $large, $thumb);
         }
+    }
+
+    /**
+     * Simpan satu gambar yang diperkecil (tidak pernah diperbesar) agar muat $maxWidth × $maxHeight, sebagai WebP.
+     *
+     * @return string path file di disk, mis. "promos/AbC….webp"
+     */
+    public function storeSingle(string $sourceFile, string $directory, int $maxWidth, int $maxHeight = PHP_INT_MAX, string $disk = 'public'): string
+    {
+        $image = $this->load($sourceFile);
+        $path = "{$directory}/".Str::random(40).'.webp';
+
+        Storage::disk($disk)->put($path, $this->encode($this->resize($image, $maxWidth, $maxHeight)));
+
+        return $path;
     }
 
     private function load(string $file): GdImage
