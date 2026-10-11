@@ -171,6 +171,7 @@ class CarController extends Controller
         return [
             'brands' => Brand::orderBy('name')->get(['id', 'name']),
             'categories' => Category::orderBy('name')->get(['id', 'name']),
+            'featuredCount' => Car::query()->featuredOnHome()->count(),
         ];
     }
 }

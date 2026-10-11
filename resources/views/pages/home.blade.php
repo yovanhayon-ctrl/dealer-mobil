@@ -6,8 +6,10 @@
 @php
     $dealer = config('dealer');
     $creditUrl = Route::has('credit.index') ? route('credit.index') : null;
-    // Mobil unggulan: pilihan admin ("Jadikan unggulan"); bila tidak ada, Nissan berfoto terbaru (lihat HomeController).
-    $featuredCar = $chosenFeaturedCar ?? $autoFeaturedCar;
+    // Mobil unggulan: pilihan admin ("Jadikan unggulan", maks. 5); bila tidak ada, Nissan berfoto terbaru (lihat HomeController).
+    // Hero memakai mobil pertama; bagian "Mobil Unggulan" menampilkan semuanya bergantian.
+    $featuredCars = $chosenFeaturedCars->isNotEmpty() ? $chosenFeaturedCars : collect([$autoFeaturedCar])->filter();
+    $featuredCar = $featuredCars->first();
     // Video latar hero (DEALER_HERO_VIDEOS): hanya file .mp4 yang benar-benar ada di folder public.
     $heroVideos = collect(config('dealer.hero_videos', []))
         ->filter(fn ($path) => is_string($path) && str_ends_with(strtolower($path), '.mp4')
@@ -98,31 +100,72 @@
     @endif
 
     {{-- Mobil unggulan saat hero memakai video (tanpa video, mobil unggulan sudah tampil di hero). --}}
-    @if ($featuredCar && $heroVideos->isNotEmpty())
-        @php($showcaseTitle = "{$featuredCar->brand->name} {$featuredCar->name} {$featuredCar->year}")
+    @if ($featuredCars->isNotEmpty() && $heroVideos->isNotEmpty())
+        @php($isSlider = $featuredCars->count() > 1)
         <section class="container home-section scroll-showcase" aria-labelledby="showcase-title">
             <div class="scroll-showcase-head text-center mx-auto">
                 <h2 id="showcase-title" class="h4 mb-1">Mobil Unggulan</h2>
-                <p class="text-muted mb-0">{{ $showcaseTitle }}, {{ strtolower($featuredCar->condition_label) }}.</p>
+                <p class="text-muted mb-0">
+                    @if ($isSlider)
+                        {{ $featuredCars->count() }} mobil pilihan {{ $dealer['name'] }}.
+                    @else
+                        {{ $featuredCar->brand->name }} {{ $featuredCar->name }} {{ $featuredCar->year }}, {{ strtolower($featuredCar->condition_label) }}.
+                    @endif
+                </p>
             </div>
 
-            {{-- Bingkai miring 3D lalu tegak saat discroll: animasi CSS murni (app.css), tanpa JavaScript. --}}
+            {{--
+                Bingkai miring 3D lalu tegak saat digulir (CSS murni, app.css). Beberapa mobil: Carousel Bootstrap
+                tanpa autoplay; pindah lewat tombol, titik, geser (HP), atau panah keyboard.
+            --}}
             <div class="scroll-showcase-stage">
-                <a href="{{ route('cars.show', $featuredCar) }}" class="scroll-showcase-card d-block text-decoration-none"
-                   aria-label="Lihat detail {{ $showcaseTitle }}">
-                    <img src="{{ $featuredCar->primaryImage->url }}" alt="{{ $showcaseTitle }}"
-                         width="1600" height="900" loading="lazy" class="scroll-showcase-img">
-                    <span class="scroll-showcase-body d-flex flex-wrap align-items-center justify-content-between gap-3">
-                        <span class="min-w-0">
-                            <span class="d-block fw-semibold font-heading text-white text-truncate">{{ $showcaseTitle }}</span>
-                            @if ($featuredCar->hasPromoPrice())
-                                <del class="small d-block scroll-showcase-old"><x-price :amount="$featuredCar->price" /></del>
-                            @endif
-                            <x-price :amount="$featuredCar->finalPrice()" class="fs-5 fw-bold text-white" />
-                        </span>
-                        <span class="btn btn-accent">Lihat Detail<i class="bi bi-arrow-right ms-1 me-0"></i></span>
-                    </span>
-                </a>
+                <div class="scroll-showcase-card">
+                    <div @if ($isSlider) id="featuredCarousel" class="carousel slide" data-bs-interval="false"
+                         aria-roledescription="carousel" aria-label="Mobil unggulan" @endif>
+                        <div @class(['carousel-inner' => $isSlider])>
+                            @foreach ($featuredCars as $car)
+                                @php($showcaseTitle = "{$car->brand->name} {$car->name} {$car->year}")
+                                <div @class(['carousel-item' => $isSlider, 'active' => $isSlider && $loop->first])
+                                     @if ($isSlider) aria-roledescription="slide" aria-label="{{ $loop->iteration }} dari {{ $loop->count }}" @endif>
+                                    <a href="{{ route('cars.show', $car) }}" class="d-block text-decoration-none"
+                                       aria-label="Lihat detail {{ $showcaseTitle }}">
+                                        <img src="{{ $car->primaryImage->url }}" alt="{{ $showcaseTitle }}"
+                                             width="1600" height="900" loading="lazy" class="scroll-showcase-img">
+                                        <span class="scroll-showcase-body d-flex flex-wrap align-items-center justify-content-between gap-3">
+                                            <span class="min-w-0">
+                                                <span class="d-block fw-semibold font-heading text-white text-truncate">{{ $showcaseTitle }}</span>
+                                                @if ($car->hasPromoPrice())
+                                                    <del class="small d-block scroll-showcase-old"><x-price :amount="$car->price" /></del>
+                                                @endif
+                                                <x-price :amount="$car->finalPrice()" class="fs-5 fw-bold text-white" />
+                                            </span>
+                                            <span class="btn btn-accent">Lihat Detail<i class="bi bi-arrow-right ms-1 me-0"></i></span>
+                                        </span>
+                                    </a>
+                                </div>
+                            @endforeach
+                        </div>
+
+                        @if ($isSlider)
+                            {{-- Tombol di bawah slide (bukan di atas foto) agar tidak menutupi tombol Lihat Detail. --}}
+                            <div class="scroll-showcase-nav">
+                                <button type="button" class="scroll-showcase-arrow" data-bs-target="#featuredCarousel" data-bs-slide="prev">
+                                    <i class="bi bi-chevron-left" aria-hidden="true"></i><span class="visually-hidden">Mobil sebelumnya</span>
+                                </button>
+                                <div class="carousel-indicators scroll-showcase-dots">
+                                    @foreach ($featuredCars as $car)
+                                        <button type="button" data-bs-target="#featuredCarousel" data-bs-slide-to="{{ $loop->index }}"
+                                                @class(['active' => $loop->first]) @if ($loop->first) aria-current="true" @endif
+                                                aria-label="Mobil {{ $loop->iteration }}: {{ $car->brand->name }} {{ $car->name }}"></button>
+                                    @endforeach
+                                </div>
+                                <button type="button" class="scroll-showcase-arrow" data-bs-target="#featuredCarousel" data-bs-slide="next">
+                                    <i class="bi bi-chevron-right" aria-hidden="true"></i><span class="visually-hidden">Mobil berikutnya</span>
+                                </button>
+                            </div>
+                        @endif
+                    </div>
+                </div>
             </div>
         </section>
     @endif

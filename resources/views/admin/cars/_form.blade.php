@@ -104,7 +104,7 @@
             <h2 class="admin-form-section-title">Status</h2>
             <x-form.checkbox name="is_active" label="Aktif (tampil di katalog)" :checked="$car->is_active" />
             <x-form.checkbox name="is_featured" label="Jadikan unggulan di beranda" :checked="$car->is_featured"
-                             help="Tampil di kartu banner beranda (bila video latar tidak dipakai). Perlu mobil aktif dan punya foto; bila beberapa dicentang, yang terakhir diubah yang tampil." />
+                             :help="'Saat ini '.$featuredCount.' mobil unggulan aktif. Beranda menampilkan maksimal '.\App\Models\Car::MAX_FEATURED_ON_HOME.' mobil bergantian (yang terakhir diubah didahulukan). Perlu mobil aktif dan punya foto.'" />
         </section>
 
         <section class="admin-form-section">

@@ -1994,6 +1994,54 @@ tr[data-row-link] {
     color: rgba(255, 255, 255, .6);
 }
 
+/* Beberapa mobil unggulan: tombol & titik di bawah slide, di dalam bingkai. */
+.scroll-showcase-nav {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    padding: .75rem 0 .25rem;
+}
+
+.scroll-showcase-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem;
+    height: 2.25rem;
+    border: 1px solid rgba(255, 255, 255, .25);
+    border-radius: 999px;
+    background: transparent;
+    color: #fff;
+}
+
+.scroll-showcase-arrow:hover,
+.scroll-showcase-arrow:focus-visible {
+    border-color: #fff;
+}
+
+.scroll-showcase .scroll-showcase-dots {
+    position: static;
+    margin: 0;
+    gap: .4rem;
+}
+
+.scroll-showcase .scroll-showcase-dots [data-bs-target] {
+    width: .55rem;
+    height: .55rem;
+    margin: 0;
+    border: 0;
+    border-radius: 999px;
+    background-color: #fff;
+    opacity: .35;
+}
+
+.scroll-showcase .scroll-showcase-dots .active {
+    width: 1.5rem;
+    background-color: var(--dm-red);
+    opacity: 1;
+}
+
 @keyframes scroll-showcase-tilt {
     from {
         transform: rotateX(20deg) scale(1.05);
