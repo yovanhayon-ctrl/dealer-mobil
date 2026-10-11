@@ -1,6 +1,11 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="csrf-token" content="{{ csrf_token() }}">
+<meta name="theme-color" content="#1c1c1e">
+@unless ($forceLight ?? false)
+    {{-- Mode terang/gelap dipasang sebelum CSS dimuat agar halaman tidak berkedip putih. --}}
+    <script src="{{ \App\Support\Asset::url('js/theme.js') }}"></script>
+@endunless
 <link rel="icon" type="image/png" href="{{ \App\Support\Asset::url('images/favicon-64.png') }}">
 <title>@hasSection('title')@yield('title') | @endif{{ config('dealer.name') }}</title>
 <meta name="description" content="@yield('meta_description', config('dealer.tagline') ?: config('dealer.name').': jual mobil baru dan bekas, promo, dan simulasi kredit.')">

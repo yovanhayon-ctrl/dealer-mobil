@@ -17,7 +17,7 @@
     --bs-primary-rgb: 28, 28, 30;
     --bs-danger: var(--dm-red);
     --bs-danger-rgb: 195, 0, 47;
-    --bs-link-color: var(--dm-navy);
+    --bs-link-color: var(--dm-ink);
     --bs-link-color-rgb: 28, 28, 30;
     --bs-link-hover-color: var(--dm-red);
     --bs-link-hover-color-rgb: 195, 0, 47;
@@ -32,6 +32,17 @@
      */
     --dm-radius-panel: 1rem;
     --dm-radius-control: .5rem;
+
+    /*
+     * Token yang berganti di mode gelap (lihat bagian "Mode gelap" di akhir file):
+     * teks utama, permukaan kartu/chip, garis tipis, latar tipis, teks redup, teks merah.
+     */
+    --dm-ink: var(--dm-navy);
+    --dm-surface: #fff;
+    --dm-line: rgba(28, 28, 30, .1);
+    --dm-tint: rgba(28, 28, 30, .08);
+    --dm-muted: #6c757d;
+    --dm-accent-text: var(--dm-red);
 }
 
 body {
@@ -49,7 +60,7 @@ h1, h2, h3, h4, h5, h6,
 
 h1, h2, h3, h4, h5, h6 {
     font-weight: 600;
-    color: var(--dm-navy);
+    color: var(--dm-ink);
 }
 
 main {
@@ -84,7 +95,7 @@ main {
 }
 
 .btn-outline-primary {
-    --bs-btn-color: var(--dm-navy);
+    --bs-btn-color: var(--dm-ink);
     --bs-btn-border-color: var(--dm-navy);
     --bs-btn-hover-bg: var(--dm-navy);
     --bs-btn-hover-border-color: var(--dm-navy);
@@ -111,7 +122,7 @@ main {
 }
 
 .text-accent {
-    color: var(--dm-red) !important;
+    color: var(--dm-accent-text) !important;
 }
 
 /* ---------- Form ---------- */
@@ -130,16 +141,16 @@ main {
 
 /* Pagination & filter pil: warna JAF (bukan biru bawaan Bootstrap). */
 .pagination {
-    --bs-pagination-color: var(--dm-navy);
+    --bs-pagination-color: var(--dm-ink);
     --bs-pagination-hover-color: var(--dm-red);
-    --bs-pagination-focus-color: var(--dm-navy);
+    --bs-pagination-focus-color: var(--dm-ink);
     --bs-pagination-focus-box-shadow: 0 0 0 .2rem rgba(28, 28, 30, .15);
     --bs-pagination-active-bg: var(--dm-navy);
     --bs-pagination-active-border-color: var(--dm-navy);
 }
 
 .nav-pills {
-    --bs-nav-link-color: var(--dm-navy);
+    --bs-nav-link-color: var(--dm-ink);
     --bs-nav-link-hover-color: var(--dm-red);
     --bs-nav-pills-link-active-bg: var(--dm-navy);
     --bs-nav-pills-border-radius: 999px;
@@ -528,7 +539,7 @@ main {
 /* Kartu mobil unggulan di hero. */
 .hero-feature {
     position: relative;
-    background-color: #fff;
+    background-color: var(--dm-surface);
     border-radius: 1rem;
     padding: .6rem;
     box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, .45);
@@ -588,8 +599,8 @@ main {
     padding: .4rem .85rem;
     border: 1px solid #dee2e6;
     border-radius: 2rem;
-    background-color: #fff;
-    color: var(--dm-navy);
+    background-color: var(--dm-surface);
+    color: var(--dm-ink);
     font-weight: 500;
     text-decoration: none;
     transition: border-color .15s ease, color .15s ease;
@@ -597,7 +608,7 @@ main {
 
 .shortcut-chip:hover {
     border-color: var(--dm-red);
-    color: var(--dm-red);
+    color: var(--dm-accent-text);
 }
 
 .shortcut-chip-count {
@@ -605,7 +616,7 @@ main {
     padding: .05rem .5rem;
     border-radius: 1rem;
     background-color: var(--dm-bg);
-    color: #6c757d;
+    color: var(--dm-muted);
 }
 
 /* ---------- Publik: kartu mobil & promo ---------- */
@@ -667,7 +678,7 @@ main {
 
 .car-card-favorite.is-favorite,
 .car-card-favorite:hover {
-    color: var(--dm-red);
+    color: var(--dm-accent-text);
 }
 
 .car-card-badges {
@@ -687,7 +698,7 @@ main {
 }
 
 .price-old {
-    color: #6c757d;
+    color: var(--dm-muted);
 }
 
 .price-final {
@@ -695,7 +706,7 @@ main {
     font-family: var(--dm-font-heading);
     font-size: 1.15rem;
     font-weight: 700;
-    color: var(--dm-red);
+    color: var(--dm-accent-text);
 }
 
 /* ---------- Publik: katalog ---------- */
@@ -706,15 +717,15 @@ main {
     gap: .4rem;
     padding: .3rem .75rem;
     border-radius: 2rem;
-    background-color: rgba(28, 28, 30, .08);
-    color: var(--dm-navy);
+    background-color: var(--dm-tint);
+    color: var(--dm-ink);
     font-size: .875rem;
     text-decoration: none;
 }
 
 .filter-chip:hover {
     background-color: rgba(195, 0, 47, .1);
-    color: var(--dm-red);
+    color: var(--dm-accent-text);
 }
 
 .filter-chip .bi {
@@ -818,11 +829,11 @@ main {
 .car-detail-link {
     font-size: .9rem;
     font-weight: 500;
-    color: var(--dm-navy);
+    color: var(--dm-ink);
 }
 
 .car-detail-link:hover {
-    color: var(--dm-red);
+    color: var(--dm-accent-text);
 }
 
 /* Spesifikasi: 2 kolom label/isi, tanpa garis per baris. */
@@ -835,7 +846,7 @@ main {
 .spec-grid dt {
     font-size: .8rem;
     font-weight: 500;
-    color: #6c757d;
+    color: var(--dm-muted);
 }
 
 .spec-grid dd {
@@ -968,7 +979,7 @@ img.promo-card-img {
 .notification-new {
     font-size: .75rem;
     font-weight: 600;
-    color: var(--dm-red);
+    color: var(--dm-accent-text);
 }
 
 /* ---------- Publik: JAF Service ---------- */
@@ -980,8 +991,8 @@ img.promo-card-img {
     width: 3rem;
     height: 3rem;
     border-radius: var(--dm-radius-control);
-    background-color: rgba(28, 28, 30, .08);
-    color: var(--dm-navy);
+    background-color: var(--dm-tint);
+    color: var(--dm-ink);
     font-size: 1.35rem;
 }
 
@@ -1086,7 +1097,7 @@ img.promo-card-img {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .03em;
-    color: #6c757d;
+    color: var(--dm-muted);
     background-color: var(--dm-bg);
     white-space: nowrap;
 }
@@ -1098,7 +1109,7 @@ img.promo-card-img {
 
 .breadcrumb {
     --bs-breadcrumb-divider-color: #adb5bd;
-    --bs-breadcrumb-item-active-color: #6c757d;
+    --bs-breadcrumb-item-active-color: var(--dm-muted);
 }
 
 .min-w-0 {
@@ -1133,7 +1144,7 @@ img.promo-card-img {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .05em;
-    color: #6c757d;
+    color: var(--dm-muted);
     margin-bottom: 1rem;
 }
 
@@ -1146,7 +1157,7 @@ img.promo-card-img {
     gap: .5rem;
     margin: 1.5rem -1.5rem -1.5rem;
     padding: .9rem 1.5rem;
-    background-color: #fff;
+    background-color: var(--dm-surface);
     border-top: 1px solid var(--bs-border-color-translucent);
     border-radius: 0 0 var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius);
 }
@@ -1205,7 +1216,7 @@ img.promo-card-img {
     height: 40px;
     object-fit: contain;
     border-radius: .5rem;
-    background-color: #fff;
+    background-color: var(--dm-surface);
     border: 1px solid #e9ecef;
 }
 
@@ -1240,8 +1251,8 @@ img.promo-card-img {
     font-size: 1.35rem;
 }
 
-.stat-card-icon-navy   { background-color: rgba(28, 28, 30, .1);   color: var(--dm-navy); }
-.stat-card-icon-red    { background-color: rgba(195, 0, 47, .1);  color: var(--dm-red); }
+.stat-card-icon-navy   { background-color: rgba(28, 28, 30, .1);   color: var(--dm-ink); }
+.stat-card-icon-red    { background-color: rgba(195, 0, 47, .1);  color: var(--dm-accent-text); }
 .stat-card-icon-yellow { background-color: rgba(255, 193, 7, .18); color: #9a6b00; }
 .stat-card-icon-green  { background-color: rgba(25, 135, 84, .12); color: #198754; }
 .stat-card-icon-blue   { background-color: rgba(13, 110, 253, .1); color: #0d6efd; }
@@ -1251,7 +1262,7 @@ img.promo-card-img {
     font-size: 1.6rem;
     font-weight: 700;
     line-height: 1.1;
-    color: var(--dm-navy);
+    color: var(--dm-ink);
 }
 
 /* ---------- Komponen: status-badge (RANCANGAN §2) ---------- */
@@ -1344,7 +1355,7 @@ img.promo-card-img {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .05em;
-    color: #6c757d;
+    color: var(--dm-muted);
     margin-bottom: .75rem;
 }
 
@@ -1502,7 +1513,7 @@ tr[data-row-link] {
 
 .promo-card-placeholder-label .bi {
     margin-right: .35rem;
-    color: var(--dm-red);
+    color: var(--dm-accent-text);
 }
 
 .promo-card-placeholder-value {
@@ -1517,13 +1528,13 @@ tr[data-row-link] {
 .shortcut-card-title {
     font-size: 1rem;
     font-weight: 600;
-    color: var(--dm-navy);
+    color: var(--dm-ink);
     margin-bottom: .85rem;
 }
 
 .shortcut-card-title .bi {
     margin-right: .4rem;
-    color: var(--dm-red);
+    color: var(--dm-accent-text);
 }
 
 /* Mobil terbaru di HP: satu baris yang bisa digeser (scroll-snap), kartu berikutnya sedikit terlihat. */
@@ -1570,7 +1581,7 @@ tr[data-row-link] {
 }
 
 .admin-list-summary {
-    color: #6c757d;
+    color: var(--dm-muted);
     font-size: .9rem;
 }
 
@@ -1639,12 +1650,12 @@ tr[data-row-link] {
     display: inline-block;
     margin-bottom: .25rem;
     font-size: .8rem;
-    color: #6c757d;
+    color: var(--dm-muted);
     text-decoration: none;
 }
 
 .admin-detail-back:hover {
-    color: var(--dm-red);
+    color: var(--dm-accent-text);
 }
 
 .admin-detail-back .bi {
@@ -1656,7 +1667,7 @@ tr[data-row-link] {
     font-weight: 600;
     text-transform: uppercase;
     letter-spacing: .05em;
-    color: #6c757d;
+    color: var(--dm-muted);
     margin-bottom: 1rem;
 }
 
@@ -1671,7 +1682,7 @@ tr[data-row-link] {
 
 .admin-detail-list dt {
     font-weight: 400;
-    color: #6c757d;
+    color: var(--dm-muted);
     font-size: .8rem;
 }
 
@@ -1722,7 +1733,7 @@ tr[data-row-link] {
     border-top: 1px solid var(--bs-border-color-translucent);
     text-align: center;
     font-size: .8rem;
-    color: #6c757d;
+    color: var(--dm-muted);
 }
 
 /* Label lebih dulu di HTML (urutan baca), angka tampil di atas. */
@@ -1759,7 +1770,7 @@ tr[data-row-link] {
     padding: .5rem .85rem;
     border-radius: 999px;
     border: 1px solid var(--bs-border-color);
-    background-color: #fff;
+    background-color: var(--dm-surface);
     color: var(--bs-body-color);
     font-size: .9rem;
     text-decoration: none;
@@ -1767,7 +1778,7 @@ tr[data-row-link] {
 }
 
 .account-nav-link:hover {
-    color: var(--dm-red);
+    color: var(--dm-accent-text);
 }
 
 .account-nav-link.active {
@@ -1780,7 +1791,7 @@ tr[data-row-link] {
     font-size: .75rem;
     padding: 0 .45rem;
     border-radius: 999px;
-    background-color: rgba(0, 0, 0, .07);
+    background-color: var(--dm-tint);
 }
 
 .account-nav-link.active .account-nav-count {
@@ -1794,7 +1805,7 @@ tr[data-row-link] {
         position: sticky;
         top: 5rem;
         padding: .5rem;
-        background-color: #fff;
+        background-color: var(--dm-surface);
         border: 1px solid var(--bs-border-color-translucent);
         border-radius: var(--bs-border-radius-lg);
     }
@@ -1831,7 +1842,7 @@ tr[data-row-link] {
     padding: .3rem .8rem;
     border-radius: 999px;
     border: 1px solid var(--bs-border-color);
-    background-color: #fff;
+    background-color: var(--dm-surface);
     color: var(--bs-body-color);
     font-size: .85rem;
     text-decoration: none;
@@ -1839,12 +1850,12 @@ tr[data-row-link] {
 
 .account-status-chip span {
     margin-left: .25rem;
-    color: #6c757d;
+    color: var(--dm-muted);
 }
 
 .account-status-chip.active {
     border-color: var(--dm-red);
-    color: var(--dm-red);
+    color: var(--dm-accent-text);
     font-weight: 600;
 }
 
@@ -1878,7 +1889,7 @@ tr[data-row-link] {
 .account-item-details summary {
     font-size: .85rem;
     font-weight: 600;
-    color: var(--dm-navy);
+    color: var(--dm-ink);
     cursor: pointer;
 }
 
@@ -1900,19 +1911,19 @@ tr[data-row-link] {
     font-size: 3.5rem;
     font-weight: 700;
     line-height: 1;
-    color: var(--dm-navy);
+    color: var(--dm-ink);
 }
 
 .testimonial-score-max {
     margin-left: .15rem;
     font-size: 1.25rem;
     font-weight: 500;
-    color: #6c757d;
+    color: var(--dm-muted);
 }
 
 .testimonial-item {
     padding: 1.5rem 0;
-    border-top: 1px solid rgba(28, 28, 30, .1);
+    border-top: 1px solid var(--dm-line);
 }
 
 .testimonial-item:first-child {
@@ -1933,7 +1944,7 @@ tr[data-row-link] {
     overflow: hidden;
     font-size: 1.05rem;
     line-height: 1.6;
-    color: var(--dm-navy);
+    color: var(--dm-ink);
 }
 
 .testimonial-stars {
@@ -2043,7 +2054,7 @@ tr[data-row-link] {
     margin: 0;
     border: 0;
     border-radius: 999px;
-    background-color: #fff;
+    background-color: var(--dm-surface);
     opacity: .35;
 }
 
@@ -2119,14 +2130,14 @@ tr[data-row-link] {
     display: flex;
     flex-direction: column;
     padding-left: 1rem;
-    border-left: 1px solid rgba(28, 28, 30, .12);
+    border-left: 1px solid var(--dm-line);
 }
 
 .about-stats dt {
     order: 2;
     font-size: .85rem;
     font-weight: 500;
-    color: #6c757d;
+    color: var(--dm-muted);
 }
 
 .about-stats dd {
@@ -2136,7 +2147,7 @@ tr[data-row-link] {
     font-size: 2.5rem;
     font-weight: 700;
     line-height: 1.1;
-    color: var(--dm-navy);
+    color: var(--dm-ink);
 }
 
 /* Penawaran: baris judul | penjelasan | tautan, dipisah garis tipis (bukan 3 kartu sama besar). */
@@ -2145,11 +2156,11 @@ tr[data-row-link] {
     grid-template-columns: 1fr;
     gap: .25rem;
     padding: 1.25rem 0;
-    border-top: 1px solid rgba(28, 28, 30, .1);
+    border-top: 1px solid var(--dm-line);
 }
 
 .about-offer:last-child {
-    border-bottom: 1px solid rgba(28, 28, 30, .1);
+    border-bottom: 1px solid var(--dm-line);
 }
 
 @media (min-width: 768px) {
@@ -2169,7 +2180,7 @@ tr[data-row-link] {
 
 .about-steps li {
     padding-top: .9rem;
-    border-top: 2px solid rgba(28, 28, 30, .12);
+    border-top: 2px solid var(--dm-line);
 }
 
 .about-steps li:first-child {
@@ -2229,4 +2240,179 @@ tr[data-row-link] {
     font-family: var(--dm-font-heading);
     font-weight: 600;
     letter-spacing: .02em;
+}
+
+/* ---------- Tombol mode terang/gelap ---------- */
+
+.theme-toggle .bi {
+    margin-right: 0;
+}
+
+.theme-toggle-label {
+    margin-left: .4rem;
+}
+
+.theme-icon-sun,
+[data-bs-theme="dark"] .theme-icon-moon {
+    display: none;
+}
+
+[data-bs-theme="dark"] .theme-icon-sun {
+    display: inline-block;
+}
+
+.auth-theme-toggle {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+}
+
+/* ==========================================================================
+ * Mode gelap (halaman publik, akun, login). Admin selalu terang (data-bs-theme="light").
+ * Bootstrap 5.3 menangani form, tabel, dropdown, dan modal; di sini warna khusus JAF.
+ * Latar hitam lembut (bukan #000), teks putih lembut, merah brand tetap; teks merah dibuat lebih terang
+ * agar kontras di latar gelap tetap cukup (WCAG AA).
+ * ========================================================================== */
+
+[data-bs-theme="dark"] {
+    color-scheme: dark;
+
+    --bs-body-bg: #0f0f11;
+    --bs-body-bg-rgb: 15, 15, 17;
+    --bs-body-color: #e7e7ea;
+    --bs-body-color-rgb: 231, 231, 234;
+    --bs-emphasis-color: #fff;
+    --bs-emphasis-color-rgb: 255, 255, 255;
+    --bs-secondary-color: #a1a1aa;
+    --bs-secondary-color-rgb: 161, 161, 170;
+    --bs-secondary-bg: #1a1a1d;
+    --bs-tertiary-bg: #141417;
+    --bs-border-color: rgba(255, 255, 255, .12);
+    --bs-link-color: #e7e7ea;
+    --bs-link-color-rgb: 231, 231, 234;
+    --bs-link-hover-color: #ff5470;
+    --bs-link-hover-color-rgb: 255, 84, 112;
+
+    --dm-bg: #141417;
+    --dm-ink: #f2f2f4;
+    --dm-surface: #1a1a1d;
+    --dm-line: rgba(255, 255, 255, .1);
+    --dm-tint: rgba(255, 255, 255, .08);
+    --dm-muted: #a1a1aa;
+    --dm-accent-text: #ff5470;
+}
+
+[data-bs-theme="dark"] .card {
+    --bs-card-bg: var(--dm-surface);
+    --bs-card-border-color: var(--dm-line);
+    border: 1px solid var(--dm-line);
+    box-shadow: none;
+}
+
+[data-bs-theme="dark"] .card-hover:hover {
+    box-shadow: 0 .75rem 1.5rem rgba(0, 0, 0, .5);
+}
+
+/* Tombol hitam JAF tidak terlihat di latar hitam: dibalik menjadi terang. */
+[data-bs-theme="dark"] .btn-primary {
+    --bs-btn-color: #0f0f11;
+    --bs-btn-bg: #e7e7ea;
+    --bs-btn-border-color: #e7e7ea;
+    --bs-btn-hover-color: #0f0f11;
+    --bs-btn-hover-bg: #fff;
+    --bs-btn-hover-border-color: #fff;
+    --bs-btn-active-color: #0f0f11;
+    --bs-btn-active-bg: #fff;
+    --bs-btn-active-border-color: #fff;
+    --bs-btn-disabled-color: #0f0f11;
+    --bs-btn-disabled-bg: #e7e7ea;
+    --bs-btn-disabled-border-color: #e7e7ea;
+}
+
+[data-bs-theme="dark"] .btn-outline-primary {
+    --bs-btn-border-color: rgba(255, 255, 255, .45);
+    --bs-btn-hover-color: #0f0f11;
+    --bs-btn-hover-bg: #e7e7ea;
+    --bs-btn-hover-border-color: #e7e7ea;
+    --bs-btn-active-color: #0f0f11;
+    --bs-btn-active-bg: #fff;
+    --bs-btn-active-border-color: #fff;
+}
+
+/* Outline abu bawaan Bootstrap terlalu redup di latar gelap (Bandingkan, Cetak PDF, Favorit). */
+[data-bs-theme="dark"] .btn-outline-secondary {
+    --bs-btn-color: #c4c4cc;
+    --bs-btn-border-color: rgba(255, 255, 255, .28);
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: rgba(255, 255, 255, .1);
+    --bs-btn-hover-border-color: rgba(255, 255, 255, .45);
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: rgba(255, 255, 255, .16);
+    --bs-btn-active-border-color: rgba(255, 255, 255, .45);
+}
+
+[data-bs-theme="dark"] .pagination {
+    --bs-pagination-active-bg: #e7e7ea;
+    --bs-pagination-active-border-color: #e7e7ea;
+    --bs-pagination-active-color: #0f0f11;
+}
+
+[data-bs-theme="dark"] .nav-pills {
+    --bs-nav-pills-link-active-bg: #e7e7ea;
+    --bs-nav-pills-link-active-color: #0f0f11;
+}
+
+[data-bs-theme="dark"] .form-check-input:checked {
+    background-color: var(--dm-red);
+    border-color: var(--dm-red);
+}
+
+[data-bs-theme="dark"] .form-check-input:focus {
+    border-color: rgba(255, 255, 255, .5);
+    box-shadow: 0 0 0 .2rem rgba(255, 255, 255, .15);
+}
+
+/* Menu akun & avatar: hitam JAF diganti terang agar tetap menonjol. */
+[data-bs-theme="dark"] .account-nav-link.active {
+    background-color: rgba(255, 255, 255, .1);
+    border-color: transparent;
+    color: #fff;
+}
+
+[data-bs-theme="dark"] .account-avatar,
+[data-bs-theme="dark"] .badge-condition-new {
+    background-color: #e7e7ea;
+    color: #0f0f11;
+}
+
+[data-bs-theme="dark"] .badge-status-muted {
+    background-color: rgba(255, 255, 255, .12);
+    color: #e7e7ea;
+}
+
+[data-bs-theme="dark"] .badge-status-dark {
+    background-color: #3f3f46;
+}
+
+/* Bagian yang memang gelap di mode terang: dipisahkan sedikit dari latar halaman. */
+[data-bs-theme="dark"] .navbar-dealer,
+[data-bs-theme="dark"] .site-footer,
+[data-bs-theme="dark"] .compare-bar {
+    background-color: #18181b;
+}
+
+[data-bs-theme="dark"] .home-cta-band {
+    background-color: #1c1c1f;
+}
+
+[data-bs-theme="dark"] .hero-feature {
+    box-shadow: 0 1.25rem 2.5rem rgba(0, 0, 0, .6);
+}
+
+[data-bs-theme="dark"] .scroll-showcase-card {
+    border-color: #2c2c30;
+}
+
+[data-bs-theme="dark"] .text-muted {
+    color: var(--dm-muted) !important;
 }
