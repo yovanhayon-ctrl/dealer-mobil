@@ -173,10 +173,14 @@ main {
  * meluncur mengikuti kursor/fokus lalu kembali ke menu aktif.
  */
 @media (min-width: 1200px) {
+    /* Pil selebar isinya, di tengah antara logo dan tombol akun; jarak antarmenu sama. */
     .navbar-tubelight {
         position: relative;
+        flex: 0 1 auto;
+        justify-content: center;
         align-items: center;
-        gap: .1rem;
+        gap: .35rem;
+        margin: 0 auto !important;
         padding: .25rem;
         border: 1px solid rgba(255, 255, 255, .1);
         border-radius: 999px;
