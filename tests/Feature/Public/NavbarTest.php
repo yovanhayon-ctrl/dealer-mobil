@@ -55,6 +55,16 @@ class NavbarTest extends TestCase
         $this->assertSame(1, substr_count($navbar, 'aria-current="page"'));
     }
 
+    public function test_menu_tubelight_dengan_lampu_dari_app_js(): void
+    {
+        $navbar = $this->navbar($this->get(route('home'))->assertOk());
+
+        // Menu dibungkus pil "tubelight"; lampu (.tubelight-lamp) dibuat app.js, bukan di HTML.
+        $this->assertStringContainsString('<ul class="navbar-nav navbar-tubelight me-auto mb-2 mb-xl-0 text-nowrap" data-tubelight>', $navbar);
+        $this->assertStringNotContainsString('tubelight-lamp', $navbar);
+        $this->assertStringContainsString("querySelector('[data-tubelight]')", file_get_contents(public_path('js/app.js')));
+    }
+
     public function test_customer_melihat_nama_dan_keluar_tanpa_dashboard_admin(): void
     {
         $customer = User::factory()->create(['name' => 'Budi Santoso']);

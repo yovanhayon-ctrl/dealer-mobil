@@ -55,7 +55,7 @@ class ProfileRequest extends FormRequest
     {
         return [
             'email.unique' => 'Email ini sudah dipakai akun lain.',
-            'phone.regex' => 'Nomor WhatsApp tidak valid. Gunakan format 08xx (10–13 digit).',
+            'phone.regex' => 'Nomor WhatsApp tidak valid. Gunakan format 08xx (10-13 digit).',
         ];
     }
 }

@@ -111,7 +111,7 @@
                                 <td>
                                     <a href="{{ route('admin.cars.images.index', $car) }}" title="Kelola galeri">
                                         @if ($car->primaryImage)
-                                            <img src="{{ $car->primaryImage->url }}" alt="{{ $carTitle }}" class="car-thumb" loading="lazy">
+                                            <img src="{{ $car->primaryImage->thumb_url }}" alt="{{ $carTitle }}" class="car-thumb" loading="lazy">
                                         @else
                                             <span class="car-thumb car-thumb-empty"><i class="bi bi-car-front"></i></span>
                                         @endif

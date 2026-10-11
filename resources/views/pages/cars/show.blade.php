@@ -15,15 +15,38 @@
 @section('title', $title)
 @section('meta_description', $metaDescription)
 
+@section('og_type', 'product')
+@if ($images->isNotEmpty())
+    @section('og_image', $images->first()->url)
+@endif
+
+@php
+    // Data terstruktur (schema.org) untuk hasil pencarian Google.
+    $structuredData = array_filter([
+        '@context' => 'https://schema.org',
+        '@type' => 'Car',
+        'name' => $title,
+        'brand' => ['@type' => 'Brand', 'name' => $car->brand->name],
+        'model' => $car->name,
+        'vehicleModelDate' => (string) $car->year,
+        'itemCondition' => $car->isNew() ? 'https://schema.org/NewCondition' : 'https://schema.org/UsedCondition',
+        'description' => $metaDescription,
+        'image' => $images->map(fn ($image) => $image->url)->values()->all() ?: null,
+        'url' => $detailUrl,
+        'offers' => [
+            '@type' => 'Offer',
+            'price' => $finalPrice,
+            'priceCurrency' => 'IDR',
+            'availability' => $car->inStock() ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            'url' => $detailUrl,
+            'seller' => ['@type' => 'AutoDealer', 'name' => config('dealer.name')],
+        ],
+    ]);
+@endphp
+
 @push('meta')
-    <link rel="canonical" href="{{ $detailUrl }}">
-    <meta property="og:type" content="product">
-    <meta property="og:title" content="{{ $title }}">
-    <meta property="og:description" content="{{ $metaDescription }}">
-    <meta property="og:url" content="{{ $detailUrl }}">
-    @if ($images->isNotEmpty())
-        <meta property="og:image" content="{{ $images->first()->url }}">
-    @endif
+    {{-- JSON-LD tidak dieksekusi browser, jadi aman untuk CSP; JSON_HEX_TAG mencegah teks keluar dari tag script. --}}
+    <script type="application/ld+json">{!! json_encode($structuredData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE | JSON_HEX_TAG | JSON_HEX_AMP) !!}</script>
 @endpush
 
 @section('content')
@@ -45,7 +68,7 @@
                             <div class="carousel-inner rounded-4">
                                 @foreach ($images as $image)
                                     <div @class(['carousel-item', 'active' => $loop->first])>
-                                        <img src="{{ $image->url }}" alt="{{ $title }} — foto {{ $loop->iteration }} dari {{ $loop->count }}"
+                                        <img src="{{ $image->url }}" alt="{{ $title }}, foto {{ $loop->iteration }} dari {{ $loop->count }}"
                                              class="car-gallery-img" loading="{{ $loop->first ? 'eager' : 'lazy' }}">
                                     </div>
                                 @endforeach
@@ -70,7 +93,7 @@
                                     <button type="button" data-bs-target="#carGallery" data-bs-slide-to="{{ $loop->index }}"
                                             aria-label="Tampilkan foto {{ $loop->iteration }}"
                                             @if ($loop->first) class="active" aria-current="true" @endif>
-                                        <img src="{{ $image->url }}" alt="" loading="lazy">
+                                        <img src="{{ $image->thumb_url }}" alt="" loading="lazy">
                                     </button>
                                 @endforeach
                             </div>
@@ -121,7 +144,7 @@
                                         @endif
                                         <br>
                                         <span class="text-muted">
-                                            {{ $promo->start_date->translatedFormat('d M Y') }} – {{ $promo->end_date->translatedFormat('d M Y') }}
+                                            {{ $promo->start_date->translatedFormat('d M Y') }} - {{ $promo->end_date->translatedFormat('d M Y') }}
                                             @if ($promo->discount_amount)
                                                 · hemat <x-price :amount="$promo->discount_amount" />
                                             @endif
@@ -189,10 +212,10 @@
                                 <tr><th scope="row">Bahan bakar</th><td>{{ $car->fuel_type_label }}</td></tr>
                                 <tr>
                                     <th scope="row">Kapasitas mesin</th>
-                                    <td>{{ $car->engine_cc ? number_format($car->engine_cc, 0, ',', '.').' cc' : '–' }}</td>
+                                    <td>{{ $car->engine_cc ? number_format($car->engine_cc, 0, ',', '.').' cc' : '-' }}</td>
                                 </tr>
                                 <tr><th scope="row">Jumlah kursi</th><td>{{ $car->seats }} kursi</td></tr>
-                                <tr><th scope="row">Warna</th><td>{{ $car->color ?: '–' }}</td></tr>
+                                <tr><th scope="row">Warna</th><td>{{ $car->color ?: '-' }}</td></tr>
                                 @unless ($car->isNew())
                                     <tr><th scope="row">Kilometer</th><td>{{ number_format($car->mileage, 0, ',', '.') }} km</td></tr>
                                 @endunless

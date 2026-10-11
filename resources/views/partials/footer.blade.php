@@ -1,7 +1,7 @@
 @php
     $dealer = config('dealer');
 
-    // Dua kolom tautan; hanya route yang sudah dibuat yang tampil.
+    // Kolom tautan; hanya route yang sudah dibuat yang tampil.
     $footerColumns = [
         'Jelajahi' => [
             'home' => 'Beranda',
@@ -13,6 +13,8 @@
             'test-drives.create' => 'Test Drive',
             'services.index' => 'Servis',
             'credit.index' => 'Simulasi Kredit',
+        ],
+        'Perusahaan' => [
             'about' => 'Tentang Kami',
             'contact' => 'Kontak',
         ],
@@ -22,21 +24,19 @@
 
 <footer class="site-footer mt-5">
     <div class="container pt-5 pb-4">
-        <div class="row g-4">
-            <div class="col-lg-4">
-                <h2 class="h5 mb-2"><i class="bi bi-car-front-fill text-accent"></i> {{ $dealer['name'] }}</h2>
-                @if ($dealer['tagline'])
-                    <p class="mb-3">{{ $dealer['tagline'] }}</p>
-                @endif
-                @if ($dealer['whatsapp'])
-                    <a href="https://wa.me/{{ $dealer['whatsapp'] }}" target="_blank" rel="noopener" class="btn btn-success btn-sm footer-whatsapp">
-                        <i class="bi bi-whatsapp"></i>Chat WhatsApp
-                    </a>
+        <div class="row g-4 g-lg-5">
+            <div class="col-lg-3">
+                <a href="{{ route('home') }}" class="footer-brand d-inline-flex align-items-center gap-2">
+                    <x-brand-logo :size="44" /> {{ $dealer['name'] }}
+                </a>
+                <p class="footer-tagline">{{ $dealer['tagline'] ?: 'Nissan Heritage & Performance' }}</p>
+                @if ($dealer['address'])
+                    <p class="footer-address mb-0">{{ $dealer['address'] }}</p>
                 @endif
             </div>
 
             @foreach ($footerColumns as $title => $links)
-                <div class="col-6 col-lg-2">
+                <div class="col-6 col-md-3 col-lg-2">
                     <h2 class="footer-title">{{ $title }}</h2>
                     <ul class="footer-links">
                         @foreach ($links as $route => $label)
@@ -47,24 +47,21 @@
                 </div>
             @endforeach
 
-            <div class="col-lg-4">
-                <h2 class="footer-title">Hubungi Kami</h2>
-                <ul class="footer-contact">
-                    @if ($dealer['address'])
-                        <li><i class="bi bi-geo-alt"></i><span>{{ $dealer['address'] }}</span></li>
-                    @endif
+            <div class="col-6 col-md-3 col-lg-3">
+                <h2 class="footer-title">Hubungi</h2>
+                <ul class="footer-links">
                     @if ($dealer['phone'])
-                        <li><i class="bi bi-telephone"></i><a href="{{ $phoneHref }}">{{ $dealer['phone'] }}</a></li>
+                        <li><a href="{{ $phoneHref }}">{{ $dealer['phone'] }}</a></li>
                     @endif
                     @if ($dealer['whatsapp'])
-                        <li><i class="bi bi-whatsapp"></i><a href="https://wa.me/{{ $dealer['whatsapp'] }}" target="_blank" rel="noopener">WhatsApp</a></li>
+                        <li><a href="https://wa.me/{{ $dealer['whatsapp'] }}" target="_blank" rel="noopener">Chat WhatsApp</a></li>
                     @endif
                     @if ($dealer['email'])
-                        <li><i class="bi bi-envelope"></i><a href="mailto:{{ $dealer['email'] }}">{{ $dealer['email'] }}</a></li>
+                        <li><a href="mailto:{{ $dealer['email'] }}" class="text-break">{{ $dealer['email'] }}</a></li>
                     @endif
                     <li>
-                        <i class="bi bi-clock"></i>
-                        <span><span class="d-block footer-muted">Jam Operasional</span>{{ $dealer['hours'] ?: '-' }}</span>
+                        <span class="d-block footer-muted">Jam Operasional</span>
+                        {{ $dealer['hours'] ?: '-' }}
                     </li>
                 </ul>
             </div>
@@ -72,13 +69,7 @@
 
         <div class="footer-bottom">
             <p class="mb-0">&copy; {{ now()->year }} {{ $dealer['name'] }}. Hak cipta dilindungi.</p>
-            <p class="mb-0">
-                {{-- Catatan data contoh hanya di luar production (situs klien tidak menampilkannya). --}}
-                @unless (app()->environment('production'))
-                    <span class="footer-muted me-3">Data kendaraan bersifat contoh.</span>
-                @endunless
-                <a href="#top">Kembali ke atas <i class="bi bi-arrow-up"></i></a>
-            </p>
+            <a href="#top" class="footer-bottom-link">Kembali ke atas</a>
         </div>
     </div>
 </footer>

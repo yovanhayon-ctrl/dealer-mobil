@@ -27,7 +27,7 @@ class TestimonialModerated extends StatusChangedNotification
             ? 'Terima kasih, ulasan Anda kini tampil di beranda.'
             : 'Silakan perbaiki ulasan Anda dari halaman Pengajuan Saya.';
 
-        return "{$car->brand->name} {$car->name} {$car->year} · ".Str::limit($this->record->comment, 60).' — '.$result;
+        return "{$car->brand->name} {$car->name} {$car->year}: “".Str::limit($this->record->comment, 60).'” '.$result;
     }
 
     protected function routeName(): string

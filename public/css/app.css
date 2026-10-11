@@ -24,6 +24,14 @@
     --bs-body-font-family: var(--dm-font-body);
     --bs-body-color: #212529;
     --bs-border-radius: .5rem;
+
+    /*
+     * Aturan sudut (satu sistem untuk seluruh situs):
+     * kartu & panel besar 1rem (--dm-radius-panel, = rounded-4), tombol/input/kotak di dalam kartu .5rem
+     * (--dm-radius-control, = rounded-3), chip & badge pill (999px).
+     */
+    --dm-radius-panel: 1rem;
+    --dm-radius-control: .5rem;
 }
 
 body {
@@ -124,7 +132,7 @@ main {
 
 .card {
     border: 0;
-    border-radius: 1rem;
+    border-radius: var(--dm-radius-panel);
     box-shadow: 0 .125rem .5rem rgba(28, 28, 30, .08);
 }
 
@@ -138,6 +146,11 @@ main {
 }
 
 /* ---------- Navbar & footer public ---------- */
+
+/* Wadah pesan (layout publik) ikut hilang setelah pesannya ditutup, agar hero kembali menempel ke navbar. */
+.flash-wrapper:not(:has(.alert)) {
+    display: none;
+}
 
 .navbar-dealer {
     background-color: var(--dm-navy);
@@ -159,27 +172,91 @@ main {
     gap: .5rem;
 }
 
+/*
+ * Menu "tubelight" (desktop): menu dalam pil, menu aktif berlatar terang dengan lampu merah bercahaya di atasnya.
+ * Tanpa JavaScript lampu menempel di menu aktif (::before/::after); dengan app.js satu lampu (.tubelight-lamp)
+ * meluncur mengikuti kursor/fokus lalu kembali ke menu aktif.
+ */
 @media (min-width: 1200px) {
-    .navbar-dealer .navbar-nav {
-        gap: .15rem;
-    }
-
-    .navbar-dealer .navbar-nav .nav-link {
+    /* Pil selebar isinya, di tengah antara logo dan tombol akun; jarak antarmenu sama. */
+    .navbar-tubelight {
         position: relative;
-        padding-left: .7rem;
-        padding-right: .7rem;
+        flex: 0 1 auto;
+        justify-content: center;
+        align-items: center;
+        gap: .35rem;
+        margin: 0 auto !important;
+        padding: .25rem;
+        border: 1px solid rgba(255, 255, 255, .1);
+        border-radius: 999px;
+        background-color: rgba(255, 255, 255, .04);
     }
 
-    /* Penanda menu aktif: garis merah di bawah teks. */
-    .navbar-dealer .navbar-nav .nav-link.active::after {
+    .navbar-tubelight .nav-link {
+        position: relative;
+        z-index: 1;
+        padding: .4rem .8rem;
+        border-radius: 999px;
+        font-size: .925rem;
+        transition: color .2s ease;
+    }
+
+    .navbar-tubelight:not(.is-enhanced) .nav-link.active,
+    .tubelight-lamp {
+        background-color: rgba(255, 255, 255, .09);
+    }
+
+    .navbar-tubelight:not(.is-enhanced) .nav-link.active::before,
+    .tubelight-lamp::before {
         content: "";
         position: absolute;
-        left: .7rem;
-        right: .7rem;
-        bottom: .1rem;
-        height: 2px;
-        border-radius: 2px;
+        top: -.3rem;
+        left: 50%;
+        width: 1.75rem;
+        height: 3px;
+        border-radius: 3px 3px 0 0;
         background-color: var(--dm-red);
+        transform: translateX(-50%);
+    }
+
+    /* Cahaya lampu: pendaran merah tipis di bawah garis. */
+    .navbar-tubelight:not(.is-enhanced) .nav-link.active::after,
+    .tubelight-lamp::after {
+        content: "";
+        position: absolute;
+        top: -.3rem;
+        left: 50%;
+        width: 3rem;
+        height: 1.1rem;
+        border-radius: 50%;
+        background-color: rgba(195, 0, 47, .35);
+        filter: blur(8px);
+        transform: translateX(-50%);
+        pointer-events: none;
+    }
+
+    .tubelight-lamp {
+        position: absolute;
+        top: .25rem;
+        bottom: .25rem;
+        left: 0;
+        width: var(--lamp-w, 0);
+        border-radius: 999px;
+        transform: translateX(var(--lamp-x, 0));
+        opacity: 0;
+        pointer-events: none;
+        list-style: none;
+        transition: transform .45s cubic-bezier(.34, 1.36, .64, 1), width .45s cubic-bezier(.34, 1.36, .64, 1), opacity .2s ease;
+    }
+
+    .tubelight-lamp.is-visible {
+        opacity: 1;
+    }
+}
+
+@media (max-width: 1199.98px) {
+    .tubelight-lamp {
+        display: none;
     }
 }
 
@@ -223,75 +300,90 @@ main {
     color: #fff;
 }
 
-.navbar-dealer .navbar-brand .bi {
-    color: var(--dm-red);
+/* Ikon dicerminkan (mis. ikon Bandingkan: panah atas ke kanan, bawah ke kiri). */
+.icon-flip-x {
+    display: inline-block;
+    transform: scaleX(-1);
 }
 
+/* Logo JAF (x-brand-logo): file sudah dipotong mengikuti lingkaran merah, luar lingkaran transparan. */
+.brand-logo {
+    flex-shrink: 0;
+    object-fit: contain;
+}
+
+/* Footer gelap: logo + tagline di kiri, kolom tautan berjudul tebal, baris hak cipta di bawah garis. */
 .site-footer {
     background-color: var(--dm-navy);
-    color: rgba(255, 255, 255, .75);
+    color: rgba(255, 255, 255, .7);
     border-top: 3px solid var(--dm-red);
 }
 
-.site-footer .footer-title {
-    font-size: .8rem;
+.footer-brand {
+    font-family: var(--dm-font-heading);
+    font-size: 1.35rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    margin-bottom: 1rem;
+    color: #fff !important;
 }
 
-.footer-links,
-.footer-contact {
-    list-style: none;
-    padding: 0;
-    margin: 0;
+.footer-tagline {
+    margin: 1rem 0 .5rem;
+    font-weight: 600;
+    color: #fff;
+}
+
+.footer-address {
+    max-width: 22rem;
     font-size: .875rem;
 }
 
+.site-footer .footer-title {
+    margin-bottom: 1.1rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #fff;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
 .footer-links li {
-    margin-bottom: .6rem;
-}
-
-.footer-contact li {
-    display: flex;
-    gap: .65rem;
-    margin-bottom: .75rem;
-}
-
-.footer-contact .bi {
-    flex: 0 0 1rem;
-    color: var(--dm-red);
-    line-height: 1.5;
+    margin-bottom: .85rem;
 }
 
 .footer-muted {
-    color: rgba(255, 255, 255, .5);
     font-size: .8rem;
+    color: rgba(255, 255, 255, .55);
 }
 
 .footer-bottom {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
-    gap: .5rem 1rem;
-    margin-top: 2rem;
-    padding-top: 1.25rem;
+    align-items: center;
+    gap: .75rem 1.5rem;
+    margin-top: 3rem;
+    padding-top: 1.5rem;
     border-top: 1px solid rgba(255, 255, 255, .12);
-    font-size: .8rem;
-}
-
-.site-footer h2 {
-    color: #fff;
+    font-size: .875rem;
 }
 
 .site-footer a {
-    color: rgba(255, 255, 255, .85);
+    color: rgba(255, 255, 255, .75);
     text-decoration: none;
+    transition: color .15s ease;
 }
 
 .site-footer a:hover {
     color: #fff;
+}
+
+.site-footer .footer-bottom-link {
+    text-decoration: underline;
+    text-underline-offset: 3px;
 }
 
 /* ---------- Publik: beranda ---------- */
@@ -302,7 +394,38 @@ main {
     isolation: isolate;
     background: linear-gradient(135deg, var(--dm-navy) 0%, var(--dm-navy-dark) 100%);
     color: rgba(255, 255, 255, .85);
-    padding-bottom: 6rem !important;
+}
+
+.home-hero-inner {
+    display: flex;
+    align-items: flex-end;
+    min-height: min(78svh, 760px);
+    padding-top: 5rem;
+    padding-bottom: 4rem;
+}
+
+.hero-kicker {
+    margin-bottom: .75rem;
+    font-size: .95rem;
+    font-weight: 500;
+    color: rgba(255, 255, 255, .7);
+}
+
+.hero-title {
+    max-width: 21ch;
+    margin-bottom: 1rem;
+    font-size: clamp(2.25rem, 4.2vw, 3.6rem);
+    font-weight: 700;
+    line-height: 1.06;
+    letter-spacing: -.02em;
+    color: #fff;
+}
+
+.hero-lead {
+    max-width: 32rem;
+    margin-bottom: 1.75rem;
+    font-size: 1.15rem;
+    color: rgba(255, 255, 255, .8);
 }
 
 /* Garis diagonal ala livery balap Nissan di sisi kanan hero (dekoratif, di belakang konten). */
@@ -314,9 +437,9 @@ main {
     pointer-events: none;
     background: linear-gradient(110deg,
         transparent 0 28%,
-        rgba(195, 0, 47, .95) 28% 31%,
-        transparent 31% 33.5%,
-        rgba(195, 0, 47, .5) 33.5% 34.8%,
+        rgba(195, 0, 47, .85) 28% 29.6%,
+        transparent 29.6% 31.6%,
+        rgba(195, 0, 47, .45) 31.6% 32.3%,
         transparent 34.8% 58%,
         rgba(255, 255, 255, .07) 58% 58.6%,
         transparent 58.6% 63%,
@@ -359,6 +482,25 @@ main {
         display: none;
     }
 
+    /* HP: foto mobil unggulan sebagai latar, digelapkan agar teks tetap terbaca. */
+    .home-hero.has-photo {
+        background: linear-gradient(180deg, rgba(11, 11, 12, .45) 0%, rgba(11, 11, 12, .92) 70%), var(--hero-photo) center / cover no-repeat;
+    }
+
+    .home-hero.has-photo::before {
+        display: none;
+    }
+
+    .home-hero-inner {
+        min-height: min(72svh, 620px);
+        padding-top: 4rem;
+        padding-bottom: 2.5rem;
+    }
+
+    .hero-lead {
+        font-size: 1.05rem;
+    }
+
     /* Layar kecil: teks memenuhi lebar, garis digeser ke tepi kanan agar tidak menabrak tagline. */
     .home-hero::before {
         inset: 0 -75% 0 72%;
@@ -387,7 +529,7 @@ main {
     width: 100%;
     aspect-ratio: 16 / 10;
     object-fit: cover;
-    border-radius: .65rem;
+    border-radius: var(--dm-radius-control);
 }
 
 .hero-feature-badge {
@@ -417,11 +559,6 @@ main {
 }
 
 /* Kartu pencarian cepat menumpang di bawah hero. */
-.home-search {
-    margin-top: -4rem;
-    position: relative;
-}
-
 .home-cta {
     background-color: var(--dm-navy);
     color: rgba(255, 255, 255, .85);
@@ -763,7 +900,7 @@ main {
     justify-content: center;
     width: 3rem;
     height: 3rem;
-    border-radius: .75rem;
+    border-radius: var(--dm-radius-control);
     background-color: rgba(28, 28, 30, .08);
     color: var(--dm-navy);
     font-size: 1.35rem;
@@ -1017,7 +1154,7 @@ main {
     flex: 0 0 48px;
     width: 48px;
     height: 48px;
-    border-radius: .75rem;
+    border-radius: var(--dm-radius-control);
     display: inline-flex;
     align-items: center;
     justify-content: center;
@@ -1124,10 +1261,6 @@ main {
 .testimonial-box {
     background-color: rgba(245, 165, 36, .08);
     border-left: 3px solid #f5a524;
-}
-
-.testimonial-card blockquote {
-    font-size: .95rem;
 }
 
 /* ---------- Admin: dashboard ---------- */
@@ -1308,11 +1441,9 @@ tr[data-row-link] {
 
 /* Jelajahi mobil: dua kartu (merek & kategori). */
 .shortcut-card-title {
-    font-size: .8rem;
+    font-size: 1rem;
     font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .05em;
-    color: #6c757d;
+    color: var(--dm-navy);
     margin-bottom: .85rem;
 }
 
@@ -1688,3 +1819,194 @@ tr[data-row-link] {
     display: none;
 }
 
+/* ---------- Testimoni beranda ---------- */
+
+.testimonial-score {
+    font-family: var(--dm-font-heading);
+    font-size: 3.5rem;
+    font-weight: 700;
+    line-height: 1;
+    color: var(--dm-navy);
+}
+
+.testimonial-score-max {
+    margin-left: .15rem;
+    font-size: 1.25rem;
+    font-weight: 500;
+    color: #6c757d;
+}
+
+.testimonial-item {
+    padding: 1.5rem 0;
+    border-top: 1px solid rgba(28, 28, 30, .1);
+}
+
+.testimonial-item:first-child {
+    padding-top: 0;
+    border-top: 0;
+}
+
+.testimonial-item:last-child {
+    padding-bottom: 0;
+}
+
+/* Kutipan dibatasi 3 baris agar tetap sekilas baca. */
+.testimonial-quote {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+    font-size: 1.05rem;
+    line-height: 1.6;
+    color: var(--dm-navy);
+}
+
+.testimonial-stars {
+    font-size: .75rem;
+}
+
+/* ---------- Beranda: pita bantuan (menyambung ke footer) ---------- */
+
+.home-cta-band {
+    margin-bottom: -3rem;
+    padding: 3.5rem 0;
+    background-color: var(--dm-navy-dark);
+    color: rgba(255, 255, 255, .75);
+}
+
+.home-cta-phone {
+    font-weight: 600;
+    color: #fff;
+    text-decoration: none;
+}
+
+.home-cta-phone:hover {
+    color: #fff;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+}
+
+/* ---------- Beranda: mobil unggulan dengan efek scroll ---------- */
+
+/*
+ * Bingkai foto mulai miring ke belakang (rotateX) lalu tegak saat masuk layar.
+ * Memakai CSS scroll-driven animation (animation-timeline: view()); browser yang belum mendukung,
+ * atau pengguna dengan "kurangi gerakan", melihat bingkai tegak tanpa animasi.
+ */
+.scroll-showcase-head {
+    max-width: 40rem;
+    margin-bottom: 1.5rem;
+}
+
+.scroll-showcase-stage {
+    perspective: 1000px;
+}
+
+.scroll-showcase-card {
+    max-width: 64rem;
+    margin: 0 auto;
+    padding: .5rem;
+    border: 4px solid #3a3a3c;
+    border-radius: var(--dm-radius-panel);
+    background-color: var(--dm-navy-dark);
+    box-shadow: 0 9px 20px rgba(11, 11, 12, .29), 0 37px 37px rgba(11, 11, 12, .26), 0 84px 50px rgba(11, 11, 12, .15);
+    transform-origin: center top;
+}
+
+.scroll-showcase-img {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--dm-radius-control);
+}
+
+.scroll-showcase-body {
+    padding: 1rem .75rem .5rem;
+}
+
+.scroll-showcase-old {
+    color: rgba(255, 255, 255, .6);
+}
+
+@keyframes scroll-showcase-tilt {
+    from {
+        transform: rotateX(20deg) scale(1.05);
+    }
+
+    to {
+        transform: rotateX(0deg) scale(1);
+    }
+}
+
+@keyframes scroll-showcase-tilt-sm {
+    from {
+        transform: rotateX(20deg) scale(.9);
+    }
+
+    to {
+        transform: rotateX(0deg) scale(1);
+    }
+}
+
+@keyframes scroll-showcase-rise {
+    from {
+        opacity: .4;
+        transform: translateY(2rem);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@supports (animation-timeline: view()) {
+    @media (prefers-reduced-motion: no-preference) {
+        .scroll-showcase-card {
+            animation: scroll-showcase-tilt linear both;
+            animation-timeline: view();
+            animation-range: entry 0% cover 45%;
+        }
+
+        .scroll-showcase-head {
+            animation: scroll-showcase-rise linear both;
+            animation-timeline: view();
+            animation-range: entry 0% cover 35%;
+        }
+    }
+
+    @media (prefers-reduced-motion: no-preference) and (max-width: 767.98px) {
+        .scroll-showcase-card {
+            animation-name: scroll-showcase-tilt-sm;
+        }
+    }
+}
+
+/* ---------- Gerakan ---------- */
+
+/* Umpan balik saat tombol ditekan. */
+@media (prefers-reduced-motion: no-preference) {
+    .btn:active {
+        transform: scale(.98);
+    }
+}
+
+/* Pengguna yang memilih "kurangi gerakan": tanpa animasi, transisi, atau efek naik saat hover. */
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+        scroll-behavior: auto !important;
+    }
+
+    .card-hover:hover,
+    .hero-feature:hover {
+        transform: none;
+    }
+}

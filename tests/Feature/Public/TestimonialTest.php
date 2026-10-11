@@ -206,8 +206,8 @@ class TestimonialTest extends TestCase
             ->assertSee('Budi S.')
             ->assertDontSee('Budi Santoso')
             ->assertDontSee($this->customer->email)
-            ->assertSee('Membeli Nissan Navara VL 4x4 AT 2024')
-            ->assertSeeInOrder(['4,5', 'dari 5', '2 ulasan'])
+            ->assertSee('membeli Nissan Navara VL 4x4 AT 2024')
+            ->assertSeeInOrder(['4,5', '/5', 'Dari 2 ulasan'])
             ->assertSee('aria-label="Rating 5 dari 5"', false);
     }
 

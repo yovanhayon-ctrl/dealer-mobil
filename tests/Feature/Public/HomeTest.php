@@ -50,9 +50,9 @@ class HomeTest extends TestCase
             ->assertDontSee('Jelajahi Mobil');
     }
 
-    public function test_menampilkan_maksimal_8_mobil_aktif_terbaru(): void
+    public function test_menampilkan_maksimal_4_mobil_aktif_terbaru(): void
     {
-        foreach (range(1, 9) as $i) {
+        foreach (range(1, 5) as $i) {
             $this->car('Toyota', 'MPV', "Model{$i}", ['created_at' => now()->subDays(10 - $i)]);
         }
         $this->car('Toyota', 'MPV', 'Tersembunyi', ['is_active' => false]);
@@ -61,11 +61,11 @@ class HomeTest extends TestCase
             ->assertOk()
             ->assertSee('Mobil Terbaru')
             ->assertDontSee('Belum ada mobil')
-            ->assertSeeInOrder(['Model9', 'Model8', 'Model7', 'Model6', 'Model5', 'Model4', 'Model3', 'Model2'])
+            ->assertSeeInOrder(['Model5', 'Model4', 'Model3', 'Model2'])
             ->assertDontSee('Model1 2025')
             ->assertDontSee('Tersembunyi');
 
-        $this->assertCount(8, $response->viewData('latestCars'));
+        $this->assertCount(4, $response->viewData('latestCars'));
     }
 
     public function test_hanya_promo_berjalan_yang_tampil(): void
@@ -87,7 +87,7 @@ class HomeTest extends TestCase
             ->assertSee('Promo umum')
             ->assertSee('Diskon Avanza')
             ->assertSee('Rp 15.000.000')
-            ->assertSee('19 Sep 2026 – 19 Okt 2026')
+            ->assertSee('19 Sep 2026 - 19 Okt 2026')
             ->assertDontSee('Promo Terjadwal')
             ->assertDontSee('Promo Berakhir')
             ->assertDontSee('Promo Nonaktif')
@@ -111,37 +111,51 @@ class HomeTest extends TestCase
             ->assertDontSee(route('cars.index', ['kategori' => 'hatchback']));
     }
 
-    public function test_form_pencarian_menuju_katalog(): void
+    public function test_beranda_tanpa_form_cari_mobil(): void
     {
         $this->car('Toyota', 'MPV', 'Avanza');
 
+        // Pencarian ada di halaman Mobil; beranda cukup tombol "Lihat Mobil" di hero.
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('action="'.route('cars.index').'"', false)
-            ->assertSee('name="q"', false)
-            ->assertSee('<option value="toyota">Toyota</option>', false)
-            ->assertSee('<option value="bekas">Bekas</option>', false);
+            ->assertDontSee('Cari Mobil')
+            ->assertDontSee('name="q"', false)
+            ->assertSee('href="'.route('cars.index').'" class="btn btn-accent btn-lg"', false);
     }
 
-    public function test_tombol_whatsapp_hanya_tampil_jika_nomor_diisi(): void
+    public function test_pita_bantuan_whatsapp_atau_kontak(): void
     {
-        $this->get(route('home'))->assertOk()->assertDontSee('Tanya via WhatsApp')->assertDontSee('wa.me');
+        config()->set('dealer.phone', '021-5550-8888');
+        config()->set('dealer.hours', 'Senin-Sabtu 08.00-17.00 WIB');
+
+        // Tanpa nomor WhatsApp: tombol ke halaman Kontak.
+        $this->get(route('home'))->assertOk()
+            ->assertSee('Butuh bantuan memilih mobil?')
+            ->assertSee('Tim kami siap membantu Senin-Sabtu 08.00-17.00 WIB.')
+            ->assertSee('href="'.route('contact').'" class="btn btn-accent btn-lg">Hubungi Kami</a>', false)
+            ->assertSee('href="tel:02155508888" class="home-cta-phone"', false)
+            ->assertDontSee('wa.me');
 
         config()->set('dealer.whatsapp', '6281234567890');
 
-        $this->get(route('home'))
-            ->assertOk()
-            ->assertSee('Tanya via WhatsApp')
-            ->assertSee('https://wa.me/6281234567890');
+        $html = $this->get(route('home'))->assertOk()
+            ->assertSee('Chat WhatsApp')
+            ->assertSee('https://wa.me/6281234567890')
+            ->assertDontSee('Hubungi Kami</a>', false)
+            ->getContent();
+
+        // "Simulasi Kredit" hanya di hero (+ navbar & footer), tidak diulang di pita bantuan.
+        $band = substr($html, strpos($html, 'class="home-cta-band"'));
+        $this->assertStringNotContainsString('Simulasi Kredit', substr($band, 0, strpos($band, '</section>')));
     }
 
     public function test_meta_title_dan_description(): void
     {
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('<title>Beranda — Dealer Maju</title>', false)
-            ->assertSee('<meta name="description" content="Dealer Maju — Nissan Heritage &amp; Performance', false)
-            ->assertSee('Nissan Heritage &amp; Performance</p>', false);
+            ->assertSee('<title>Beranda | Dealer Maju</title>', false)
+            ->assertSee('<meta name="description" content="Dealer Maju, Nissan Heritage &amp; Performance', false)
+            ->assertSee('<h1 id="hero-title" class="hero-title">Nissan pilihan, dari klasik sampai terbaru.</h1>', false);
     }
 
     // ---------- Banner hero: mobil unggulan ----------
@@ -165,7 +179,9 @@ class HomeTest extends TestCase
             ->assertSee('aria-label="Mobil unggulan: Nissan Skyline GT-R 2025"', false)
             ->assertSee('hero-feature-badge', false)
             ->assertDontSee('Mobil unggulan: Subaru', false)
-            ->assertDontSee('Mobil unggulan: Nissan Livina Tanpa Foto', false);
+            ->assertDontSee('Mobil unggulan: Nissan Livina Tanpa Foto', false)
+            // Tanpa video, unggulan sudah di hero: bagian scroll tidak ditampilkan dobel.
+            ->assertDontSee('scroll-showcase', false);
     }
 
     public function test_hero_memakai_merek_lain_bila_tidak_ada_nissan_berfoto(): void
@@ -248,9 +264,13 @@ class HomeTest extends TestCase
 
         $response = $this->get(route('home'))->assertOk();
 
-        $response->assertSee('class="home-hero py-5 has-video"', false)
+        $response->assertSee('class="home-hero has-video has-photo"', false)
             ->assertDontSee('hero-video-toggle', false)
-            ->assertDontSee('hero-feature', false);
+            ->assertDontSee('hero-feature', false)
+            // Mobil unggulan pindah ke bagian scroll di bawah "Mobil Terbaru".
+            ->assertSee('aria-labelledby="showcase-title"', false)
+            ->assertSee('aria-label="Lihat detail Nissan Skyline GT-R 2025"', false)
+            ->assertSee('loading="lazy" class="scroll-showcase-img"', false);
 
         preg_match("/data-hero-videos='([^']+)'/", $response->getContent(), $match);
         $sources = json_decode(html_entity_decode($match[1]), true, flags: JSON_THROW_ON_ERROR);

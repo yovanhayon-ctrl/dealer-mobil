@@ -154,7 +154,7 @@ class ServiceBookingRequest extends FormRequest
             'preferred_date.after_or_equal' => "Tanggal servis paling cepat besok ({$first}).",
             'preferred_date.before_or_equal' => "Tanggal servis paling lambat {$last}.",
             'preferred_time.in' => 'Pilih jam antara '.reset($slots).' dan '.end($slots).' WIB.',
-            'phone.regex' => 'Nomor WhatsApp tidak valid. Gunakan format 08xx (10–13 digit).',
+            'phone.regex' => 'Nomor WhatsApp tidak valid. Gunakan format 08xx (10-13 digit).',
         ];
     }
 
