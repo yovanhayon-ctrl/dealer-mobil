@@ -46,7 +46,7 @@
                                                    ? $service->name.' (mulai Rp '.number_format($service->price_from, 0, ',', '.').')'
                                                    : $service->name])->all()" />
 
-                                <h2 class="h6 text-muted text-uppercase mt-4 mb-3">Data Kendaraan</h2>
+                                <h2 class="h6 fw-semibold mt-4 mb-3">Data kendaraan</h2>
                                 <div class="row g-3">
                                     <div class="col-sm-7">
                                         <x-form.input name="vehicle_model" label="Merek & Model" required maxlength="100"
@@ -66,7 +66,7 @@
                                     </div>
                                 </div>
 
-                                <h2 class="h6 text-muted text-uppercase mt-2 mb-3">Jadwal</h2>
+                                <h2 class="h6 fw-semibold mt-2 mb-3">Jadwal</h2>
                                 <div class="row g-3">
                                     <div class="col-sm-6">
                                         <x-form.input name="preferred_date" type="date" label="Tanggal" required

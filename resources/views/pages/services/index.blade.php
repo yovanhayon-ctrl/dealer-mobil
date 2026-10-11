@@ -13,7 +13,7 @@
         <div class="container py-lg-3">
             <div class="row">
                 <div class="col-lg-8">
-                    <p class="text-uppercase small fw-semibold mb-2 opacity-75">JAF Service</p>
+                    <p class="hero-kicker">JAF Service</p>
                     <h1 id="service-title" class="display-6 fw-bold text-white mb-3">Servis & Perawatan Kendaraan</h1>
                     <p class="lead mb-4">
                         Layanan yang menemani Anda setelah pembelian: jaga kendaraan tetap prima dengan servis berkala,
@@ -25,7 +25,7 @@
                         </a>
                         @if ($whatsapp)
                             <a href="https://wa.me/{{ $whatsapp }}?text={{ rawurlencode('Halo, saya ingin konsultasi servis kendaraan.') }}"
-                               target="_blank" rel="noopener" class="btn btn-success btn-lg">
+                               target="_blank" rel="noopener" class="btn btn-outline-light btn-lg">
                                 <i class="bi bi-whatsapp"></i>Konsultasi Servis
                             </a>
                         @endif
@@ -52,7 +52,6 @@
                     <div class="col-12 col-md-6 col-lg-4">
                         <article class="card h-100 service-card">
                             <div class="card-body d-flex flex-column p-4">
-                                <span class="service-card-icon mb-3" aria-hidden="true"><i class="bi bi-tools"></i></span>
                                 <h3 class="h5 mb-2">{{ $service->name }}</h3>
                                 @if ($service->description)
                                     <p class="text-muted small mb-3">{{ $service->description }}</p>
@@ -61,8 +60,8 @@
                                 <div class="mt-auto">
                                     <p class="mb-1">
                                         @if ($service->price_from)
-                                            <span class="small text-muted">Mulai</span>
-                                            <span class="fw-bold">Rp {{ number_format($service->price_from, 0, ',', '.') }}</span>
+                                            <span class="small text-muted d-block">Mulai</span>
+                                            <span class="fs-5 fw-bold">Rp {{ number_format($service->price_from, 0, ',', '.') }}</span>
                                         @else
                                             <span class="small text-muted">Harga sesuai kebutuhan, hubungi dealer</span>
                                         @endif
@@ -72,7 +71,7 @@
                                     @else
                                         <div class="mb-3"></div>
                                     @endif
-                                    <a href="{{ route('service-bookings.create', ['layanan' => $service->slug]) }}" class="btn btn-primary btn-sm">
+                                    <a href="{{ route('service-bookings.create', ['layanan' => $service->slug]) }}" class="btn btn-outline-primary btn-sm">
                                         <i class="bi bi-calendar-plus"></i>Booking Layanan Ini
                                     </a>
                                 </div>
@@ -83,32 +82,25 @@
             </div>
         @endif
 
-        <div class="row g-4 mt-2">
+        {{-- Dua kolom teks (tanpa kartu). --}}
+        <div class="row g-4 g-lg-5 mt-4">
             <div class="col-lg-6">
-                <div class="card h-100">
-                    <div class="card-body p-4">
-                        <h2 class="h5 mb-3">Cara Booking Servis</h2>
-                        <ol class="small mb-0 ps-3">
-                            <li class="mb-1">Masuk atau daftar akun customer.</li>
-                            <li class="mb-1">Pilih layanan, isi data kendaraan, lalu pilih tanggal dan jam.</li>
-                            <li class="mb-1">Tim kami mengonfirmasi jadwal lewat WhatsApp.</li>
-                            <li>Pantau status servis di menu <strong>Servis Saya</strong>.</li>
-                        </ol>
-                    </div>
-                </div>
+                <h2 class="h5 mb-3">Cara Booking Servis</h2>
+                <ol class="mb-0 ps-3">
+                    <li class="mb-1">Masuk atau daftar akun customer.</li>
+                    <li class="mb-1">Pilih layanan, isi data kendaraan, lalu pilih tanggal dan jam.</li>
+                    <li class="mb-1">Tim kami mengonfirmasi jadwal lewat WhatsApp.</li>
+                    <li>Pantau status servis di menu <strong>Servis Saya</strong>.</li>
+                </ol>
             </div>
             <div class="col-lg-6">
-                <div class="card h-100">
-                    <div class="card-body p-4">
-                        <h2 class="h5 mb-3">Layanan Pendukung</h2>
-                        <ul class="small mb-0 ps-3">
-                            <li class="mb-1">Konsultasi kebutuhan servis sesuai kondisi dan pemakaian kendaraan.</li>
-                            <li class="mb-1">Informasi estimasi pekerjaan dan komponen yang perlu diperiksa.</li>
-                            <li class="mb-1">Riwayat servis tersimpan di akun Anda.</li>
-                            <li>Jadwal bengkel: besok s/d 30 hari ke depan, pukul {{ reset($slots) }}-{{ end($slots) }} WIB.</li>
-                        </ul>
-                    </div>
-                </div>
+                <h2 class="h5 mb-3">Layanan Pendukung</h2>
+                <ul class="mb-0 ps-3">
+                    <li class="mb-1">Konsultasi kebutuhan servis sesuai kondisi dan pemakaian kendaraan.</li>
+                    <li class="mb-1">Informasi estimasi pekerjaan dan komponen yang perlu diperiksa.</li>
+                    <li class="mb-1">Riwayat servis tersimpan di akun Anda.</li>
+                    <li>Jadwal bengkel: besok s/d 30 hari ke depan, pukul {{ reset($slots) }}-{{ end($slots) }} WIB.</li>
+                </ul>
             </div>
         </div>
     </div>
