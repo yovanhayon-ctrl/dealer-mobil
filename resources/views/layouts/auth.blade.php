@@ -4,6 +4,10 @@
     @include('partials.head', ['noindex' => true])
 </head>
 <body class="auth-wrapper">
+    <button type="button" class="btn btn-outline-secondary btn-sm theme-toggle auth-theme-toggle" data-theme-toggle aria-pressed="false"
+            aria-label="Aktifkan mode gelap" title="Aktifkan mode gelap">
+        <i class="bi bi-moon-stars theme-icon-moon" aria-hidden="true"></i><i class="bi bi-sun theme-icon-sun" aria-hidden="true"></i>
+    </button>
     <main class="d-flex align-items-center justify-content-center py-5 px-3">
         <div class="auth-card">
             <a href="{{ route('home') }}" class="d-block text-center text-decoration-none mb-4">

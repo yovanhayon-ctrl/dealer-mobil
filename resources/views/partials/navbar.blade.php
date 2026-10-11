@@ -39,6 +39,10 @@
 
             {{-- Area akun: di HP memenuhi lebar di bawah menu, di desktop sejajar di kanan. --}}
             <div class="navbar-actions">
+                <button type="button" class="btn btn-outline-light btn-sm theme-toggle" data-theme-toggle aria-pressed="false"
+                        aria-label="Aktifkan mode gelap" title="Aktifkan mode gelap">
+                    <i class="bi bi-moon-stars theme-icon-moon" aria-hidden="true"></i><i class="bi bi-sun theme-icon-sun" aria-hidden="true"></i><span class="theme-toggle-label d-xl-none" data-theme-label>Mode gelap</span>
+                </button>
                 @guest
                     <a href="{{ route('login') }}" class="btn btn-outline-light btn-sm">
                         <i class="bi bi-box-arrow-in-right"></i>Masuk
