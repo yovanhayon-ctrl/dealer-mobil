@@ -59,6 +59,9 @@ class Car extends Model
     /** Batas "stok menipis" di laporan admin (mobil aktif dengan stok ≤ nilai ini). */
     public const LOW_STOCK_THRESHOLD = 1;
 
+    /** Jumlah maksimal mobil unggulan yang bergantian di beranda. */
+    public const MAX_FEATURED_ON_HOME = 5;
+
     /** Relasi yang dipakai x-car-card; di-eager load agar tidak terjadi N+1. */
     public const CARD_RELATIONS = [
         'brand:id,name,slug', 'category:id,name,slug', 'primaryImage:id,car_id,path,thumb_path',
@@ -123,6 +126,15 @@ class Car extends Model
     protected function active(Builder $query): void
     {
         $query->where('is_active', true);
+    }
+
+    /**
+     * Mobil unggulan yang bisa tampil di beranda: dicentang admin, aktif, dan punya foto.
+     */
+    #[Scope]
+    protected function featuredOnHome(Builder $query): void
+    {
+        $query->where('is_active', true)->where('is_featured', true)->whereHas('primaryImage');
     }
 
     /**

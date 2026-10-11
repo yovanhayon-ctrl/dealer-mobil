@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Brand;
 use App\Models\Car;
+use App\Models\CarImage;
 use App\Models\Category;
 use App\Models\Promo;
 use App\Models\PurchaseRequest;
@@ -450,5 +451,18 @@ class CarManagementTest extends TestCase
         DB::disableQueryLog();
 
         return $count;
+    }
+
+    public function test_form_mobil_menampilkan_jumlah_mobil_unggulan_aktif(): void
+    {
+        $featured = Car::factory()->count(2)->create(['is_featured' => true]);
+        foreach ($featured as $car) {
+            CarImage::create(['car_id' => $car->id, 'path' => "cars/{$car->id}/a.webp", 'is_primary' => true, 'sort_order' => 1]);
+        }
+        // Unggulan tanpa foto tidak dihitung (tidak bisa tampil di beranda).
+        Car::factory()->create(['is_featured' => true]);
+
+        $this->actingAs($this->admin)->get(route('admin.cars.create'))->assertOk()
+            ->assertSee('Saat ini 2 mobil unggulan aktif. Beranda menampilkan maksimal 5 mobil bergantian');
     }
 }

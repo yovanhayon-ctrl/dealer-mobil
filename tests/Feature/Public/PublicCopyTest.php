@@ -59,4 +59,44 @@ class PublicCopyTest extends TestCase
         $this->assertStringContainsString('4,0<span class="testimonial-score-max">/5</span>', $html);
         $this->assertStringContainsString('Dari 3 ulasan pembeli', $html);
     }
+
+    public function test_whatsapp_berupa_tautan_teks_bukan_tombol_hijau(): void
+    {
+        config()->set('dealer.whatsapp', '6281234567890');
+        $car = Car::factory()->create();
+        $promo = Promo::factory()->forCar($car)->create();
+
+        foreach (["/mobil/{$car->slug}", "/promo/{$promo->slug}", '/kontak'] as $path) {
+            $html = $this->get($path)->assertOk()->getContent();
+
+            // Satu warna aksen: tidak ada tombol hijau (btn-success) selain di footer.
+            $this->assertStringNotContainsString('btn-success', $html, "Tombol hijau di {$path}");
+            $this->assertStringContainsString('https://wa.me/6281234567890', $html);
+        }
+    }
+
+    public function test_detail_mobil_spesifikasi_grid_dan_aksi_berdampingan(): void
+    {
+        $car = Car::factory()->create(['color' => 'Putih']);
+
+        $this->get("/mobil/{$car->slug}")->assertOk()
+            ->assertSee('<dl class="spec-grid mb-0">', false)
+            ->assertSee('<dt>Warna</dt>', false)
+            ->assertSee('<div class="car-detail-actions">', false)
+            ->assertDontSee('spec-table', false)
+            ->assertDontSee('promo-box', false);
+    }
+
+    public function test_kolom_samping_detail_promo_tidak_memanjang(): void
+    {
+        $car = Car::factory()->create();
+        $promo = Promo::factory()->forCar($car)->create();
+        Promo::factory()->create();
+
+        $html = $this->get("/promo/{$promo->slug}")->assertOk()->getContent();
+
+        $this->assertStringContainsString('car-card card-hover h-100 h-auto', $html);
+        $this->assertStringContainsString('promo-card card-hover h-100 overflow-hidden h-auto', $html);
+        $this->assertStringNotContainsString('promo-card-img-empty', $html);
+    }
 }
