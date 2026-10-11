@@ -13,6 +13,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Testing\TestResponse;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
@@ -411,5 +412,27 @@ class ReportTest extends TestCase
             $this->assertFalse($cell !== '' && in_array($cell[0], ['=', '+', '-', '@', "\t", "\r"], true), "Sel berbahaya: {$cell}");
         }
         $this->assertContains('250000000', $cells);
+    }
+
+    public function test_export_excel_rapi_dan_bisa_dibaca(): void
+    {
+        $response = $this->actingAs($this->admin)->get(route('admin.reports.export-excel', ['periode' => 'bulan-ini']))->assertOk();
+
+        $this->assertStringContainsString('spreadsheetml', $response->headers->get('Content-Type'));
+        $this->assertStringContainsString('.xlsx', $response->headers->get('Content-Disposition'));
+
+        $file = tempnam(sys_get_temp_dir(), 'xlsx');
+        file_put_contents($file, $response->streamedContent());
+        $sheet = IOFactory::load($file)->getActiveSheet();
+        @unlink($file);
+
+        $this->assertSame('Laporan', $sheet->getTitle());
+        $this->assertStringStartsWith('Laporan ', (string) $sheet->getCell('A1')->getValue());
+        $this->assertTrue($sheet->getStyle('A1')->getFont()->getBold());
+
+        $values = array_merge(...$sheet->toArray(null, false, false));
+        $this->assertContains('Ringkasan Pengajuan', $values);
+        $this->assertContains('Stok Menipis (mobil aktif, stok maksimal 1)', $values);
+        $this->assertGreaterThan(30, $sheet->getColumnDimension('A')->getWidth());
     }
 }
