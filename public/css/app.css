@@ -868,9 +868,23 @@ main {
     font-size: 1.5rem;
 }
 
-.admin-note-box {
-    background-color: rgba(13, 110, 253, .08);
-    border-left: 3px solid #0d6efd;
+/* File foto hilang: teks alt disembunyikan (tetap terbaca pembaca layar), ukuran kotak dipertahankan. */
+img.test-drive-car-thumb,
+img.car-card-img,
+img.compare-img,
+img.hero-feature-img,
+img.scroll-showcase-img,
+img.promo-card-img {
+    overflow: hidden;
+    color: transparent;
+    font-size: 0;
+    background-color: var(--dm-bg);
+}
+
+/* Catatan dealer/bengkel & ulasan di halaman akun: kotak abu netral (tanpa garis warna). */
+.admin-note-box,
+.testimonial-box {
+    background-color: var(--dm-bg);
 }
 
 /* Dibuka dari notifikasi (#test-drive-5 dst.): beri jarak dari navbar sticky & sorot kartunya. */
@@ -950,9 +964,11 @@ main {
     font-size: .65rem;
 }
 
-.notification-item.is-unread {
-    background-color: rgba(195, 0, 47, .05);
-    border-left: 3px solid var(--dm-red);
+/* Belum dibaca: judul tebal + label "Baru" (bukan latar merah muda bergaris). */
+.notification-new {
+    font-size: .75rem;
+    font-weight: 600;
+    color: var(--dm-red);
 }
 
 /* ---------- Publik: JAF Service ---------- */
@@ -1319,11 +1335,6 @@ main {
 
 .rating-input .btn .bi {
     margin: 0;
-}
-
-.testimonial-box {
-    background-color: rgba(245, 165, 36, .08);
-    border-left: 3px solid #f5a524;
 }
 
 /* ---------- Admin: dashboard ---------- */
@@ -2202,4 +2213,20 @@ tr[data-row-link] {
     .hero-feature:hover {
         transform: none;
     }
+}
+
+/* Profil: inisial nama dalam lingkaran. */
+.account-avatar {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 999px;
+    background-color: var(--dm-navy);
+    color: #fff;
+    font-family: var(--dm-font-heading);
+    font-weight: 600;
+    letter-spacing: .02em;
 }

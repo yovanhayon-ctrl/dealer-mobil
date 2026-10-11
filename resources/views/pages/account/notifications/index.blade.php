@@ -34,7 +34,7 @@
                                 <x-status-badge :status="$data['status']" />
                             @endisset
                             @if ($notification->unread())
-                                <span class="visually-hidden">(belum dibaca)</span>
+                                <span class="notification-new">Baru<span class="visually-hidden"> (belum dibaca)</span></span>
                             @endif
                             <small class="text-muted ms-auto" title="{{ $notification->created_at->translatedFormat('d M Y H:i') }}">
                                 {{ $notification->created_at->diffForHumans() }}

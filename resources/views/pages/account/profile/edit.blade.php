@@ -6,7 +6,8 @@
     <x-account.layout title="Profil Saya" active="account.profile*">
         <div class="card mb-4">
             <div class="card-body p-3 p-lg-4 d-flex flex-wrap align-items-center gap-3">
-                <span class="service-card-icon" aria-hidden="true"><i class="bi bi-person"></i></span>
+                @php($initials = collect(preg_split('/\s+/u', trim($user->name), -1, PREG_SPLIT_NO_EMPTY))->take(2)->map(fn ($part) => mb_strtoupper(mb_substr($part, 0, 1)))->implode(''))
+                <span class="account-avatar" aria-hidden="true">{{ $initials ?: '?' }}</span>
                 <div class="min-w-0 flex-grow-1">
                     <h2 class="h5 mb-0">{{ $user->name }}</h2>
                     <p class="small text-muted text-break mb-0">{{ $user->email }} · terdaftar sejak {{ $user->created_at->translatedFormat('d F Y') }}</p>
