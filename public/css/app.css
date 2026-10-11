@@ -300,11 +300,16 @@ main {
     color: #fff;
 }
 
-/* Logo JAF (x-brand-logo): gambar bulat, sudut hitam file aslinya dipotong. */
+/* Ikon dicerminkan (mis. ikon Bandingkan: panah atas ke kanan, bawah ke kiri). */
+.icon-flip-x {
+    display: inline-block;
+    transform: scaleX(-1);
+}
+
+/* Logo JAF (x-brand-logo): file sudah dipotong mengikuti lingkaran merah, luar lingkaran transparan. */
 .brand-logo {
     flex-shrink: 0;
-    border-radius: 50%;
-    object-fit: cover;
+    object-fit: contain;
 }
 
 /* Footer gelap: logo + tagline di kiri, kolom tautan berjudul tebal, baris hak cipta di bawah garis. */
