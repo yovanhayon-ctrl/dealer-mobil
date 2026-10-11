@@ -5,6 +5,7 @@ namespace Tests\Feature\Admin;
 use App\Models\Car;
 use App\Models\Promo;
 use App\Models\User;
+use App\Support\CarImageProcessor;
 use Closure;
 use Database\Seeders\CarSeeder;
 use Database\Seeders\PromoSeeder;
@@ -284,14 +285,14 @@ class PromoManagementTest extends TestCase
     public static function invalidBannerProvider(): array
     {
         $wrongType = 'Banner harus berupa gambar JPG, JPEG, PNG, atau WEBP.';
-        $tooSmall = 'Banner minimal berukuran 1200×400 piksel.';
+        $tooSmall = 'Banner minimal berukuran 1200×400 piksel dan maksimal 8000×8000 piksel.';
 
         return [
             'svg' => [fn () => UploadedFile::fake()->createWithContent(
                 'banner.svg', '<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="400"></svg>',
             ), $wrongType],
             'pdf' => [fn () => UploadedFile::fake()->create('banner.pdf', 100, 'application/pdf'), $wrongType],
-            'lebih dari 2 MB' => [fn (self $test) => $test->banner('besar.png')->size(2049), 'Ukuran banner maksimal 2 MB.'],
+            'lebih dari 8 MB' => [fn (self $test) => $test->banner('besar.png')->size(8193), 'Ukuran banner maksimal 8 MB.'],
             'lebar 1199 px' => [fn (self $test) => $test->banner('sempit.jpg', 1199, 400), $tooSmall],
             'tinggi 399 px' => [fn (self $test) => $test->banner('pendek.jpg', 1200, 399), $tooSmall],
         ];
@@ -539,5 +540,47 @@ class PromoManagementTest extends TestCase
         $this->seed(PromoSeeder::class);
 
         $this->assertSame(['gratis-servis-3-tahun', 'promo-kemerdekaan'], Promo::orderBy('slug')->pluck('slug')->all());
+    }
+
+    // ---------- Optimasi banner (WebP, lebar maks. 1600 px) ----------
+
+    public function test_banner_besar_diperkecil_ke_webp_1600_px(): void
+    {
+        $this->store($this->validData(['image' => $this->banner('dari-desainer.jpg', 4800, 1600)]))->assertSessionHasNoErrors();
+
+        $promo = Promo::sole();
+        $this->assertStringStartsWith('promos/', $promo->image);
+        $this->assertStringEndsWith('.webp', $promo->image);
+        $this->assertStringNotContainsString('dari-desainer', $promo->image);
+
+        $contents = Storage::disk('public')->get($promo->image);
+        $this->assertSame('WEBP', substr($contents, 8, 4));
+        $this->assertSame([1600, 533], array_slice(getimagesizefromstring($contents), 0, 2));
+        $this->assertCount(1, Storage::disk('public')->allFiles('promos'), 'Hanya file WebP; file asli tidak disimpan.');
+    }
+
+    public function test_banner_kecil_tidak_diperbesar(): void
+    {
+        $this->store($this->validData(['image' => $this->banner('pas.png', 1200, 400)]))->assertSessionHasNoErrors();
+
+        $contents = Storage::disk('public')->get(Promo::sole()->image);
+        $this->assertSame([1200, 400], array_slice(getimagesizefromstring($contents), 0, 2));
+    }
+
+    public function test_banner_rusak_ditolak_dengan_pesan_jelas(): void
+    {
+        $this->mock(CarImageProcessor::class)
+            ->shouldReceive('storeSingle')->andThrow(new \RuntimeException('Gambar tidak bisa dibaca.'));
+
+        $this->store($this->validData(['image' => $this->banner()]))
+            ->assertSessionHasErrors(['image' => 'Banner tidak bisa diproses. Coba simpan ulang sebagai JPG lalu unggah lagi.']);
+
+        $this->assertSame(0, Promo::count());
+    }
+
+    public function test_form_promo_menampilkan_batas_8_mb(): void
+    {
+        $this->actingAs($this->admin)->get(route('admin.promos.create'))->assertOk()
+            ->assertSee('Maksimal 8 MB, minimal 1200×400 piksel. Disimpan otomatis sebagai WebP (lebar maks. 1600 px).');
     }
 }
