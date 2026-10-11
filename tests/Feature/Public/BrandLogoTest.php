@@ -3,6 +3,7 @@
 namespace Tests\Feature\Public;
 
 use App\Models\User;
+use App\Support\Asset;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
@@ -18,8 +19,8 @@ class BrandLogoTest extends TestCase
         $this->assertFileExists(public_path('images/logo-128.webp'));
         $this->assertFileExists(public_path('images/favicon-64.png'));
 
-        $logo = 'src="'.asset('images/logo-128.webp').'"';
-        $favicon = '<link rel="icon" type="image/png" href="'.asset('images/favicon-64.png').'">';
+        $logo = 'src="'.Asset::url('images/logo-128.webp').'"';
+        $favicon = '<link rel="icon" type="image/png" href="'.Asset::url('images/favicon-64.png').'">';
 
         $home = $this->get('/')->assertOk()->assertSee($favicon, false)->getContent();
         $this->assertSame(2, substr_count($home, $logo), 'Logo di navbar dan footer.');

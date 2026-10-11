@@ -36,7 +36,7 @@
 
         @if ($rows->isEmpty())
             <div class="card">
-                <x-empty-state icon="bi-layout-three-columns" title="Belum ada mobil yang dibandingkan"
+                <x-empty-state icon="bi-arrow-left-right icon-flip-x" title="Belum ada mobil yang dibandingkan"
                                message="Tekan tombol Bandingkan pada kartu mobil untuk memilih 2-{{ $max }} mobil.">
                     <a href="{{ route('cars.index') }}" class="btn btn-primary btn-sm">Lihat Mobil</a>
                 </x-empty-state>
