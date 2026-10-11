@@ -47,28 +47,21 @@
                     </div>
                 </div>
 
-                @if ($whatsappUrl)
-                    <a href="{{ $whatsappUrl }}" target="_blank" rel="noopener" class="btn btn-success w-100 mb-4">
-                        <i class="bi bi-whatsapp"></i>Chat via WhatsApp
-                    </a>
-                @endif
-
-                <div class="card">
-                    <div class="card-body p-4">
-                        <h2 class="h6 mb-3">Butuh sesuatu yang lebih cepat?</h2>
-                        <div class="d-grid gap-2">
-                            @foreach ([
-                                ['test-drives.create', 'bi-calendar-check', 'Booking Test Drive'],
-                                ['services.index', 'bi-tools', 'Booking Servis'],
-                                ['credit.index', 'bi-calculator', 'Simulasi Kredit'],
-                            ] as [$route, $icon, $label])
-                                @if (Route::has($route))
-                                    <a href="{{ route($route) }}" class="btn btn-outline-primary text-start"><i class="bi {{ $icon }}"></i>{{ $label }}</a>
-                                @endif
-                            @endforeach
-                        </div>
-                    </div>
-                </div>
+                {{-- WhatsApp cukup di daftar kontak di atas; pintasan berupa tautan teks. --}}
+                <h2 class="h6 mb-2">Butuh sesuatu yang lebih cepat?</h2>
+                <ul class="list-unstyled mb-0">
+                    @foreach ([
+                        ['test-drives.create', 'bi-calendar-check', 'Booking Test Drive'],
+                        ['services.index', 'bi-tools', 'Booking Servis'],
+                        ['credit.index', 'bi-calculator', 'Simulasi Kredit'],
+                    ] as [$route, $icon, $label])
+                        @if (Route::has($route))
+                            <li class="mb-2">
+                                <a href="{{ route($route) }}" class="car-detail-link"><i class="bi {{ $icon }} me-2"></i>{{ $label }}</a>
+                            </li>
+                        @endif
+                    @endforeach
+                </ul>
             </div>
 
             <div class="col-lg-7">

@@ -128,6 +128,23 @@ main {
     border-color: var(--dm-navy);
 }
 
+/* Pagination & filter pil: warna JAF (bukan biru bawaan Bootstrap). */
+.pagination {
+    --bs-pagination-color: var(--dm-navy);
+    --bs-pagination-hover-color: var(--dm-red);
+    --bs-pagination-focus-color: var(--dm-navy);
+    --bs-pagination-focus-box-shadow: 0 0 0 .2rem rgba(28, 28, 30, .15);
+    --bs-pagination-active-bg: var(--dm-navy);
+    --bs-pagination-active-border-color: var(--dm-navy);
+}
+
+.nav-pills {
+    --bs-nav-link-color: var(--dm-navy);
+    --bs-nav-link-hover-color: var(--dm-red);
+    --bs-nav-pills-link-active-bg: var(--dm-navy);
+    --bs-nav-pills-border-radius: 999px;
+}
+
 /* ---------- Kartu ---------- */
 
 .card {
@@ -780,10 +797,56 @@ main {
     border-left: 4px solid var(--dm-red);
 }
 
-.spec-table th {
-    width: 40%;
+/* Detail promo tanpa banner: foto mobil ditampilkan utuh (tidak terpotong). */
+.promo-detail-car-img {
+    object-fit: contain;
+    background-color: #fff;
+}
+
+/* ---------- Detail mobil: aksi, promo, spesifikasi ---------- */
+
+.car-detail-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+}
+
+.car-detail-actions > .btn {
+    flex: 1 1 12rem;
+}
+
+.car-detail-link {
+    font-size: .9rem;
+    font-weight: 500;
+    color: var(--dm-navy);
+}
+
+.car-detail-link:hover {
+    color: var(--dm-red);
+}
+
+/* Spesifikasi: 2 kolom label/isi, tanpa garis per baris. */
+.spec-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1rem 1.5rem;
+}
+
+.spec-grid dt {
+    font-size: .8rem;
     font-weight: 500;
     color: #6c757d;
+}
+
+.spec-grid dd {
+    margin: 0;
+    font-weight: 500;
+}
+
+@media (min-width: 576px) {
+    .spec-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
 }
 
 @media (min-width: 992px) {
