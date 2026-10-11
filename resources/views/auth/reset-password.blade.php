@@ -36,7 +36,7 @@
                    class="form-control" autocomplete="new-password" required>
         </div>
 
-        <button type="submit" class="btn btn-primary w-100">
+        <button type="submit" class="btn btn-accent w-100">
             <i class="bi bi-key"></i>Simpan Kata Sandi Baru
         </button>
     </form>

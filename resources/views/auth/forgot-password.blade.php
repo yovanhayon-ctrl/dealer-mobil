@@ -19,7 +19,7 @@
             @enderror
         </div>
 
-        <button type="submit" class="btn btn-primary w-100">
+        <button type="submit" class="btn btn-accent w-100">
             <i class="bi bi-envelope"></i>Kirim Tautan Reset
         </button>
     </form>
