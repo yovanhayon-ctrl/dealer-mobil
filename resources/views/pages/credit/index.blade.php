@@ -42,7 +42,7 @@
                             <div class="mb-3">
                                 <label for="mobil" class="form-label">Mobil</label>
                                 <select id="mobil" name="mobil" class="form-select" data-credit-car>
-                                    <option value="">— Isi harga sendiri —</option>
+                                    <option value="">Isi harga sendiri</option>
                                     @foreach ($cars as $option)
                                         <option value="{{ $option->slug }}" data-price="{{ $option->finalPrice() }}" @selected($car?->is($option))>
                                             {{ $option->brand->name }} {{ $option->name }} {{ $option->year }} · {{ $rupiah($option->finalPrice()) }}

@@ -98,7 +98,7 @@
                     </div>
 
                     <ul class="small text-muted mt-3 mb-0">
-                        <li>Jadwal dapat dipilih mulai besok sampai 30 hari ke depan, pukul {{ reset($slots) }}–{{ end($slots) }} WIB.</li>
+                        <li>Jadwal dapat dipilih mulai besok sampai 30 hari ke depan, pukul {{ reset($slots) }}-{{ end($slots) }} WIB.</li>
                         <li>Setiap jam hanya menerima {{ \App\Models\ServiceBooking::slotCapacity() }} kendaraan sesuai kapasitas bengkel.</li>
                         <li>Status booking "Menunggu" sampai dikonfirmasi dealer; Anda bisa membatalkannya selama belum dikonfirmasi.</li>
                     </ul>

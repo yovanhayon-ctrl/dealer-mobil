@@ -75,7 +75,7 @@ class PromoPageTest extends TestCase
         $this->assertSame(['Diskon Kicks', 'Promo Umum Lama'], $this->listedTitles());
 
         $this->get(route('promos.index'))
-            ->assertSee('<title>Promo — ', false)
+            ->assertSee('<title>Promo | ', false)
             ->assertSee('Berakhir dalam 2 hari')
             ->assertSee('Nissan Kicks e-Power VL 2025')
             ->assertSee('hemat')
@@ -162,7 +162,7 @@ class PromoPageTest extends TestCase
 
         $this->get(route('promos.show', $promo))
             ->assertOk()
-            ->assertSee('<title>Diskon Kicks — ', false)
+            ->assertSee('<title>Diskon Kicks | ', false)
             ->assertSee('<meta name="description" content="Potongan Rp 15 juta.">', false)
             ->assertSee('Khusus mobil')
             ->assertSee('Berakhir dalam 4 hari')

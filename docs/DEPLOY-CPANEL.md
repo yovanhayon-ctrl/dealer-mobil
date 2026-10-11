@@ -106,7 +106,7 @@ DEALER_ADDRESS="…"
 DEALER_PHONE="…"
 DEALER_WHATSAPP=62…
 DEALER_EMAIL=…
-DEALER_HOURS="Senin–Sabtu 08.00–17.00 WIB"
+DEALER_HOURS="Senin-Sabtu 08.00-17.00 WIB"
 DEALER_MAPS_EMBED_URL="https://www.google.com/maps/embed?pb=…"
 
 ADMIN_EMAIL=admin@domain-anda.com

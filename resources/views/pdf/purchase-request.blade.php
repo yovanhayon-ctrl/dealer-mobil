@@ -10,7 +10,7 @@
 <html lang="id">
 <head>
     <meta charset="utf-8">
-    <title>Bukti Pengajuan {{ $purchase->documentNumber() }} — {{ $dealer['name'] }}</title>
+    <title>Bukti Pengajuan {{ $purchase->documentNumber() }} | {{ $dealer['name'] }}</title>
     <style>
         @page { margin: 28px 36px; }
         body { font-family: 'DejaVu Sans', sans-serif; font-size: 10.5px; color: #1c1c1e; line-height: 1.45; }

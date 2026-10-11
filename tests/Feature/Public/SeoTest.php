@@ -157,7 +157,7 @@ class SeoTest extends TestCase
 
         $this->get(route('promos.show', $carPromo))->assertOk()
             ->assertSee('<meta property="og:image" content="'.$image->url.'">', false)
-            ->assertSee('<meta property="og:title" content="'.e($carPromo->title.' — '.config('dealer.name')).'">', false);
+            ->assertSee('<meta property="og:title" content="'.e($carPromo->title.' | '.config('dealer.name')).'">', false);
 
         $this->get(route('promos.show', $generalPromo))->assertOk()
             ->assertSee('<meta property="og:image" content="'.asset('images/og-default.jpg').'">', false);

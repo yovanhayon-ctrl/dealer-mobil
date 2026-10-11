@@ -51,7 +51,7 @@
                             </fieldset>
 
                             <x-form.textarea name="comment" label="Ulasan" :value="$testimonial?->comment" rows="5" required maxlength="1000"
-                                             help="20–1000 karakter. Ceritakan pelayanan, proses pembelian, atau kondisi mobil. Jangan menulis nomor HP atau data pribadi." />
+                                             help="20-1000 karakter. Ceritakan pelayanan, proses pembelian, atau kondisi mobil. Jangan menulis nomor HP atau data pribadi." />
 
                             <p class="small text-muted">
                                 <i class="bi bi-shield-check me-1"></i>Ulasan tampil di beranda setelah disetujui admin, dengan nama disingkat

@@ -42,7 +42,7 @@ class InfoPageTest extends TestCase
 
         $this->get(route('about'))
             ->assertOk()
-            ->assertSee('<title>Tentang Kami — JAF Dealer</title>', false)
+            ->assertSee('<title>Tentang Kami | JAF Dealer</title>', false)
             ->assertSee('Tentang JAF Dealer')
             ->assertSee('Dream the Legacy. Drive the Future.')
             ->assertViewHas('stats', ['cars' => 2, 'brands' => 1, 'services' => 3])
@@ -60,7 +60,7 @@ class InfoPageTest extends TestCase
 
         $this->get(route('contact'))
             ->assertOk()
-            ->assertSee('<title>Kontak — JAF Dealer</title>', false)
+            ->assertSee('<title>Kontak | JAF Dealer</title>', false)
             ->assertSeeInOrder(['Alamat Showroom', 'Jl. Otomotif Raya No. 88', 'Telepon', '021-5550-8888', 'WhatsApp', 'Email', 'info@jafdealer.test', 'Jam Operasional', 'Senin–Sabtu'])
             ->assertSee('href="tel:02155508888"', false)
             ->assertSee('href="mailto:info@jafdealer.test"', false)

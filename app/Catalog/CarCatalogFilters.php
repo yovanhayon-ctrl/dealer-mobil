@@ -236,7 +236,7 @@ final class CarCatalogFilters
     private static function rangeLabel(string $label, ?int $min, ?int $max, callable $format): ?string
     {
         return match (true) {
-            $min !== null && $max !== null => "{$label} {$format($min)} – {$format($max)}",
+            $min !== null && $max !== null => "{$label} {$format($min)} - {$format($max)}",
             $min !== null => "{$label} mulai {$format($min)}",
             $max !== null => "{$label} s/d {$format($max)}",
             default => null,

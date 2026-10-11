@@ -87,7 +87,7 @@ class HomeTest extends TestCase
             ->assertSee('Promo umum')
             ->assertSee('Diskon Avanza')
             ->assertSee('Rp 15.000.000')
-            ->assertSee('19 Sep 2026 – 19 Okt 2026')
+            ->assertSee('19 Sep 2026 - 19 Okt 2026')
             ->assertDontSee('Promo Terjadwal')
             ->assertDontSee('Promo Berakhir')
             ->assertDontSee('Promo Nonaktif')
@@ -139,8 +139,8 @@ class HomeTest extends TestCase
     {
         $this->get(route('home'))
             ->assertOk()
-            ->assertSee('<title>Beranda — Dealer Maju</title>', false)
-            ->assertSee('<meta name="description" content="Dealer Maju — Nissan Heritage &amp; Performance', false)
+            ->assertSee('<title>Beranda | Dealer Maju</title>', false)
+            ->assertSee('<meta name="description" content="Dealer Maju, Nissan Heritage &amp; Performance', false)
             ->assertSee('Nissan Heritage &amp; Performance</p>', false);
     }
 

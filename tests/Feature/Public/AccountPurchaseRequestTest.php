@@ -69,7 +69,7 @@ class AccountPurchaseRequestTest extends TestCase
         $this->actingAs($this->customer)->get(route('account.purchase-requests.index'))
             ->assertOk()
             ->assertSeeInOrder(['Nissan Serena e-Power 2025', 'Diproses', 'Kredit', 'Rp 650.000.000',
-                'DP', 'Rp 130.000.000', '36 bulan (bunga 6%/tahun)', 'Rp 17.045.000', '/bulan', 'Rp '.number_format(130_000_000 + 17_045_000 * 36, 0, ',', '.')])
+                'DP', 'Rp 130.000.000', 'Tenor 36 bulan, bunga 6%/tahun', 'Rp 17.045.000', '/bulan', 'Rp '.number_format(130_000_000 + 17_045_000 * 36, 0, ',', '.')])
             ->assertSee('Jl. Merdeka No. 10, Bandung')
             ->assertSee('Warna hitam.')
             ->assertSee('Dokumen sedang dicek.')

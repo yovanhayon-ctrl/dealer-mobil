@@ -25,7 +25,7 @@ trait BuildsNotificationMail
         $dealer = config('dealer.name');
 
         $mail = (new MailMessage)
-            ->subject("{$data['title']} — {$dealer}")
+            ->subject("{$data['title']} | {$dealer}")
             ->greeting("Halo, {$notifiable->name}")
             ->line("**{$data['title']}**")
             ->line($data['message']);

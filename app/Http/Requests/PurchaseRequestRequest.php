@@ -144,7 +144,7 @@ class PurchaseRequestRequest extends FormRequest
             'down_payment.required_if' => 'Uang muka wajib diisi untuk pembayaran kredit.',
             'tenor_months.required_if' => 'Pilih tenor untuk pembayaran kredit.',
             'tenor_months.in' => 'Tenor tidak tersedia.',
-            'phone.regex' => 'Nomor WhatsApp tidak valid. Gunakan format 08xx (10–13 digit).',
+            'phone.regex' => 'Nomor WhatsApp tidak valid. Gunakan format 08xx (10-13 digit).',
             'address.min' => 'Alamat terlalu pendek, tuliskan alamat lengkap.',
         ];
     }

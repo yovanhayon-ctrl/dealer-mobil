@@ -88,7 +88,7 @@ class CarCatalogTest extends TestCase
         $this->assertEqualsCanonicalizing(['Avanza', 'Fortuner'], $this->names($this->catalog('merek=toyota')));
         $this->assertEqualsCanonicalizing(['Fortuner', 'CR-V'], $this->names($this->catalog('kategori=sport-utility')));
 
-        $this->catalog('merek=toyota')->assertSee('<title>Mobil Toyota — ', false);
+        $this->catalog('merek=toyota')->assertSee('<title>Mobil Toyota | ', false);
     }
 
     public function test_filter_kondisi_transmisi_bbm_dan_kursi(): void
@@ -240,7 +240,7 @@ class CarCatalogTest extends TestCase
 
         $this->catalog('merek=toyota&kondisi=baru&harga_min=100.000.000&harga_max=400000000&promo=1&urut=harga_termurah')
             ->assertSee('Filter aktif')
-            ->assertSee('Harga Rp 100.000.000 – Rp 400.000.000')
+            ->assertSee('Harga Rp 100.000.000 - Rp 400.000.000')
             ->assertSee('Hanya promo')
             // Chip "Toyota" menghapus merek saja, filter lain & urutan tetap.
             ->assertSee(route('cars.index', [

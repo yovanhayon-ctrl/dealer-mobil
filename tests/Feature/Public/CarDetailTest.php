@@ -70,7 +70,7 @@ class CarDetailTest extends TestCase
 
         $response = $this->get('/mobil/toyota-avanza-2025')
             ->assertOk()
-            ->assertSee('<title>Toyota Avanza 2025 — Dealer Maju</title>', false)
+            ->assertSee('<title>Toyota Avanza 2025 | Dealer Maju</title>', false)
             ->assertSee('<h1 class="h2 mb-2">Avanza 2025</h1>', false)
             ->assertSee('Toyota · MPV')
             ->assertSeeInOrder(['breadcrumb', route('home'), 'Beranda', route('cars.index'), 'Mobil', 'aria-current="page"', 'Toyota Avanza 2025'], false)
@@ -105,8 +105,8 @@ class CarDetailTest extends TestCase
             ->assertSee('id="carGallery"', false)
             ->assertSeeInOrder(['utama.jpg', 'depan.jpg', 'belakang.jpg'])
             ->assertSeeInOrder([
-                'alt="Toyota Avanza 2025 — foto 1 dari 3"', 'loading="eager"',
-                'alt="Toyota Avanza 2025 — foto 2 dari 3"', 'loading="lazy"',
+                'alt="Toyota Avanza 2025, foto 1 dari 3"', 'loading="eager"',
+                'alt="Toyota Avanza 2025, foto 2 dari 3"', 'loading="lazy"',
             ], false)
             ->assertSee('data-bs-slide-to="2"', false)
             ->assertSee('aria-label="Tampilkan foto 3"', false)
@@ -143,7 +143,7 @@ class CarDetailTest extends TestCase
         $this->detail($car)
             ->assertSeeInOrder(['<del', 'Rp 285.000.000', '</del>', 'Rp 270.000.000'], false)
             ->assertSee('Promo berlaku')
-            ->assertSeeInOrder(['Diskon Besar', 'Dipakai di harga', '19 Sep 2026 – 19 Okt 2026', 'Rp 15.000.000', 'Diskon Kecil', 'Rp 10.000.000'])
+            ->assertSeeInOrder(['Diskon Besar', 'Dipakai di harga', '19 Sep 2026 - 19 Okt 2026', 'Rp 15.000.000', 'Diskon Kecil', 'Rp 10.000.000'])
             ->assertDontSee('Diskon Terjadwal');
 
         $this->assertSame(1, substr_count($this->detail($car)->getContent(), 'Dipakai di harga'));
@@ -171,7 +171,7 @@ class CarDetailTest extends TestCase
         ]);
 
         $this->detail($used)
-            ->assertSeeInOrder(['Kapasitas mesin', '–', 'Warna', '–', 'Kilometer', '45.000 km', 'Stok', 'Habis'])
+            ->assertSeeInOrder(['Kapasitas mesin', '-', 'Warna', '-', 'Kilometer', '45.000 km', 'Stok', 'Habis'])
             ->assertSee('Stok habis')
             ->assertSee('Stok Habis');
     }
@@ -349,7 +349,7 @@ class CarDetailTest extends TestCase
 
         $html = $this->detail($car)
             ->assertSee('<meta property="og:image" content="'.$car->images()->first()->url.'">', false)
-            ->assertSee('<meta property="og:title" content="Toyota Avanza 2025 — '.config('dealer.name').'">', false)
+            ->assertSee('<meta property="og:title" content="Toyota Avanza 2025 | '.config('dealer.name').'">', false)
             ->assertSee('<link rel="canonical" href="'.route('cars.show', $car).'">', false)
             ->getContent();
 

@@ -45,10 +45,9 @@
                                         <x-status-badge :status="$booking->status" />
                                     </div>
                                     <p class="small mb-0">
-                                        <i class="bi bi-car-front me-1"></i>{{ $booking->vehicle_model }}@if ($booking->vehicle_year) ({{ $booking->vehicle_year }})@endif
-                                        · <span class="fw-semibold">{{ $booking->plate_number }}</span>
-                                        @if ($booking->mileage !== null)
-                                            · {{ number_format($booking->mileage, 0, ',', '.') }} km
+                                        <i class="bi bi-car-front me-1"></i>{{ $booking->vehicle_model }}@if ($booking->vehicle_year) ({{ $booking->vehicle_year }})@endif,
+                                        <span class="fw-semibold">{{ $booking->plate_number }}</span>@if ($booking->mileage !== null),
+                                            {{ number_format($booking->mileage, 0, ',', '.') }} km
                                         @endif
                                     </p>
                                     <p class="small mb-0">

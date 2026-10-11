@@ -84,7 +84,7 @@ class ServiceBookingTest extends TestCase
             ->assertSeeInOrder(['Servis Berkala', 'Rp 450.000', '±120 menit', 'Suku Cadang', 'hubungi dealer'])
             ->assertDontSee('Layanan Lama')
             ->assertSee('href="'.route('service-bookings.create', ['layanan' => 'servis-berkala']).'"', false)
-            ->assertSee('08:00–15:00 WIB');
+            ->assertSee('08:00-15:00 WIB');
     }
 
     public function test_halaman_servis_kosong(): void

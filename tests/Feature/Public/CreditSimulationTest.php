@@ -42,9 +42,9 @@ class CreditSimulationTest extends TestCase
     public function test_halaman_terbuka_untuk_tamu_tanpa_hasil(): void
     {
         $this->simulate()
-            ->assertSee('<title>Simulasi Kredit — ', false)
+            ->assertSee('<title>Simulasi Kredit | ', false)
             ->assertSee('Belum ada simulasi')
-            ->assertSee('— Isi harga sendiri —')
+            ->assertSee('<option value="">Isi harga sendiri</option>', false)
             ->assertSee('Nissan Kicks e-Power VL 2025 · Rp 520.000.000')
             ->assertSee('36 bulan (3 tahun) · bunga 6%/tahun')
             ->assertSee('48 bulan (4 tahun) · bunga 6,5%/tahun')

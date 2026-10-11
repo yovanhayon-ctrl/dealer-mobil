@@ -64,7 +64,7 @@
                                             <span class="small text-muted">Mulai</span>
                                             <span class="fw-bold">Rp {{ number_format($service->price_from, 0, ',', '.') }}</span>
                                         @else
-                                            <span class="small text-muted">Harga sesuai kebutuhan — hubungi dealer</span>
+                                            <span class="small text-muted">Harga sesuai kebutuhan, hubungi dealer</span>
                                         @endif
                                     </p>
                                     @if ($service->duration_minutes)
@@ -105,7 +105,7 @@
                             <li class="mb-1">Konsultasi kebutuhan servis sesuai kondisi dan pemakaian kendaraan.</li>
                             <li class="mb-1">Informasi estimasi pekerjaan dan komponen yang perlu diperiksa.</li>
                             <li class="mb-1">Riwayat servis tersimpan di akun Anda.</li>
-                            <li>Jadwal bengkel: besok s/d 30 hari ke depan, pukul {{ reset($slots) }}–{{ end($slots) }} WIB.</li>
+                            <li>Jadwal bengkel: besok s/d 30 hari ke depan, pukul {{ reset($slots) }}-{{ end($slots) }} WIB.</li>
                         </ul>
                     </div>
                 </div>

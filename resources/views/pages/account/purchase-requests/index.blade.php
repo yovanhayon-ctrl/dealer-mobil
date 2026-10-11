@@ -61,10 +61,9 @@
                                         <x-status-badge :status="$purchase->status" />
                                     </div>
                                     <p class="small mb-0">
-                                        <span class="fw-semibold">{{ $purchase->paymentMethodLabel() }}</span>
-                                        · harga <x-price :amount="$purchase->car_price" />
-                                        @if ($purchase->isCredit())
-                                            · cicilan <span class="fw-semibold"><x-price :amount="$purchase->monthly_installment" />/bulan</span>
+                                        <span class="fw-semibold">{{ $purchase->paymentMethodLabel() }}</span>,
+                                        harga <x-price :amount="$purchase->car_price" />@if ($purchase->isCredit()),
+                                            cicilan <span class="fw-semibold"><x-price :amount="$purchase->monthly_installment" />/bulan</span>
                                         @endif
                                     </p>
                                     <p class="small text-muted mb-0">Diajukan {{ $purchase->created_at->translatedFormat('d M Y H:i') }}</p>
@@ -82,12 +81,12 @@
                                 <summary>Lihat rincian</summary>
                                 <div class="small pt-2">
                                     @if ($purchase->isCredit())
-                                        <p class="mb-2">
-                                            DP <x-price :amount="$purchase->down_payment" />
-                                            · {{ $purchase->tenor_months }} bulan (bunga {{ $percent((float) $purchase->interest_rate) }}/tahun)
-                                            · cicilan <span class="fw-semibold"><x-price :amount="$purchase->monthly_installment" />/bulan</span>
-                                            · total <x-price :amount="$purchase->totalPayment()" />
-                                        </p>
+                                        <ul class="list-unstyled mb-2">
+                                            <li>DP <x-price :amount="$purchase->down_payment" /></li>
+                                            <li>Tenor {{ $purchase->tenor_months }} bulan, bunga {{ $percent((float) $purchase->interest_rate) }}/tahun</li>
+                                            <li>Cicilan <span class="fw-semibold"><x-price :amount="$purchase->monthly_installment" />/bulan</span></li>
+                                            <li>Total <x-price :amount="$purchase->totalPayment()" /></li>
+                                        </ul>
                                     @endif
                                     <p class="text-muted mb-2"><span class="fw-semibold">Alamat:</span> {{ $purchase->address }}</p>
                                     @if ($purchase->notes)

@@ -103,7 +103,7 @@ class EmailNotificationTest extends TestCase
         $mail = $notification->toMail($this->customer);
 
         $this->assertInstanceOf(MailMessage::class, $mail);
-        $this->assertSame('Test Drive Dikonfirmasi — JAF Dealer', $mail->subject);
+        $this->assertSame('Test Drive Dikonfirmasi | JAF Dealer', $mail->subject);
         $this->assertSame('Halo, Budi Santoso', $mail->greeting);
         $this->assertContains('Nissan Kicks e-Power VL 2025 · 12 Okt 2026 pukul 10:00 WIB', $mail->introLines);
         $this->assertContains('Catatan dealer: Bawa SIM A.', $mail->introLines);
@@ -122,7 +122,7 @@ class EmailNotificationTest extends TestCase
         $notification->id = '9a1b2c3d-0000-4000-8000-000000000001';
         $mail = $notification->toMail($this->admin);
 
-        $this->assertSame('Test Drive Baru · Budi Santoso — JAF Dealer', $mail->subject);
+        $this->assertSame('Test Drive Baru · Budi Santoso | JAF Dealer', $mail->subject);
         $this->assertSame('Halo, Admin JAF', $mail->greeting);
         $this->assertSame('Buka di Admin', $mail->actionText);
         $this->assertSame(route('admin.notifications.open', $notification->id), $mail->actionUrl);

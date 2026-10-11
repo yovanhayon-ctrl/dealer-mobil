@@ -1,8 +1,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="csrf-token" content="{{ csrf_token() }}">
-<title>@hasSection('title')@yield('title') — @endif{{ config('dealer.name') }}</title>
-<meta name="description" content="@yield('meta_description', config('dealer.tagline') ?: config('dealer.name').' — jual mobil baru dan bekas, promo, dan simulasi kredit.')">
+<title>@hasSection('title')@yield('title') | @endif{{ config('dealer.name') }}</title>
+<meta name="description" content="@yield('meta_description', config('dealer.tagline') ?: config('dealer.name').': jual mobil baru dan bekas, promo, dan simulasi kredit.')">
 @php
     // Admin, akun, login/daftar, dan bandingkan tidak perlu muncul di mesin pencari.
     $noindex = ($noindex ?? false) || request()->is('admin', 'admin/*', 'akun', 'akun/*', 'bandingkan');
@@ -15,8 +15,8 @@
     <meta property="og:site_name" content="{{ config('dealer.name') }}">
     <meta property="og:locale" content="id_ID">
     <meta property="og:type" content="@yield('og_type', 'website')">
-    <meta property="og:title" content="@hasSection('title')@yield('title') — @endif{{ config('dealer.name') }}">
-    <meta property="og:description" content="@yield('meta_description', config('dealer.tagline') ?: config('dealer.name').' — jual mobil baru dan bekas, promo, dan simulasi kredit.')">
+    <meta property="og:title" content="@hasSection('title')@yield('title') | @endif{{ config('dealer.name') }}">
+    <meta property="og:description" content="@yield('meta_description', config('dealer.tagline') ?: config('dealer.name').': jual mobil baru dan bekas, promo, dan simulasi kredit.')">
     <meta property="og:url" content="{{ url()->current() }}">
     {{-- Gambar pratinjau saat tautan dibagikan; halaman tanpa foto memakai gambar bawaan 1200×630. --}}
     <meta property="og:image" content="@yield('og_image', asset('images/og-default.jpg'))">

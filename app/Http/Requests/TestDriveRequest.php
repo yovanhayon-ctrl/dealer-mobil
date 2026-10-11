@@ -128,7 +128,7 @@ class TestDriveRequest extends FormRequest
             'preferred_date.after_or_equal' => "Tanggal test drive paling cepat besok ({$first}).",
             'preferred_date.before_or_equal' => "Tanggal test drive paling lambat {$last}.",
             'preferred_time.in' => 'Pilih jam antara 09:00 dan 16:00 WIB.',
-            'phone.regex' => 'Nomor WhatsApp tidak valid. Gunakan format 08xx (10–13 digit).',
+            'phone.regex' => 'Nomor WhatsApp tidak valid. Gunakan format 08xx (10-13 digit).',
         ];
     }
 }

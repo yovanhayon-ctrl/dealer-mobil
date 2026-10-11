@@ -58,7 +58,7 @@ class CreditCalculator
 
         if ($downPayment < $this->minDownPayment($price) || $downPayment > $this->maxDownPayment($price)) {
             throw new InvalidArgumentException(
-                "Uang muka harus {$this->config['dp_min']}%–{$this->config['dp_max']}% dari harga."
+                "Uang muka harus {$this->config['dp_min']}%-{$this->config['dp_max']}% dari harga."
             );
         }
 

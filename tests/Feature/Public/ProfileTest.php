@@ -62,7 +62,7 @@ class ProfileTest extends TestCase
 
         $this->actingAs($this->customer)->get(route('account.profile'))
             ->assertOk()
-            ->assertSee('<title>Profil Saya — ', false)
+            ->assertSee('<title>Profil Saya | ', false)
             ->assertSee('value="Budi Santoso"', false)
             ->assertSee('value="budi@example.test"', false)
             ->assertSee('value="081211112222"', false)
