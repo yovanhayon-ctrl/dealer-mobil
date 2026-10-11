@@ -25,7 +25,8 @@
         </button>
 
         <div class="collapse navbar-collapse" id="mainNavbar">
-            <ul class="navbar-nav me-auto mb-2 mb-xl-0 text-nowrap">
+            {{-- Desktop: menu dalam "pil" dengan lampu merah di menu aktif; app.js membuat lampunya mengikuti kursor. --}}
+            <ul class="navbar-nav navbar-tubelight me-auto mb-2 mb-xl-0 text-nowrap" data-tubelight>
                 @foreach ($menu as $item)
                     @continue(! Route::has($item['route']))
 
