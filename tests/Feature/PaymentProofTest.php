@@ -7,6 +7,7 @@ use App\Models\Car;
 use App\Models\PaymentProof;
 use App\Models\PurchaseRequest;
 use App\Models\User;
+use App\Support\PurchaseRequestPdf;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
@@ -263,7 +264,7 @@ class PaymentProofTest extends TestCase
 
         $this->patch(route('admin.payment-proofs.approve', [$this->cash, $proof]))
             ->assertRedirect(route('admin.purchase-requests.show', $this->cash).'#bukti-pembayaran')
-            ->assertSessionHas('success', 'Bukti Tanda jadi Rp 5.000.000 diterima.');
+            ->assertSessionHas('success', 'Bukti Tanda jadi Rp 5.000.000 diterima. Status pembayaran: Dibayar sebagian.');
 
         $proof->refresh();
         $this->assertSame(PaymentProof::STATUS_APPROVED, $proof->status);
@@ -305,6 +306,98 @@ class PaymentProofTest extends TestCase
 
         $this->actingAs($this->customer)->patch(route('admin.payment-proofs.approve', [$this->cash, $proof]))->assertForbidden();
         $this->assertTrue($proof->fresh()->isPending());
+    }
+
+    public function test_status_pembayaran_cash_dari_belum_dibayar_hingga_lunas(): void
+    {
+        $this->assertSame(['unpaid', 'Belum dibayar'], [$this->cash->paymentStatus(), $this->cash->paymentStatusLabel()]);
+
+        $booking = $this->proof(['amount' => 5_000_000]);
+        $settlement = $this->proof(['type' => PaymentProof::TYPE_SETTLEMENT, 'amount' => 500_000_000]);
+
+        $this->actingAs($this->admin)->patch(route('admin.payment-proofs.approve', [$this->cash, $booking]));
+        $cash = $this->cash->fresh();
+        $this->assertSame(['partial', 'Dibayar sebagian', 500_000_000], [$cash->paymentStatus(), $cash->paymentStatusLabel(), $cash->remainingPayment()]);
+
+        $this->patch(route('admin.payment-proofs.approve', [$this->cash, $settlement]))
+            ->assertSessionHas('success', 'Bukti Pelunasan Rp 500.000.000 diterima. Status pembayaran: Lunas.');
+        $cash = $this->cash->fresh();
+        $this->assertSame(['paid', 'Lunas', 0], [$cash->paymentStatus(), $cash->paymentStatusLabel(), $cash->remainingPayment()]);
+        $this->assertTrue($cash->isPaidOff());
+        // Status pengajuan tetap manual (Selesai = mobil sudah diserahkan).
+        $this->assertSame(PurchaseRequest::STATUS_APPROVED, $cash->status);
+
+        $this->get(route('admin.purchase-requests.show', $this->cash))
+            ->assertSee('Lunas')
+            ->assertSee('Ubah status ke');
+        $this->get(route('admin.purchase-requests.index'))->assertSee('Lunas');
+    }
+
+    public function test_status_pembayaran_kredit_memakai_dp(): void
+    {
+        $credit = PurchaseRequest::factory()->recycle($this->customer)->credit()->create([
+            'status' => PurchaseRequest::STATUS_APPROVED, 'down_payment' => 100_000_000,
+        ]);
+
+        $this->proof(['amount' => 40_000_000], $credit)->update(['status' => PaymentProof::STATUS_APPROVED]);
+        $this->assertSame('DP sebagian', $credit->fresh()->paymentStatusLabel());
+
+        $this->proof(['type' => PaymentProof::TYPE_DOWN_PAYMENT, 'amount' => 60_000_000], $credit)->update(['status' => PaymentProof::STATUS_APPROVED]);
+        $this->assertSame('DP lunas', $credit->fresh()->paymentStatusLabel());
+    }
+
+    public function test_admin_tidak_bisa_menerima_bukti_yang_melebihi_tagihan(): void
+    {
+        $first = $this->proof(['type' => PaymentProof::TYPE_SETTLEMENT, 'amount' => 505_000_000]);
+        $duplicate = $this->proof(['type' => PaymentProof::TYPE_SETTLEMENT, 'amount' => 505_000_000]);
+
+        $this->actingAs($this->admin)->patch(route('admin.payment-proofs.approve', [$this->cash, $first]));
+        $this->patch(route('admin.payment-proofs.approve', [$this->cash, $duplicate]))
+            ->assertSessionHas('error', 'Bukti tidak bisa diterima: total pembayaran akan melebihi Rp 505.000.000 (sisa Rp 0). Periksa lagi atau tolak bukti ini.');
+
+        $this->assertTrue($duplicate->fresh()->isPending());
+        $this->assertSame(505_000_000, $this->cash->fresh()->verifiedPaymentTotal());
+    }
+
+    public function test_setelah_lunas_customer_tidak_bisa_mengirim_bukti_lagi(): void
+    {
+        $this->proof(['type' => PaymentProof::TYPE_SETTLEMENT, 'amount' => 505_000_000])->update(['status' => PaymentProof::STATUS_APPROVED]);
+
+        $this->actingAs($this->customer)->get(route('account.purchase-requests.index'))
+            ->assertSee('Lunas')
+            ->assertSee('Pembayaran lunas. Tim kami akan menghubungi Anda untuk jadwal serah terima.')
+            ->assertDontSee('Kirim Bukti Pembayaran')
+            ->assertDontSee('Transfer ke');
+
+        $this->upload()->assertRedirect(route('account.purchase-requests.index'))
+            ->assertSessionHas('status', 'Pembayaran pengajuan ini sudah lunas. Tidak perlu mengirim bukti lagi.');
+        $this->assertSame(1, PaymentProof::query()->count());
+    }
+
+    public function test_pengajuan_saya_menampilkan_jumlah_bukti_menunggu(): void
+    {
+        $this->proof();
+        $this->proof();
+
+        $this->actingAs($this->customer)->get(route('account.purchase-requests.index'))
+            ->assertSee('Belum dibayar')
+            ->assertSee('2 bukti menunggu verifikasi admin.');
+    }
+
+    public function test_pdf_memuat_status_dan_daftar_pembayaran_diterima(): void
+    {
+        $this->proof(['amount' => 5_000_000, 'paid_on' => '2026-10-10'])->update(['status' => PaymentProof::STATUS_APPROVED]);
+        $this->proof(['type' => PaymentProof::TYPE_SETTLEMENT, 'amount' => 1_000_000]);
+
+        $html = app(PurchaseRequestPdf::class)->html($this->cash->fresh());
+
+        $this->assertStringContainsString('Pembayaran: <span class="status">Dibayar sebagian</span>', $html);
+        $this->assertStringContainsString('Pembayaran Diterima', $html);
+        $this->assertStringContainsString('Tanda jadi · 10 Oktober 2026', $html);
+        $this->assertStringContainsString('Rp 5.000.000', $html);
+        $this->assertStringContainsString('Sisa pembayaran', $html);
+        $this->assertStringContainsString('Rp 500.000.000', $html);
+        $this->assertStringNotContainsString('Rp 1.000.000<', $html);
     }
 
     public function test_detail_admin_tanpa_kartu_bila_belum_disetujui_dan_belum_ada_bukti(): void

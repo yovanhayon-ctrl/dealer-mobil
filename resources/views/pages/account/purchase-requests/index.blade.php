@@ -86,15 +86,22 @@
                             @endif
 
                             {{-- Pembayaran: setelah disetujui customer mengirim bukti transfer; riwayatnya tetap tampil setelahnya. --}}
-                            @if ($purchase->canReceivePaymentProofs() || $purchase->paymentProofs->isNotEmpty())
+                            @if ($purchase->hasPaymentSection())
                                 <div class="payment-box small rounded-3 p-3 mt-3" id="pembayaran-{{ $purchase->id }}">
                                     <div class="d-flex flex-wrap justify-content-between gap-1 mb-2">
-                                        <span class="fw-semibold">Pembayaran ke dealer</span>
+                                        <span class="fw-semibold">
+                                            Pembayaran ke dealer
+                                            <x-status-badge :status="$purchase->paymentStatusBadge()" :label="$purchase->paymentStatusLabel()" class="ms-1" />
+                                        </span>
                                         <span class="text-muted">
                                             Terverifikasi <x-price :amount="$purchase->verifiedPaymentTotal()" />
                                             dari <x-price :amount="$purchase->amountPayableToDealer()" />{{ $purchase->isCredit() ? ' (DP)' : '' }}
                                         </span>
                                     </div>
+
+                                    @if (($pendingProofs = $purchase->pendingPaymentProofCount()) > 0)
+                                        <p class="text-muted mb-2"><i class="bi bi-hourglass-split me-1"></i>{{ $pendingProofs }} bukti menunggu verifikasi admin.</p>
+                                    @endif
 
                                     @if ($purchase->canReceivePaymentProofs())
                                         <x-payment-bank />

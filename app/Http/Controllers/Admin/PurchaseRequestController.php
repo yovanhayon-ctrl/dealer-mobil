@@ -39,7 +39,10 @@ class PurchaseRequestController extends Controller
         $filters = $this->filters($request);
 
         $purchaseRequests = PurchaseRequest::query()
-            ->with(['user:id,name,email', 'car:id,brand_id,name,year', 'car.brand:id,name'])
+            ->with([
+                'user:id,name,email', 'car:id,brand_id,name,year', 'car.brand:id,name',
+                'paymentProofs:id,purchase_request_id,amount,status,created_at',
+            ])
             ->tap(fn (Builder $query) => $this->applyFilters($query, $filters))
             ->orderBy('created_at', self::SORTS[$filters['urut']])
             ->orderBy('id', self::SORTS[$filters['urut']])

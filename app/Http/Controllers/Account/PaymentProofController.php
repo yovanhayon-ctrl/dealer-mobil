@@ -76,8 +76,12 @@ class PaymentProofController extends Controller
     {
         $back = redirect()->route('account.purchase-requests.index');
 
-        if (! $purchaseRequest->canReceivePaymentProofs()) {
+        if ($purchaseRequest->status !== PurchaseRequest::STATUS_APPROVED) {
             return $back->with('error', 'Bukti pembayaran hanya bisa dikirim untuk pengajuan yang sudah disetujui.');
+        }
+
+        if ($purchaseRequest->isPaidOff()) {
+            return $back->with('status', 'Pembayaran pengajuan ini sudah '.mb_strtolower($purchaseRequest->paymentStatusLabel()).'. Tidak perlu mengirim bukti lagi.');
         }
 
         if ($purchaseRequest->paymentProofs()->count() >= PaymentProof::MAX_PER_PURCHASE) {
