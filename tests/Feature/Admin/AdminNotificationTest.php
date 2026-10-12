@@ -9,14 +9,17 @@ use App\Models\PurchaseRequest;
 use App\Models\Service;
 use App\Models\ServiceBooking;
 use App\Models\TestDrive;
+use App\Models\Testimonial;
 use App\Models\User;
 use App\Notifications\Admin\AdminActivityNotification;
 use App\Notifications\Admin\PurchaseRequestActivity;
 use App\Notifications\Admin\ServiceBookingActivity;
 use App\Notifications\Admin\TestDriveActivity;
+use App\Notifications\Admin\TestimonialActivity;
 use App\Notifications\TestDriveStatusChanged;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Str;
 use Tests\TestCase;
 
 /**
@@ -76,6 +79,7 @@ class AdminNotificationTest extends TestCase
                 'admin_note' => null,
                 'route' => 'admin.test-drives.show',
                 'params' => [$testDrive->id],
+                'record' => ['type' => 'TestDrive', 'id' => $testDrive->id],
             ], $notification->data);
         }
 
@@ -257,6 +261,41 @@ class AdminNotificationTest extends TestCase
             ->assertSee('Lunas')
             ->assertSee('Dikonfirmasi')
             ->assertDontSee('>Menunggu<', false);
+    }
+
+    public function test_notifikasi_ulasan_menampilkan_status_ulasan_terkini(): void
+    {
+        $testimonial = Testimonial::factory()->create();
+        AdminActivityNotification::notifyAdmins(new TestimonialActivity($testimonial));
+        $this->assertSame(
+            ['type' => 'Testimonial', 'id' => $testimonial->id],
+            $this->admin->notifications()->sole()->data['record'],
+        );
+
+        $this->actingAs($this->admin)->get(route('admin.notifications.index'))->assertSee('Menunggu');
+
+        $testimonial->update(['status' => Testimonial::STATUS_APPROVED, 'approved_at' => now()]);
+        $this->get(route('admin.notifications.index'))
+            ->assertSee('Disetujui')
+            ->assertDontSee('>Menunggu<', false);
+    }
+
+    public function test_notifikasi_lama_tanpa_id_data_tidak_menampilkan_status_usang(): void
+    {
+        // Format notifikasi ulasan sebelum "record" disimpan: hanya route daftar ulasan + status saat dibuat.
+        $this->admin->notifications()->create([
+            'id' => (string) Str::uuid(),
+            'type' => TestimonialActivity::class,
+            'data' => [
+                'title' => 'Ulasan Baru · Budi Santoso', 'message' => '★★★★★ · Nissan Kicks', 'status' => 'pending',
+                'admin_note' => null, 'route' => 'admin.testimonials.index', 'params' => ['status' => 'pending'],
+            ],
+        ]);
+
+        $this->actingAs($this->admin)->get(route('admin.notifications.index'))
+            ->assertOk()
+            ->assertSee('Ulasan Baru · Budi Santoso')
+            ->assertDontSee('Menunggu');
     }
 
     public function test_status_tersimpan_dipakai_bila_data_sudah_terhapus(): void
