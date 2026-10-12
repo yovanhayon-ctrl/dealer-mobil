@@ -59,6 +59,7 @@ class PurchaseRequestController extends Controller
             'user:id,name,email,phone',
             'car:id,brand_id,name,slug,year,vehicle_condition,price,stock,is_active',
             'car.brand:id,name',
+            'paymentProofs',
         ]);
 
         return view('admin.purchase-requests.show', ['purchaseRequest' => $purchaseRequest]);

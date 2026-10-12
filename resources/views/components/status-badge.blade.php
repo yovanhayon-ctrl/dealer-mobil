@@ -1,4 +1,4 @@
-@props(['status'])
+@props(['status', 'label' => null])
 
 @php
     // Warna sesuai RANCANGAN §2.
@@ -20,7 +20,9 @@
         'ended' => ['Berakhir', 'dark'],
     ];
 
-    [$label, $color] = $map[$status] ?? [ucfirst((string) $status), 'muted'];
+    [$defaultLabel, $color] = $map[$status] ?? [ucfirst((string) $status), 'muted'];
+    // Label khusus (mis. bukti pembayaran: "Menunggu verifikasi" / "Diterima") dengan warna status yang sama.
+    $label ??= $defaultLabel;
 @endphp
 
 <span {{ $attributes->class(['badge rounded-pill', 'badge-status-'.$color]) }}>{{ $label }}</span>

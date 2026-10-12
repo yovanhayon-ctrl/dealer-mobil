@@ -41,6 +41,7 @@ class PurchaseRequestController extends Controller
                 'car.brand:id,name',
                 'car.primaryImage:id,car_id,path,thumb_path',
                 'testimonial:id,purchase_request_id,rating,comment,status,admin_note',
+                'paymentProofs:id,purchase_request_id,type,amount,paid_on,status,admin_note,created_at',
             ])
             ->latest()
             ->orderByDesc('id')
