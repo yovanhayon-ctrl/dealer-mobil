@@ -9,7 +9,7 @@ Berlaku untuk rilis **v1.4.0** (notifikasi customer & admin, email, favorit, ban
 | Kebutuhan | Keterangan |
 |---|---|
 | **PHP 8.4 atau lebih baru (disarankan 8.5)** | **Wajib.** Paket yang terkunci di `composer.lock` (Symfony 8) membutuhkan PHP ≥ 8.4.1. Di PHP 8.3 aplikasi **tidak** akan berjalan. Atur di cPanel → *Select PHP Version* / *MultiPHP Manager*. |
-| Ekstensi PHP | `pdo_mysql`, `mbstring`, `openssl`, `fileinfo` (validasi upload), `ctype`, `tokenizer`, `xml`, `curl`, `dom` (PDF bukti pengajuan, dompdf). |
+| Ekstensi PHP | `pdo_mysql`, `mbstring`, `openssl`, `fileinfo` (validasi upload), `ctype`, `tokenizer`, `xml`, `curl`, `dom` (PDF bukti pengajuan, dompdf), `zip` (export laporan Excel). |
 | Batas upload PHP | `upload_max_filesize` ≥ **8M** dan `post_max_size` ≥ **80M** (galeri bisa mengunggah beberapa foto HP sekaligus, maks. 8 MB per foto; banner promo juga maks. 8 MB). Atur di cPanel → *Select PHP Version* → *Options* / *MultiPHP INI Editor*. |
 | Database | MySQL 8 (atau MariaDB 10.6+). |
 | Terminal / SSH di cPanel | **Sangat disarankan** (untuk `php artisan`). Tanpa Terminal lihat bagian 9. |
@@ -32,7 +32,7 @@ Ekstrak `dealer-mobil-release.zip` ke folder baru (mis. `C:/laragon/www/dealer-m
 composer install --no-dev --optimize-autoloader
 ```
 
-Perintah ini juga memasang `dompdf/dompdf` (fitur **Cetak PDF**), jadi folder `vendor` di paket sudah lengkap. Kompres ulang isi folder tersebut menjadi `dealer-mobil.zip`. Paket **tidak** boleh berisi `.env` (berisi rahasia) — `git archive` sudah tidak menyertakannya.
+Perintah ini juga memasang `dompdf/dompdf` (fitur **Cetak PDF**) dan `phpoffice/phpspreadsheet` (fitur **Export Excel** laporan), jadi folder `vendor` di paket sudah lengkap. Kompres ulang isi folder tersebut menjadi `dealer-mobil.zip`. Paket **tidak** boleh berisi `.env` (berisi rahasia) — `git archive` sudah tidak menyertakannya.
 
 ## 3. Upload
 
@@ -185,6 +185,7 @@ Header keamanan (CSP, HSTS saat HTTPS, dll.) sudah dipasang aplikasi; aturan cac
 | Foto tidak tampil | `storage:link` belum ada / salah folder (opsi B: tautan harus `public_html/storage` → `~/dealer-mobil/storage/app/public`, dibuat manual dengan `ln -s`). |
 | Peta tidak tampil | `DEALER_MAPS_EMBED_URL` harus URL **embed** Google Maps (https). |
 | **Cetak PDF** error *Class "Dompdf\Dompdf" not found* | Folder `vendor` lama → upload paket baru (bagian 2) atau `composer install --no-dev`. |
+| **Export Excel** error *Class "PhpOffice\PhpSpreadsheet\..." not found* atau file gagal dibuat | Folder `vendor` lama → upload paket baru / `composer install --no-dev`; pastikan ekstensi PHP `zip` dan `xml` aktif. |
 | Upload foto gagal / halaman error saat mengunggah | Batas `upload_max_filesize` / `post_max_size` hosting terlalu kecil → naikkan (lihat bagian 1). Foto lama: jalankan `php artisan cars:optimize-images` sekali. |
 | **Cetak PDF** error terkait `DOMDocument` | Ekstensi PHP `dom` belum aktif → cPanel → *Select PHP Version* → *Extensions* → centang `dom`. |
 | Email notifikasi tidak terkirim / aksi lambat | `MAIL_*` salah atau port SMTP diblokir hosting → cek `laravel.log`, perbaiki lalu `php artisan optimize`, atau sementara `DEALER_MAIL_NOTIFICATIONS=false`. |
