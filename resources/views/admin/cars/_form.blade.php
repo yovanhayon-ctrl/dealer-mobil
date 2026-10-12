@@ -41,11 +41,11 @@
                     @enderror
                 </div>
                 <div class="col-md-4">
-                    <x-form.input name="year" label="Tahun" type="number" :value="$car->year" required
+                    <x-form.input name="year" data-number="digits" label="Tahun" type="number" :value="$car->year" required
                                   min="{{ \App\Models\Car::MIN_YEAR }}" :max="now()->year + 1" />
                 </div>
                 <div @class(['col-md-4', 'd-none' => $condition !== \App\Models\Car::CONDITION_USED]) data-mileage-field>
-                    <x-form.input name="mileage" label="Kilometer" :value="$formatNumber($car->mileage ?: null)"
+                    <x-form.input name="mileage" data-number="thousands" label="Kilometer" :value="$formatNumber($car->mileage ?: null)"
                                   inputmode="numeric" placeholder="Contoh: 45.000" help="Wajib untuk mobil bekas." />
                 </div>
             </div>
@@ -63,10 +63,10 @@
                                    placeholder="Pilih bahan bakar" required />
                 </div>
                 <div class="col-md-4">
-                    <x-form.input name="seats" label="Jumlah Kursi" type="number" :value="$car->seats" required min="2" max="9" />
+                    <x-form.input name="seats" data-number="digits" label="Jumlah Kursi" type="number" :value="$car->seats" required min="2" max="9" />
                 </div>
                 <div class="col-md-6">
-                    <x-form.input name="engine_cc" label="Kapasitas Mesin (cc)" type="number" :value="$car->engine_cc" min="500" max="10000"
+                    <x-form.input name="engine_cc" data-number="digits" label="Kapasitas Mesin (cc)" type="number" :value="$car->engine_cc" min="500" max="10000"
                                   help="Opsional. Kosongkan untuk mobil listrik." />
                 </div>
                 <div class="col-md-6">
@@ -85,7 +85,7 @@
                     <label for="price" class="form-label">Harga<span class="text-danger ms-1" aria-hidden="true">*</span></label>
                     <div class="input-group has-validation">
                         <span class="input-group-text">Rp</span>
-                        <input type="text" id="price" name="price" inputmode="numeric" required
+                        <input type="text" id="price" name="price" data-number="thousands" inputmode="numeric" required
                                value="{{ old('price', $formatNumber($car->price)) }}" placeholder="285.000.000"
                                @class(['form-control', 'is-invalid' => $errors->has('price')])>
                         @error('price')
@@ -95,7 +95,7 @@
                     <div class="form-text">Boleh memakai titik pemisah ribuan.</div>
                 </div>
                 <div class="col-12">
-                    <x-form.input name="stock" label="Stok" type="number" :value="$car->stock" required min="0" />
+                    <x-form.input name="stock" data-number="digits" label="Stok" type="number" :value="$car->stock" required min="0" max="9999" />
                 </div>
             </div>
         </section>

@@ -10,13 +10,13 @@
                          help="Cakupan pekerjaan dan manfaat layanan. Tampil di halaman Servis." />
     </div>
     <div class="col-md-6">
-        <x-form.input name="price_from" label="Harga Mulai (Rp)"
+        <x-form.input name="price_from" data-number="thousands" label="Harga Mulai (Rp)"
                       :value="$service->price_from ? number_format($service->price_from, 0, ',', '.') : ''"
                       inputmode="numeric" placeholder="Contoh: 450.000"
                       help="Estimasi harga terendah. Kosongkan jika harga tergantung kebutuhan (tampil “Hubungi dealer”)." />
     </div>
     <div class="col-md-6">
-        <x-form.input name="duration_minutes" label="Estimasi Durasi (menit)" :value="$service->duration_minutes"
+        <x-form.input name="duration_minutes" data-number="digits" label="Estimasi Durasi (menit)" :value="$service->duration_minutes"
                       inputmode="numeric" placeholder="Contoh: 120" help="Opsional, 15–1440 menit." />
     </div>
 </div>
