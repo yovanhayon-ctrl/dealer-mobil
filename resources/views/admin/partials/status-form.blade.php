@@ -1,10 +1,12 @@
 {{--
     Form ubah status + catatan admin (test drive & pengajuan).
     Parameter: $action (URL PATCH), $currentLabel (label status sekarang), $allowed ([status => label]
-    transisi yang diizinkan; kosong = status akhir), $adminNote, $noteHelp.
+    transisi yang diizinkan; kosong = status akhir), $adminNote, $noteHelp,
+    $noteTemplates (opsional, [status => catatan]: catatan terisi otomatis saat status dipilih, lihat admin.js).
     Server tetap memeriksa ulang transisi yang diizinkan.
 --}}
-<form method="POST" action="{{ $action }}" novalidate>
+<form method="POST" action="{{ $action }}" novalidate
+      @if (! empty($noteTemplates)) data-note-templates='@json($noteTemplates)' @endif>
     @csrf
     @method('PATCH')
 

@@ -25,6 +25,7 @@
         .meta { width: 100%; margin-bottom: 14px; }
         .meta td { padding: 1px 0; }
         .status { display: inline-block; padding: 2px 8px; border-radius: 9px; background: #1c1c1e; color: #fff; font-size: 9.5px; font-weight: bold; }
+        .status.paid { background: #198754; }
         .section { font-size: 11px; font-weight: bold; color: #c3002f; text-transform: uppercase; letter-spacing: .5px; margin: 12px 0 4px; }
         table.data { width: 100%; border-collapse: collapse; }
         table.data th, table.data td { padding: 5px 8px; border-bottom: 1px solid #e5e7eb; text-align: left; vertical-align: top; }
@@ -57,7 +58,12 @@
     <table class="meta">
         <tr>
             <td>No. <strong>{{ $purchase->documentNumber() }}</strong> · diajukan {{ $purchase->created_at->translatedFormat('d F Y, H:i') }} WIB</td>
-            <td style="text-align: right;">Status: <span class="status">{{ $purchase->statusLabel() }}</span></td>
+            <td style="text-align: right;">
+                Status: <span class="status">{{ $purchase->statusLabel() }}</span>
+                @if ($purchase->hasPaymentSection())
+                    &nbsp;Pembayaran: <span class="status{{ $purchase->isPaidOff() ? ' paid' : '' }}">{{ $purchase->paymentStatusLabel() }}</span>
+                @endif
+            </td>
         </tr>
     </table>
 
@@ -94,6 +100,23 @@
             <tr class="total"><th>Total pembayaran</th><td class="amount">{{ $rupiah($purchase->car_price) }}</td></tr>
         @endif
     </table>
+
+    @php($received = $purchase->paymentProofs->where('status', \App\Models\PaymentProof::STATUS_APPROVED)->sortBy('paid_on'))
+    @if ($received->isNotEmpty())
+        <div class="section">Pembayaran Diterima</div>
+        <table class="data">
+            @foreach ($received as $payment)
+                <tr>
+                    <th>{{ $payment->typeLabel() }} · {{ $payment->paid_on->translatedFormat('d F Y') }}</th>
+                    <td>{{ $rupiah($payment->amount) }}@if ($payment->isShowroomPayment()) · {{ $payment->methodLabel() }}@endif</td>
+                </tr>
+            @endforeach
+            <tr class="total"><th>Total diterima</th><td class="amount">{{ $rupiah($purchase->verifiedPaymentTotal()) }}</td></tr>
+            @unless ($purchase->isPaidOff())
+                <tr><th>Sisa {{ $purchase->isCredit() ? 'DP' : 'pembayaran' }}</th><td>{{ $rupiah($purchase->remainingPayment()) }}</td></tr>
+            @endunless
+        </table>
+    @endif
 
     @if ($purchase->notes)
         <div class="section">Catatan Customer</div>

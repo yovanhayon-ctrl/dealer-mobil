@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable([
@@ -37,6 +38,13 @@ class PurchaseRequest extends Model
     ];
 
     /** Label bahasa Indonesia (sama dengan x-status-badge). */
+    /** Status pembayaran (dihitung dari bukti yang diterima admin, tidak disimpan). */
+    public const PAYMENT_UNPAID = 'unpaid';
+
+    public const PAYMENT_PARTIAL = 'partial';
+
+    public const PAYMENT_PAID = 'paid';
+
     /** Peringatan penipuan: tampil di form pengajuan dan PDF bukti pengajuan. */
     public const SAFE_PAYMENT_NOTE = 'Kami tidak pernah meminta pembayaran sebelum Anda cek unit. Transfer hanya ke rekening atas nama dealer.';
 
@@ -61,6 +69,21 @@ class PurchaseRequest extends Model
 
     /** Status yang wajib disertai catatan admin (alasan untuk customer). */
     public const NOTE_REQUIRED_STATUSES = [self::STATUS_REJECTED, self::STATUS_CANCELLED];
+
+    /** Tanda bagian catatan yang wajib dilengkapi admin (alasan menolak / membatalkan). */
+    public const NOTE_PLACEHOLDER = '…';
+
+    /**
+     * Catatan admin otomatis saat status diubah (form admin mengisinya, admin boleh mengubah).
+     * Ditolak/Dibatalkan berisi tanda "…" yang wajib diganti alasan sebelum disimpan.
+     */
+    public const NOTE_TEMPLATES = [
+        self::STATUS_PROCESSING => 'Pengajuan Anda sedang kami proses. Tim kami akan menghubungi Anda lewat WhatsApp untuk jadwal cek unit.',
+        self::STATUS_APPROVED => 'Pengajuan Anda disetujui. Silakan lakukan pembayaran ke rekening resmi dealer atau langsung di showroom, lalu kirim bukti transfer di menu Pengajuan Saya.',
+        self::STATUS_COMPLETED => 'Terima kasih! Mobil telah diserahterimakan. Selamat menikmati kendaraan baru Anda.',
+        self::STATUS_REJECTED => 'Mohon maaf, pengajuan Anda belum dapat kami setujui karena '.self::NOTE_PLACEHOLDER,
+        self::STATUS_CANCELLED => 'Pengajuan dibatalkan karena '.self::NOTE_PLACEHOLDER,
+    ];
 
     /** Dihitung "terjual" di laporan: unit sudah dipotong dari stok. */
     public const SOLD_STATUSES = [self::STATUS_APPROVED, self::STATUS_COMPLETED];
@@ -108,6 +131,111 @@ class PurchaseRequest extends Model
         return $this->hasOne(Testimonial::class);
     }
 
+    public function paymentProofs(): HasMany
+    {
+        return $this->hasMany(PaymentProof::class)->latest()->orderByDesc('id');
+    }
+
+    /**
+     * Bukti pembayaran hanya bisa dikirim setelah pengajuan disetujui dealer dan selama belum lunas.
+     */
+    public function canReceivePaymentProofs(): bool
+    {
+        return $this->status === self::STATUS_APPROVED && ! $this->isPaidOff();
+    }
+
+    /**
+     * Bagian pembayaran tampil untuk pengajuan disetujui, atau bila sudah ada bukti (riwayat).
+     */
+    public function hasPaymentSection(): bool
+    {
+        $this->loadMissing('paymentProofs');
+
+        return $this->status === self::STATUS_APPROVED || $this->paymentProofs->isNotEmpty();
+    }
+
+    /**
+     * Jenis pembayaran ke dealer: cash = tanda jadi & pelunasan; kredit = tanda jadi & DP (sisanya dibayar leasing).
+     *
+     * @return array<string, string>
+     */
+    public function paymentProofTypes(): array
+    {
+        $types = $this->isCredit()
+            ? [PaymentProof::TYPE_BOOKING_FEE, PaymentProof::TYPE_DOWN_PAYMENT]
+            : [PaymentProof::TYPE_BOOKING_FEE, PaymentProof::TYPE_SETTLEMENT];
+
+        return array_intersect_key(PaymentProof::TYPE_LABELS, array_flip($types));
+    }
+
+    /**
+     * Total yang dibayar customer langsung ke dealer: harga mobil (cash) atau DP (kredit).
+     */
+    public function amountPayableToDealer(): int
+    {
+        return $this->isCredit() ? (int) $this->down_payment : (int) $this->car_price;
+    }
+
+    /**
+     * Jumlah bukti pembayaran yang sudah diterima admin.
+     */
+    public function verifiedPaymentTotal(): int
+    {
+        $this->loadMissing('paymentProofs');
+
+        return (int) $this->paymentProofs->where('status', PaymentProof::STATUS_APPROVED)->sum('amount');
+    }
+
+    public function remainingPayment(): int
+    {
+        return max(0, $this->amountPayableToDealer() - $this->verifiedPaymentTotal());
+    }
+
+    public function isPaidOff(): bool
+    {
+        return $this->amountPayableToDealer() > 0 && $this->remainingPayment() === 0;
+    }
+
+    public function paymentStatus(): string
+    {
+        return match (true) {
+            $this->isPaidOff() => self::PAYMENT_PAID,
+            $this->verifiedPaymentTotal() > 0 => self::PAYMENT_PARTIAL,
+            default => self::PAYMENT_UNPAID,
+        };
+    }
+
+    /**
+     * Cash: Belum dibayar / Dibayar sebagian / Lunas. Kredit (yang dibayar ke dealer hanya DP): Belum dibayar / DP sebagian / DP lunas.
+     */
+    public function paymentStatusLabel(): string
+    {
+        return match ($this->paymentStatus()) {
+            self::PAYMENT_PAID => $this->isCredit() ? 'DP lunas' : 'Lunas',
+            self::PAYMENT_PARTIAL => $this->isCredit() ? 'DP sebagian' : 'Dibayar sebagian',
+            default => 'Belum dibayar',
+        };
+    }
+
+    /**
+     * Warna badge status pembayaran (kunci warna di komponen status-badge).
+     */
+    public function paymentStatusBadge(): string
+    {
+        return match ($this->paymentStatus()) {
+            self::PAYMENT_PAID => 'completed',
+            self::PAYMENT_PARTIAL => 'processing',
+            default => 'inactive',
+        };
+    }
+
+    public function pendingPaymentProofCount(): int
+    {
+        $this->loadMissing('paymentProofs');
+
+        return $this->paymentProofs->where('status', PaymentProof::STATUS_PENDING)->count();
+    }
+
     /**
      * Nomor dokumen untuk bukti pengajuan: PB-{tahun pengajuan}-{id 6 digit}, mis. PB-2026-000123.
      */
@@ -150,9 +278,11 @@ class PurchaseRequest extends Model
             self::STATUS_PROCESSING => $this->isCredit()
                 ? 'Siapkan KTP, KK, NPWP, dan slip gaji atau rekening koran untuk survei leasing.'
                 : 'Atur jadwal cek unit di showroom. Pembayaran dilakukan setelah Anda cocok dengan unitnya.',
-            self::STATUS_APPROVED => $this->isCredit()
-                ? 'Bayar DP dan tanda tangani perjanjian kredit, lalu jadwalkan serah terima.'
-                : 'Lakukan pelunasan di showroom atau transfer ke rekening atas nama dealer, lalu konfirmasi lewat WhatsApp.',
+            self::STATUS_APPROVED => $this->isPaidOff()
+                ? 'Pembayaran lunas. Tim kami akan menghubungi Anda untuk jadwal serah terima.'
+                : ($this->isCredit()
+                ? 'Bayar DP dan tanda tangani perjanjian kredit, lalu kirim bukti transfer DP di menu Pengajuan Saya.'
+                : 'Lakukan pelunasan di showroom atau transfer ke rekening atas nama dealer, lalu kirim bukti transfernya di menu Pengajuan Saya.'),
             default => null,
         };
     }
