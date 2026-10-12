@@ -139,6 +139,8 @@
                                                  maxlength="{{ PurchaseRequestRequest::MAX_NOTES_LENGTH }}"
                                                  help="Mis. warna yang diinginkan atau waktu yang nyaman untuk dihubungi." />
 
+                                <x-purchase-steps />
+
                                 <div class="d-flex flex-wrap gap-2 align-items-center">
                                     <button type="submit" class="btn btn-accent">
                                         <i class="bi bi-cart-check"></i>Kirim Pengajuan
