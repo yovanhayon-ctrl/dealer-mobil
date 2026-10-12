@@ -105,7 +105,13 @@
         <div class="note">{{ $purchase->admin_note }}</div>
     @endif
 
+    @if ($nextStep = $purchase->nextStep())
+        <div class="section">Langkah Selanjutnya</div>
+        <div class="note">{{ $nextStep }}</div>
+    @endif
+
     <div class="footer">
+        {{ \App\Models\PurchaseRequest::SAFE_PAYMENT_NOTE }}<br>
         Dokumen ini adalah <strong>bukti pengajuan pembelian</strong>, bukan bukti pembayaran atau kontrak jual beli.
         Nilai kredit merupakan simulasi bunga flat dan dapat berubah sesuai persetujuan lembaga pembiayaan.<br>
         Dicetak {{ now()->translatedFormat('d F Y, H:i') }} WIB dari {{ config('app.url') }} · {{ $dealer['name'] }}

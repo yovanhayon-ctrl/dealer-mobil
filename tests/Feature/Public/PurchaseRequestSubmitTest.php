@@ -200,7 +200,7 @@ class PurchaseRequestSubmitTest extends TestCase
         $this->submit()
             ->assertRedirect(route('account.purchase-requests.index'))
             ->assertSessionHas('success', 'Pengajuan pembelian Nissan Kicks e-Power VL 2025 (kredit DP Rp 104.000.000, 36 bulan, cicilan Rp '
-                .number_format($expected['monthly_installment'], 0, ',', '.').'/bulan) berhasil dikirim. Tim kami akan menghubungi Anda.');
+                .number_format($expected['monthly_installment'], 0, ',', '.').'/bulan) berhasil dikirim. Tim kami akan menghubungi Anda; langkah berikutnya bisa dilihat di daftar di bawah.');
 
         $purchase = PurchaseRequest::sole();
         $this->assertSame($this->customer->id, $purchase->user_id);

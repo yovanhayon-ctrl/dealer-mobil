@@ -4,6 +4,7 @@
 
 @php
     $percent = fn (float $value) => rtrim(rtrim(number_format($value, 2, ',', '.'), '0'), ',').'%';
+    $whatsapp = preg_replace('/\D/', '', (string) config('dealer.whatsapp'));
 @endphp
 
 @section('content')
@@ -70,6 +71,13 @@
                                 </div>
                             </div>
 
+                            @if ($nextStep = $purchase->nextStep())
+                                <p class="small mt-3 mb-0">
+                                    <i class="bi bi-signpost-2 text-accent me-1" aria-hidden="true"></i><span class="fw-semibold">Langkah berikutnya:</span>
+                                    {{ $nextStep }}
+                                </p>
+                            @endif
+
                             @if ($purchase->admin_note)
                                 <div class="admin-note-box small rounded-3 p-2 mt-3">
                                     <span class="fw-semibold"><i class="bi bi-chat-left-text me-1"></i>Catatan dealer:</span>
@@ -132,6 +140,12 @@
                                     <a href="{{ route('account.purchase-requests.pdf', $purchase) }}" target="_blank" rel="noopener"
                                        class="btn btn-outline-secondary btn-sm" aria-label="Cetak PDF bukti pengajuan {{ $carTitle }}">
                                         <i class="bi bi-file-earmark-pdf"></i>Cetak PDF
+                                    </a>
+                                @endif
+                                @if ($whatsapp !== '' && ! $purchase->isFinal())
+                                    <a href="https://wa.me/{{ $whatsapp }}?text={{ rawurlencode('Halo '.config('dealer.name').', saya ingin menanyakan pengajuan '.$purchase->documentNumber().' ('.$carTitle.', '.mb_strtolower($purchase->paymentMethodLabel()).').') }}"
+                                       target="_blank" rel="noopener" class="btn btn-outline-secondary btn-sm">
+                                        <i class="bi bi-whatsapp"></i>Tanya via WhatsApp
                                     </a>
                                 @endif
                                 @if ($purchase->canBeCancelledByCustomer())

@@ -37,6 +37,9 @@ class PurchaseRequest extends Model
     ];
 
     /** Label bahasa Indonesia (sama dengan x-status-badge). */
+    /** Peringatan penipuan: tampil di form pengajuan dan PDF bukti pengajuan. */
+    public const SAFE_PAYMENT_NOTE = 'Kami tidak pernah meminta pembayaran sebelum Anda cek unit. Transfer hanya ke rekening atas nama dealer.';
+
     public const STATUS_LABELS = [
         self::STATUS_PENDING => 'Menunggu',
         self::STATUS_PROCESSING => 'Diproses',
@@ -135,6 +138,23 @@ class PurchaseRequest extends Model
     public function isCredit(): bool
     {
         return $this->payment_method === self::PAYMENT_CREDIT;
+    }
+
+    /**
+     * Langkah berikutnya untuk customer sesuai status & metode (halaman Pengajuan Saya dan PDF); null untuk status akhir.
+     */
+    public function nextStep(): ?string
+    {
+        return match ($this->status) {
+            self::STATUS_PENDING => 'Tim kami akan menghubungi Anda lewat WhatsApp dalam 1 hari kerja.',
+            self::STATUS_PROCESSING => $this->isCredit()
+                ? 'Siapkan KTP, KK, NPWP, dan slip gaji atau rekening koran untuk survei leasing.'
+                : 'Atur jadwal cek unit di showroom. Pembayaran dilakukan setelah Anda cocok dengan unitnya.',
+            self::STATUS_APPROVED => $this->isCredit()
+                ? 'Bayar DP dan tanda tangani perjanjian kredit, lalu jadwalkan serah terima.'
+                : 'Lakukan pelunasan di showroom atau transfer ke rekening atas nama dealer, lalu konfirmasi lewat WhatsApp.',
+            default => null,
+        };
     }
 
     /**
