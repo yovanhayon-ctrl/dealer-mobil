@@ -30,7 +30,7 @@
                             <x-form.input name="name" label="Nama Lengkap" :value="$user->name" required maxlength="100" autocomplete="name" />
                             <x-form.input name="email" type="email" label="Email" :value="$user->email" required maxlength="255" autocomplete="email"
                                           help="Dipakai untuk masuk ke akun." />
-                            <x-form.input name="phone" type="tel" label="Nomor WhatsApp" :value="$user->phone" required inputmode="tel" autocomplete="tel"
+                            <x-form.input name="phone" data-number="phone" type="tel" label="Nomor WhatsApp" :value="$user->phone" required inputmode="tel" autocomplete="tel"
                                           help="Format 08xx. Otomatis terisi saat booking test drive, servis, dan pengajuan." />
 
                             <button type="submit" class="btn btn-primary">

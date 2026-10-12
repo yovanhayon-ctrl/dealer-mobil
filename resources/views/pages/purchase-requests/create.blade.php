@@ -107,7 +107,7 @@
                                     <p class="small text-muted mb-3">Isi bagian ini bila memilih <strong>Kredit</strong>.</p>
                                     <div class="row g-3">
                                         <div class="col-sm-6">
-                                            <x-form.input name="down_payment" label="Uang Muka / DP (Rp)" :value="$digits($defaultDownPayment)"
+                                            <x-form.input name="down_payment" data-number="thousands" label="Uang Muka / DP (Rp)" :value="$digits($defaultDownPayment)"
                                                           inputmode="numeric" data-purchase-dp
                                                           :help="'Minimal '.$digits($creditCalc->minDownPayment($price)).' ('.config('credit.dp_min').'%), maksimal '.config('credit.dp_max').'%.'" />
                                         </div>
@@ -127,7 +127,7 @@
                                     </div>
                                 </div>
 
-                                <x-form.input name="phone" type="tel" label="Nomor WhatsApp" required
+                                <x-form.input name="phone" data-number="phone" type="tel" label="Nomor WhatsApp" required
                                               :value="auth()->user()->phone" inputmode="tel" autocomplete="tel"
                                               help="Format 08xx. Dipakai tim kami untuk menghubungi Anda." />
 

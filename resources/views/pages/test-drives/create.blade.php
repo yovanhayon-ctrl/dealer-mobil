@@ -79,7 +79,7 @@
                                     </div>
                                 </div>
 
-                                <x-form.input name="phone" type="tel" label="Nomor WhatsApp" required
+                                <x-form.input name="phone" data-number="phone" type="tel" label="Nomor WhatsApp" required
                                               :value="auth()->user()->phone" inputmode="tel" autocomplete="tel"
                                               help="Format 08xx. Dipakai tim kami untuk konfirmasi jadwal." />
 

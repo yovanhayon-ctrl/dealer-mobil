@@ -76,7 +76,7 @@ return [
     'in' => ':Attribute yang dipilih tidak valid.',
     'in_array' => ':Attribute harus ada di :other.',
     'in_array_keys' => ':Attribute harus berisi minimal salah satu key berikut: :values.',
-    'integer' => ':Attribute harus berupa bilangan bulat.',
+    'integer' => ':Attribute hanya boleh berisi angka.',
     'ip' => ':Attribute harus berupa alamat IP yang valid.',
     'ipv4' => ':Attribute harus berupa alamat IPv4 yang valid.',
     'ipv6' => ':Attribute harus berupa alamat IPv6 yang valid.',

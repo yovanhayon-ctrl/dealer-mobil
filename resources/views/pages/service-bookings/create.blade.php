@@ -57,11 +57,11 @@
                                                       placeholder="B 1234 ABC" autocapitalize="characters" />
                                     </div>
                                     <div class="col-6 col-sm-4">
-                                        <x-form.input name="vehicle_year" label="Tahun" inputmode="numeric" maxlength="4"
+                                        <x-form.input name="vehicle_year" data-number="digits" label="Tahun" inputmode="numeric" maxlength="4"
                                                       placeholder="2020" help="Opsional." />
                                     </div>
                                     <div class="col-6 col-sm-8">
-                                        <x-form.input name="mileage" label="Kilometer Saat Ini" inputmode="numeric"
+                                        <x-form.input name="mileage" data-number="thousands" label="Kilometer Saat Ini" inputmode="numeric"
                                                       placeholder="Contoh: 45.000" help="Opsional, membantu menentukan paket servis." />
                                     </div>
                                 </div>
@@ -79,7 +79,7 @@
                                     </div>
                                 </div>
 
-                                <x-form.input name="phone" type="tel" label="Nomor WhatsApp" required
+                                <x-form.input name="phone" data-number="phone" type="tel" label="Nomor WhatsApp" required
                                               :value="auth()->user()->phone" inputmode="tel" autocomplete="tel"
                                               help="Format 08xx. Dipakai tim kami untuk konfirmasi jadwal." />
 

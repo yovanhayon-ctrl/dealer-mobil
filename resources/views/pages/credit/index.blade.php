@@ -53,12 +53,12 @@
                             </div>
 
                             <div @class(['d-none' => $car !== null]) data-credit-price-group>
-                                <x-form.input name="harga" label="Harga Mobil (Rp)" :value="$car ? '' : $digits($price)"
+                                <x-form.input name="harga" data-number="thousands" label="Harga Mobil (Rp)" :value="$car ? '' : $digits($price)"
                                               inputmode="numeric" placeholder="Contoh: 300.000.000" data-credit-price
                                               help="Diisi bila mobil tidak dipilih dari daftar." />
                             </div>
 
-                            <x-form.input name="dp" label="Uang Muka / DP (Rp)" :value="$digits($downPayment ?? ($result['down_payment'] ?? null))"
+                            <x-form.input name="dp" data-number="thousands" label="Uang Muka / DP (Rp)" :value="$digits($downPayment ?? ($result['down_payment'] ?? null))"
                                           inputmode="numeric" placeholder="Minimal {{ config('credit.dp_min') }}% dari harga" data-credit-dp
                                           :help="'Minimal '.config('credit.dp_min').'%, maksimal '.config('credit.dp_max').'% dari harga. Kosongkan untuk DP minimal.'" />
                             <div class="d-flex flex-wrap gap-2 mb-3 mt-n2 d-none" data-credit-dp-shortcuts>
