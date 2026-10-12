@@ -28,6 +28,11 @@ document.addEventListener('DOMContentLoaded', function () {
     var render = function () {
         creditFields.classList.toggle('d-none', !isCredit());
 
+        // Langkah "Pembayaran" di kotak langkah: hanya versi metode yang dipilih.
+        form.querySelectorAll('[data-step-method]').forEach(function (step) {
+            step.classList.toggle('d-none', step.getAttribute('data-step-method') !== (isCredit() ? 'credit' : 'cash'));
+        });
+
         var digits = (dpInput.value || '').replace(/\D/g, '').replace(/^0+/, '').slice(0, 13);
         var downPayment = digits === '' ? null : BigInt(digits);
         var tenor = parseInt(tenorSelect.value, 10);

@@ -2207,6 +2207,40 @@ tr[data-row-link] {
     }
 }
 
+/* Langkah setelah pengajuan pembelian: daftar bernomor ringkas di dalam form. */
+.purchase-steps-box {
+    background-color: var(--dm-bg);
+}
+
+.purchase-steps {
+    counter-reset: step;
+}
+
+.purchase-steps li {
+    position: relative;
+    padding-left: 2rem;
+    counter-increment: step;
+}
+
+.purchase-steps li + li {
+    margin-top: .5rem;
+}
+
+.purchase-steps li::before {
+    content: counter(step);
+    position: absolute;
+    top: 0;
+    left: 0;
+    display: grid;
+    place-items: center;
+    width: 1.35rem;
+    height: 1.35rem;
+    border: 1px solid var(--dm-line);
+    border-radius: 50%;
+    font-size: .75rem;
+    font-weight: 600;
+}
+
 /* ---------- Gerakan ---------- */
 
 /* Umpan balik saat tombol ditekan. */

@@ -65,7 +65,7 @@ class PurchaseRequestController extends Controller
             : 'cash '.CreditSimulationController::rupiah($purchaseRequest->car_price);
 
         return redirect()->route('account.purchase-requests.index')->with('success', sprintf(
-            'Pengajuan pembelian %s %s %s (%s) berhasil dikirim. Tim kami akan menghubungi Anda.',
+            'Pengajuan pembelian %s %s %s (%s) berhasil dikirim. Tim kami akan menghubungi Anda; langkah berikutnya bisa dilihat di daftar di bawah.',
             $car->brand->name, $car->name, $car->year, $detail,
         ));
     }
