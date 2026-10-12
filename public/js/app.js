@@ -70,6 +70,44 @@ document.addEventListener('DOMContentLoaded', function () {
 
         syncNavbar();
         window.addEventListener('scroll', syncNavbar, { passive: true });
+
+        // Menu hamburger (HP): ketuk di luar navbar atau tekan Esc untuk menutup. Ketukan pertama hanya menutup menu,
+        // tidak ikut menekan tombol/tautan di baliknya.
+        var menu = navbar.querySelector('.navbar-collapse');
+
+        if (menu && window.bootstrap) {
+            var closeMenu = function () {
+                window.bootstrap.Collapse.getOrCreateInstance(menu, { toggle: false }).hide();
+            };
+
+            document.addEventListener('click', function (event) {
+                if (menu.classList.contains('show') && !navbar.contains(event.target)) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    closeMenu();
+                }
+            }, true);
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key === 'Escape' && menu.classList.contains('show')) {
+                    closeMenu();
+                    navbar.querySelector('.navbar-toggler').focus();
+                }
+            });
+
+            // Halaman digulir (lebih dari sedikit) saat menu terbuka: tutup menu.
+            var openedAt = 0;
+
+            menu.addEventListener('shown.bs.collapse', function () {
+                openedAt = window.scrollY;
+            });
+
+            window.addEventListener('scroll', function () {
+                if (menu.classList.contains('show') && Math.abs(window.scrollY - openedAt) > 24) {
+                    closeMenu();
+                }
+            }, { passive: true });
+        }
     }
 
     // Menu "tubelight" (desktop ≥1200px): satu lampu meluncur ke menu yang disorot, lalu kembali ke menu aktif.
