@@ -4,6 +4,7 @@ namespace Tests\Feature\Admin;
 
 use App\Models\Brand;
 use App\Models\Car;
+use App\Models\PaymentProof;
 use App\Models\PurchaseRequest;
 use App\Models\Service;
 use App\Models\ServiceBooking;
@@ -235,5 +236,37 @@ class AdminNotificationTest extends TestCase
         AdminActivityNotification::notifyAdmins(new TestDriveActivity($testDrive));
 
         $this->assertDatabaseCount('notifications', 0);
+    }
+
+    public function test_daftar_notifikasi_menampilkan_status_terkini_bukan_status_saat_dibuat(): void
+    {
+        $purchase = PurchaseRequest::factory()->recycle($this->customer)->recycle($this->car)
+            ->create(['payment_method' => 'cash', 'car_price' => 520_000_000, 'status' => PurchaseRequest::STATUS_PENDING]);
+        $testDrive = TestDrive::factory()->recycle($this->customer)->recycle($this->car)->create(['status' => 'pending']);
+        AdminActivityNotification::notifyAdmins(new PurchaseRequestActivity($purchase));
+        AdminActivityNotification::notifyAdmins(new TestDriveActivity($testDrive));
+
+        // Setelah notifikasi dibuat: pengajuan selesai & lunas, test drive dikonfirmasi.
+        $purchase->update(['status' => PurchaseRequest::STATUS_COMPLETED]);
+        PaymentProof::factory()->recycle($purchase)->approved()->create(['amount' => 520_000_000]);
+        $testDrive->update(['status' => 'confirmed']);
+
+        $this->actingAs($this->admin)->get(route('admin.notifications.index'))
+            ->assertOk()
+            ->assertSee('Selesai')
+            ->assertSee('Lunas')
+            ->assertSee('Dikonfirmasi')
+            ->assertDontSee('>Menunggu<', false);
+    }
+
+    public function test_status_tersimpan_dipakai_bila_data_sudah_terhapus(): void
+    {
+        $testDrive = TestDrive::factory()->recycle($this->customer)->recycle($this->car)->create(['status' => 'pending']);
+        AdminActivityNotification::notifyAdmins(new TestDriveActivity($testDrive));
+        $testDrive->delete();
+
+        $this->actingAs($this->admin)->get(route('admin.notifications.index'))
+            ->assertOk()
+            ->assertSee('Menunggu');
     }
 }

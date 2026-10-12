@@ -70,6 +70,21 @@ class PurchaseRequest extends Model
     /** Status yang wajib disertai catatan admin (alasan untuk customer). */
     public const NOTE_REQUIRED_STATUSES = [self::STATUS_REJECTED, self::STATUS_CANCELLED];
 
+    /** Tanda bagian catatan yang wajib dilengkapi admin (alasan menolak / membatalkan). */
+    public const NOTE_PLACEHOLDER = '…';
+
+    /**
+     * Catatan admin otomatis saat status diubah (form admin mengisinya, admin boleh mengubah).
+     * Ditolak/Dibatalkan berisi tanda "…" yang wajib diganti alasan sebelum disimpan.
+     */
+    public const NOTE_TEMPLATES = [
+        self::STATUS_PROCESSING => 'Pengajuan Anda sedang kami proses. Tim kami akan menghubungi Anda lewat WhatsApp untuk jadwal cek unit.',
+        self::STATUS_APPROVED => 'Pengajuan Anda disetujui. Silakan lakukan pembayaran ke rekening resmi dealer atau langsung di showroom, lalu kirim bukti transfer di menu Pengajuan Saya.',
+        self::STATUS_COMPLETED => 'Terima kasih! Mobil telah diserahterimakan. Selamat menikmati kendaraan baru Anda.',
+        self::STATUS_REJECTED => 'Mohon maaf, pengajuan Anda belum dapat kami setujui karena '.self::NOTE_PLACEHOLDER,
+        self::STATUS_CANCELLED => 'Pengajuan dibatalkan karena '.self::NOTE_PLACEHOLDER,
+    ];
+
     /** Dihitung "terjual" di laporan: unit sudah dipotong dari stok. */
     public const SOLD_STATUSES = [self::STATUS_APPROVED, self::STATUS_COMPLETED];
 

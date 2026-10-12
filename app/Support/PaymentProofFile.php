@@ -15,7 +15,7 @@ final class PaymentProofFile
     {
         $disk = Storage::disk(PaymentProof::DISK);
 
-        abort_unless($disk->exists($paymentProof->file_path), 404);
+        abort_unless($paymentProof->hasFile() && $disk->exists($paymentProof->file_path), 404);
 
         $extension = strtolower(pathinfo($paymentProof->file_path, PATHINFO_EXTENSION));
 

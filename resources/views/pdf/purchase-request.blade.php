@@ -106,7 +106,10 @@
         <div class="section">Pembayaran Diterima</div>
         <table class="data">
             @foreach ($received as $payment)
-                <tr><th>{{ $payment->typeLabel() }} · {{ $payment->paid_on->translatedFormat('d F Y') }}</th><td>{{ $rupiah($payment->amount) }}</td></tr>
+                <tr>
+                    <th>{{ $payment->typeLabel() }} · {{ $payment->paid_on->translatedFormat('d F Y') }}</th>
+                    <td>{{ $rupiah($payment->amount) }}@if ($payment->isShowroomPayment()) · {{ $payment->methodLabel() }}@endif</td>
+                </tr>
             @endforeach
             <tr class="total"><th>Total diterima</th><td class="amount">{{ $rupiah($purchase->verifiedPaymentTotal()) }}</td></tr>
             @unless ($purchase->isPaidOff())
