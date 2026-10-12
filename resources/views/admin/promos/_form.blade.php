@@ -18,7 +18,7 @@
         <x-form.textarea name="description" label="Deskripsi" :value="$promo->description" rows="4" maxlength="5000" />
     </div>
     <div class="col-md-6">
-        <x-form.input name="discount_amount" label="Diskon (Rp)" :value="$formatNumber($promo->discount_amount)"
+        <x-form.input name="discount_amount" data-number="thousands" label="Diskon (Rp)" :value="$formatNumber($promo->discount_amount)"
                       inputmode="numeric" placeholder="Contoh: 15.000.000"
                       help="Wajib untuk promo khusus mobil dan harus lebih kecil dari harga mobil. Kosongkan untuk promo umum." />
     </div>

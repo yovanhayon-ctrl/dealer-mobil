@@ -51,12 +51,12 @@
         <div class="row g-2">
             <div class="col-6">
                 <label for="{{ $id('harga_min') }}" class="visually-hidden">Harga minimum</label>
-                <input type="text" inputmode="numeric" id="{{ $id('harga_min') }}" name="harga_min" value="{{ $digits($filters->minPrice) }}"
+                <input type="text" inputmode="numeric" id="{{ $id('harga_min') }}" name="harga_min" data-number="thousands" value="{{ $digits($filters->minPrice) }}"
                        class="form-control form-control-sm" placeholder="Min">
             </div>
             <div class="col-6">
                 <label for="{{ $id('harga_max') }}" class="visually-hidden">Harga maksimum</label>
-                <input type="text" inputmode="numeric" id="{{ $id('harga_max') }}" name="harga_max" value="{{ $digits($filters->maxPrice) }}"
+                <input type="text" inputmode="numeric" id="{{ $id('harga_max') }}" name="harga_max" data-number="thousands" value="{{ $digits($filters->maxPrice) }}"
                        class="form-control form-control-sm" placeholder="Maks">
             </div>
         </div>
@@ -67,12 +67,12 @@
         <div class="row g-2">
             <div class="col-6">
                 <label for="{{ $id('tahun_min') }}" class="visually-hidden">Tahun minimum</label>
-                <input type="number" id="{{ $id('tahun_min') }}" name="tahun_min" value="{{ $filters->minYear }}"
+                <input type="number" id="{{ $id('tahun_min') }}" name="tahun_min" data-number="digits" value="{{ $filters->minYear }}"
                        min="{{ \App\Catalog\CarCatalogFilters::MIN_YEAR }}" max="{{ now()->year + 1 }}" class="form-control form-control-sm" placeholder="Dari">
             </div>
             <div class="col-6">
                 <label for="{{ $id('tahun_max') }}" class="visually-hidden">Tahun maksimum</label>
-                <input type="number" id="{{ $id('tahun_max') }}" name="tahun_max" value="{{ $filters->maxYear }}"
+                <input type="number" id="{{ $id('tahun_max') }}" name="tahun_max" data-number="digits" value="{{ $filters->maxYear }}"
                        min="{{ \App\Catalog\CarCatalogFilters::MIN_YEAR }}" max="{{ now()->year + 1 }}" class="form-control form-control-sm" placeholder="Sampai">
             </div>
         </div>
