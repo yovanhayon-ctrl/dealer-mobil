@@ -29,9 +29,18 @@ class PaymentProofController extends Controller
             return $redirect->with('status', "Bukti pembayaran ini sudah {$this->decidedLabel($paymentProof)}.");
         }
 
-        $paymentProof->update(['status' => PaymentProof::STATUS_APPROVED, 'admin_note' => null, 'verified_at' => now()]);
+        // Total yang diterima tidak boleh melebihi tagihan (mis. bukti pelunasan terkirim dua kali).
+        if ($paymentProof->amount > $purchaseRequest->remainingPayment()) {
+            return $redirect->with('error', 'Bukti tidak bisa diterima: total pembayaran akan melebihi Rp '
+                .number_format($purchaseRequest->amountPayableToDealer(), 0, ',', '.')
+                .' (sisa Rp '.number_format($purchaseRequest->remainingPayment(), 0, ',', '.').'). Periksa lagi atau tolak bukti ini.');
+        }
 
-        return $redirect->with('success', "Bukti {$paymentProof->typeLabel()} Rp ".number_format($paymentProof->amount, 0, ',', '.').' diterima.');
+        $paymentProof->update(['status' => PaymentProof::STATUS_APPROVED, 'admin_note' => null, 'verified_at' => now()]);
+        $purchaseRequest->load('paymentProofs');
+
+        return $redirect->with('success', "Bukti {$paymentProof->typeLabel()} Rp ".number_format($paymentProof->amount, 0, ',', '.')
+            ." diterima. Status pembayaran: {$purchaseRequest->paymentStatusLabel()}.");
     }
 
     public function reject(Request $request, PurchaseRequest $purchaseRequest, PaymentProof $paymentProof): RedirectResponse

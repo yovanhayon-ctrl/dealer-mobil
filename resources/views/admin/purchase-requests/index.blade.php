@@ -83,7 +83,12 @@
                                     </div>
                                     <x-price :amount="$purchase->car_price" />
                                 </td>
-                                <td><x-status-badge :status="$purchase->status" /></td>
+                                <td>
+                                    <x-status-badge :status="$purchase->status" />
+                                    @if ($purchase->hasPaymentSection())
+                                        <x-status-badge :status="$purchase->paymentStatusBadge()" :label="$purchase->paymentStatusLabel()" class="ms-1" />
+                                    @endif
+                                </td>
                                 <td class="text-end">
                                     <a href="{{ $detailUrl }}" class="btn btn-sm btn-outline-primary btn-icon" title="Detail" aria-label="Detail pengajuan {{ $purchase->user->name }}">
                                         <i class="bi bi-chevron-right"></i>

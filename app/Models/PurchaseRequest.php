@@ -38,6 +38,13 @@ class PurchaseRequest extends Model
     ];
 
     /** Label bahasa Indonesia (sama dengan x-status-badge). */
+    /** Status pembayaran (dihitung dari bukti yang diterima admin, tidak disimpan). */
+    public const PAYMENT_UNPAID = 'unpaid';
+
+    public const PAYMENT_PARTIAL = 'partial';
+
+    public const PAYMENT_PAID = 'paid';
+
     /** Peringatan penipuan: tampil di form pengajuan dan PDF bukti pengajuan. */
     public const SAFE_PAYMENT_NOTE = 'Kami tidak pernah meminta pembayaran sebelum Anda cek unit. Transfer hanya ke rekening atas nama dealer.';
 
@@ -115,11 +122,21 @@ class PurchaseRequest extends Model
     }
 
     /**
-     * Bukti pembayaran hanya bisa dikirim setelah pengajuan disetujui dealer.
+     * Bukti pembayaran hanya bisa dikirim setelah pengajuan disetujui dealer dan selama belum lunas.
      */
     public function canReceivePaymentProofs(): bool
     {
-        return $this->status === self::STATUS_APPROVED;
+        return $this->status === self::STATUS_APPROVED && ! $this->isPaidOff();
+    }
+
+    /**
+     * Bagian pembayaran tampil untuk pengajuan disetujui, atau bila sudah ada bukti (riwayat).
+     */
+    public function hasPaymentSection(): bool
+    {
+        $this->loadMissing('paymentProofs');
+
+        return $this->status === self::STATUS_APPROVED || $this->paymentProofs->isNotEmpty();
     }
 
     /**
@@ -149,7 +166,59 @@ class PurchaseRequest extends Model
      */
     public function verifiedPaymentTotal(): int
     {
+        $this->loadMissing('paymentProofs');
+
         return (int) $this->paymentProofs->where('status', PaymentProof::STATUS_APPROVED)->sum('amount');
+    }
+
+    public function remainingPayment(): int
+    {
+        return max(0, $this->amountPayableToDealer() - $this->verifiedPaymentTotal());
+    }
+
+    public function isPaidOff(): bool
+    {
+        return $this->amountPayableToDealer() > 0 && $this->remainingPayment() === 0;
+    }
+
+    public function paymentStatus(): string
+    {
+        return match (true) {
+            $this->isPaidOff() => self::PAYMENT_PAID,
+            $this->verifiedPaymentTotal() > 0 => self::PAYMENT_PARTIAL,
+            default => self::PAYMENT_UNPAID,
+        };
+    }
+
+    /**
+     * Cash: Belum dibayar / Dibayar sebagian / Lunas. Kredit (yang dibayar ke dealer hanya DP): Belum dibayar / DP sebagian / DP lunas.
+     */
+    public function paymentStatusLabel(): string
+    {
+        return match ($this->paymentStatus()) {
+            self::PAYMENT_PAID => $this->isCredit() ? 'DP lunas' : 'Lunas',
+            self::PAYMENT_PARTIAL => $this->isCredit() ? 'DP sebagian' : 'Dibayar sebagian',
+            default => 'Belum dibayar',
+        };
+    }
+
+    /**
+     * Warna badge status pembayaran (kunci warna di komponen status-badge).
+     */
+    public function paymentStatusBadge(): string
+    {
+        return match ($this->paymentStatus()) {
+            self::PAYMENT_PAID => 'completed',
+            self::PAYMENT_PARTIAL => 'processing',
+            default => 'inactive',
+        };
+    }
+
+    public function pendingPaymentProofCount(): int
+    {
+        $this->loadMissing('paymentProofs');
+
+        return $this->paymentProofs->where('status', PaymentProof::STATUS_PENDING)->count();
     }
 
     /**
@@ -194,9 +263,11 @@ class PurchaseRequest extends Model
             self::STATUS_PROCESSING => $this->isCredit()
                 ? 'Siapkan KTP, KK, NPWP, dan slip gaji atau rekening koran untuk survei leasing.'
                 : 'Atur jadwal cek unit di showroom. Pembayaran dilakukan setelah Anda cocok dengan unitnya.',
-            self::STATUS_APPROVED => $this->isCredit()
+            self::STATUS_APPROVED => $this->isPaidOff()
+                ? 'Pembayaran lunas. Tim kami akan menghubungi Anda untuk jadwal serah terima.'
+                : ($this->isCredit()
                 ? 'Bayar DP dan tanda tangani perjanjian kredit, lalu kirim bukti transfer DP di menu Pengajuan Saya.'
-                : 'Lakukan pelunasan di showroom atau transfer ke rekening atas nama dealer, lalu kirim bukti transfernya di menu Pengajuan Saya.',
+                : 'Lakukan pelunasan di showroom atau transfer ke rekening atas nama dealer, lalu kirim bukti transfernya di menu Pengajuan Saya.'),
             default => null,
         };
     }

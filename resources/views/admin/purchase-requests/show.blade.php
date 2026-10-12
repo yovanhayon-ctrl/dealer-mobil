@@ -21,6 +21,9 @@
     <x-admin.detail-header :title="'Pengajuan #'.$purchaseRequest->id" :subtitle="$purchaseRequest->documentNumber().' · diajukan '.$purchaseRequest->created_at->translatedFormat('d F Y H:i').' WIB'"
                            :back-url="route('admin.purchase-requests.index')" back-label="Pengajuan">
         <x-status-badge :status="$purchaseRequest->status" />
+        @if ($purchaseRequest->hasPaymentSection())
+            <x-status-badge :status="$purchaseRequest->paymentStatusBadge()" :label="$purchaseRequest->paymentStatusLabel()" />
+        @endif
         @if (Route::has('admin.purchase-requests.pdf'))
             <a href="{{ route('admin.purchase-requests.pdf', $purchaseRequest) }}" target="_blank" rel="noopener"
                class="btn btn-outline-secondary btn-sm" title="Bukti {{ $purchaseRequest->documentNumber() }}">
@@ -105,16 +108,28 @@
                 </div>
             </div>
 
-            @if ($purchaseRequest->canReceivePaymentProofs() || $purchaseRequest->paymentProofs->isNotEmpty())
+            @if ($purchaseRequest->hasPaymentSection())
                 <div class="card mb-4" id="bukti-pembayaran">
                     <div class="card-body p-4">
                         <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-3">
-                            <h3 class="admin-card-title mb-0">Bukti Pembayaran</h3>
+                            <div class="d-flex align-items-center gap-2">
+                                <h3 class="admin-card-title mb-0">Bukti Pembayaran</h3>
+                                <x-status-badge :status="$purchaseRequest->paymentStatusBadge()" :label="$purchaseRequest->paymentStatusLabel()" />
+                            </div>
                             <span class="small text-muted">
                                 Diterima <span class="fw-semibold text-body"><x-price :amount="$purchaseRequest->verifiedPaymentTotal()" /></span>
                                 dari <x-price :amount="$purchaseRequest->amountPayableToDealer()" />{{ $purchaseRequest->isCredit() ? ' (DP)' : '' }}
                             </span>
                         </div>
+
+                        @if ($purchaseRequest->isPaidOff() && $purchaseRequest->status === PurchaseRequest::STATUS_APPROVED)
+                            <div class="alert alert-success small py-2">
+                                <i class="bi bi-check-circle me-1"></i>Pembayaran {{ mb_strtolower($purchaseRequest->paymentStatusLabel()) }}.
+                                Ubah status ke <span class="fw-semibold">Selesai</span> setelah mobil diserahkan.
+                            </div>
+                        @elseif ($purchaseRequest->verifiedPaymentTotal() > 0)
+                            <p class="small text-muted mb-3">Sisa <span class="fw-semibold text-body"><x-price :amount="$purchaseRequest->remainingPayment()" /></span></p>
+                        @endif
 
                         @forelse ($purchaseRequest->paymentProofs as $proof)
                             @php($bag = $errors->getBag("rejectProof{$proof->id}"))
