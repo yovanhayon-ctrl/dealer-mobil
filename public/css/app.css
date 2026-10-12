@@ -2208,8 +2208,45 @@ tr[data-row-link] {
 }
 
 /* Langkah setelah pengajuan pembelian: daftar bernomor ringkas di dalam form. */
-.purchase-steps-box {
+.purchase-steps-box,
+.payment-box {
     background-color: var(--dm-bg);
+}
+
+.payment-proof-list li {
+    padding: .5rem 0;
+    border-top: 1px solid var(--dm-line);
+}
+
+.payment-proof-list li:first-child {
+    border-top: 0;
+    padding-top: 0;
+}
+
+/* Admin: daftar bukti pembayaran dengan pratinjau kecil (gambar) atau ikon PDF. */
+.admin-proof + .admin-proof {
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--dm-line);
+}
+
+.admin-proof-thumb {
+    display: grid;
+    flex-shrink: 0;
+    place-items: center;
+    width: 4.5rem;
+    height: 4.5rem;
+    overflow: hidden;
+    border: 1px solid var(--dm-line);
+    border-radius: .5rem;
+    font-size: 1.75rem;
+    color: var(--dm-muted);
+}
+
+.admin-proof-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
 }
 
 .purchase-steps {

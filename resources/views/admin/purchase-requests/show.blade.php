@@ -21,6 +21,9 @@
     <x-admin.detail-header :title="'Pengajuan #'.$purchaseRequest->id" :subtitle="$purchaseRequest->documentNumber().' · diajukan '.$purchaseRequest->created_at->translatedFormat('d F Y H:i').' WIB'"
                            :back-url="route('admin.purchase-requests.index')" back-label="Pengajuan">
         <x-status-badge :status="$purchaseRequest->status" />
+        @if ($purchaseRequest->hasPaymentSection())
+            <x-status-badge :status="$purchaseRequest->paymentStatusBadge()" :label="$purchaseRequest->paymentStatusLabel()" />
+        @endif
         @if (Route::has('admin.purchase-requests.pdf'))
             <a href="{{ route('admin.purchase-requests.pdf', $purchaseRequest) }}" target="_blank" rel="noopener"
                class="btn btn-outline-secondary btn-sm" title="Bukti {{ $purchaseRequest->documentNumber() }}">
@@ -105,6 +108,179 @@
                 </div>
             </div>
 
+            @if ($purchaseRequest->hasPaymentSection())
+                <div class="card mb-4" id="bukti-pembayaran">
+                    <div class="card-body p-4">
+                        <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-3">
+                            <div class="d-flex align-items-center gap-2">
+                                <h3 class="admin-card-title mb-0">Bukti Pembayaran</h3>
+                                <x-status-badge :status="$purchaseRequest->paymentStatusBadge()" :label="$purchaseRequest->paymentStatusLabel()" />
+                            </div>
+                            <span class="small text-muted">
+                                Diterima <span class="fw-semibold text-body"><x-price :amount="$purchaseRequest->verifiedPaymentTotal()" /></span>
+                                dari <x-price :amount="$purchaseRequest->amountPayableToDealer()" />{{ $purchaseRequest->isCredit() ? ' (DP)' : '' }}
+                            </span>
+                        </div>
+
+                        @if ($purchaseRequest->isPaidOff() && $purchaseRequest->status === PurchaseRequest::STATUS_APPROVED)
+                            <div class="alert alert-success small py-2">
+                                <i class="bi bi-check-circle me-1"></i>Pembayaran {{ mb_strtolower($purchaseRequest->paymentStatusLabel()) }}.
+                                Ubah status ke <span class="fw-semibold">Selesai</span> setelah mobil diserahkan.
+                            </div>
+                        @elseif ($purchaseRequest->verifiedPaymentTotal() > 0)
+                            <p class="small text-muted mb-3">Sisa <span class="fw-semibold text-body"><x-price :amount="$purchaseRequest->remainingPayment()" /></span></p>
+                        @endif
+
+                        @forelse ($purchaseRequest->paymentProofs as $proof)
+                            @php($bag = $errors->getBag("rejectProof{$proof->id}"))
+                            @php($fileUrl = route('admin.payment-proofs.file', [$purchaseRequest, $proof]))
+                            <div class="admin-proof d-flex gap-3">
+                                @if ($proof->hasFile())
+                                    <a href="{{ $fileUrl }}" target="_blank" rel="noopener" class="admin-proof-thumb" aria-label="Buka file bukti {{ $proof->typeLabel() }}">
+                                        @if ($proof->isImage())
+                                            <img src="{{ $fileUrl }}" alt="" loading="lazy">
+                                        @else
+                                            <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>
+                                        @endif
+                                    </a>
+                                @else
+                                    <span class="admin-proof-thumb" aria-hidden="true"><i class="bi bi-cash-coin"></i></span>
+                                @endif
+                                <div class="min-w-0 flex-grow-1 small">
+                                    <div class="d-flex flex-wrap align-items-center gap-2">
+                                        <span class="fw-semibold">{{ $proof->typeLabel() }} <x-price :amount="$proof->amount" /></span>
+                                        <x-status-badge :status="$proof->status" :label="$proof->statusLabel()" />
+                                    </div>
+                                    <p class="text-muted mb-1">
+                                        @if ($proof->isShowroomPayment())
+                                            {{ $proof->methodLabel() }} · {{ $proof->paid_on->translatedFormat('d M Y') }}
+                                            · dicatat {{ $proof->recorder?->name ?? 'admin' }} {{ $proof->created_at->translatedFormat('d M Y H:i') }}
+                                        @else
+                                            Transfer {{ $proof->paid_on->translatedFormat('d M Y') }} · dikirim {{ $proof->created_at->translatedFormat('d M Y H:i') }}
+                                        @endif
+                                        @if ($proof->hasFile())
+                                            · <a href="{{ $fileUrl }}" target="_blank" rel="noopener" class="text-break">{{ $proof->file_name }}</a>
+                                        @endif
+                                    </p>
+                                    @if ($proof->note)
+                                        <p class="mb-1"><span class="fw-semibold">{{ $proof->isShowroomPayment() ? 'Catatan' : 'Catatan customer' }}:</span> {{ $proof->note }}</p>
+                                    @endif
+                                    @if ($proof->status === \App\Models\PaymentProof::STATUS_REJECTED && $proof->admin_note)
+                                        <p class="text-danger mb-1"><span class="fw-semibold">Alasan ditolak:</span> {{ $proof->admin_note }}</p>
+                                    @endif
+
+                                    @if ($proof->isPending())
+                                        <div class="d-flex flex-wrap gap-2 mt-2">
+                                            <form method="POST" action="{{ route('admin.payment-proofs.approve', [$purchaseRequest, $proof]) }}"
+                                                  data-confirm="Terima bukti {{ $proof->typeLabel() }} Rp {{ number_format($proof->amount, 0, ',', '.') }}? Pastikan dana sudah masuk ke rekening dealer."
+                                                  data-disable-on-submit>
+                                                @csrf
+                                                @method('PATCH')
+                                                <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-lg"></i>Terima</button>
+                                            </form>
+                                            <button class="btn btn-outline-danger btn-sm" type="button" data-bs-toggle="collapse"
+                                                    data-bs-target="#reject-proof-{{ $proof->id }}" aria-expanded="{{ $bag->any() ? 'true' : 'false' }}"
+                                                    aria-controls="reject-proof-{{ $proof->id }}">
+                                                <i class="bi bi-x-lg"></i>Tolak
+                                            </button>
+                                        </div>
+                                        <form method="POST" action="{{ route('admin.payment-proofs.reject', [$purchaseRequest, $proof]) }}"
+                                              @class(['collapse mt-2', 'show' => $bag->any()]) id="reject-proof-{{ $proof->id }}" data-disable-on-submit>
+                                            @csrf
+                                            @method('PATCH')
+                                            <label for="proof_note-{{ $proof->id }}" class="form-label small">Alasan penolakan (dilihat customer)</label>
+                                            <textarea id="proof_note-{{ $proof->id }}" name="admin_note" rows="2" maxlength="500" required
+                                                      @class(['form-control form-control-sm', 'is-invalid' => $bag->has('admin_note')])
+                                                      placeholder="Contoh: Dana belum masuk ke rekening dealer. Mohon cek kembali.">{{ $bag->any() ? old('admin_note') : '' }}</textarea>
+                                            @if ($bag->has('admin_note'))
+                                                <div class="invalid-feedback">{{ $bag->first('admin_note') }}</div>
+                                            @endif
+                                            <button type="submit" class="btn btn-danger btn-sm mt-2">Tolak Bukti</button>
+                                        </form>
+                                    @endif
+                                </div>
+                            </div>
+                        @empty
+                            <p class="small text-muted mb-0">Belum ada bukti pembayaran dari customer.</p>
+                        @endforelse
+
+                        {{-- Pembayaran langsung di showroom: dicatat admin, langsung diterima. --}}
+                        @if ($purchaseRequest->status === PurchaseRequest::STATUS_APPROVED && ! $purchaseRequest->isPaidOff())
+                            @php($showroomErrors = $errors->getBag('showroomPayment'))
+                            <div class="mt-3 pt-3 border-top">
+                                <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#showroom-payment"
+                                        aria-expanded="{{ $showroomErrors->any() ? 'true' : 'false' }}" aria-controls="showroom-payment">
+                                    <i class="bi bi-cash-coin"></i>Catat Pembayaran di Showroom
+                                </button>
+                                <form method="POST" action="{{ route('admin.payment-proofs.store', $purchaseRequest) }}" enctype="multipart/form-data"
+                                      @class(['collapse mt-3', 'show' => $showroomErrors->any()]) id="showroom-payment" novalidate
+                                      data-confirm="Catat pembayaran ini sebagai diterima? Pastikan uang sudah diterima kasir.">
+                                    @csrf
+                                    @php($fieldError = fn (string $field) => $showroomErrors->first($field))
+                                    <div class="row g-2">
+                                        <div class="col-sm-6">
+                                            <label for="sp-type" class="form-label small">Jenis pembayaran</label>
+                                            <select id="sp-type" name="type" @class(['form-select form-select-sm', 'is-invalid' => $fieldError('type')]) required>
+                                                @foreach ($purchaseRequest->paymentProofTypes() as $value => $label)
+                                                    <option value="{{ $value }}" @selected(old('type') === $value)>{{ $label }}</option>
+                                                @endforeach
+                                            </select>
+                                            @if ($fieldError('type'))<div class="invalid-feedback">{{ $fieldError('type') }}</div>@endif
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label for="sp-method" class="form-label small">Cara bayar</label>
+                                            <select id="sp-method" name="method" @class(['form-select form-select-sm', 'is-invalid' => $fieldError('method')]) required>
+                                                @foreach (\App\Models\PaymentProof::SHOWROOM_METHODS as $method)
+                                                    <option value="{{ $method }}" @selected(old('method') === $method)>{{ \App\Models\PaymentProof::METHOD_LABELS[$method] }}</option>
+                                                @endforeach
+                                            </select>
+                                            @if ($fieldError('method'))<div class="invalid-feedback">{{ $fieldError('method') }}</div>@endif
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label for="sp-amount" class="form-label small">Nominal (Rp)</label>
+                                            <input type="text" id="sp-amount" name="amount" data-number="thousands" inputmode="numeric" required
+                                                   value="{{ old('amount', number_format($purchaseRequest->remainingPayment(), 0, ',', '.')) }}"
+                                                   @class(['form-control form-control-sm', 'is-invalid' => $fieldError('amount')])>
+                                            @if ($fieldError('amount'))
+                                                <div class="invalid-feedback">{{ $fieldError('amount') }}</div>
+                                            @else
+                                                <div class="form-text">Sisa tagihan <x-price :amount="$purchaseRequest->remainingPayment()" /></div>
+                                            @endif
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <label for="sp-date" class="form-label small">Tanggal bayar</label>
+                                            <input type="date" id="sp-date" name="paid_on" required value="{{ old('paid_on', today()->toDateString()) }}"
+                                                   min="{{ $purchaseRequest->created_at->toDateString() }}" max="{{ today()->toDateString() }}"
+                                                   @class(['form-control form-control-sm', 'is-invalid' => $fieldError('paid_on')])>
+                                            @if ($fieldError('paid_on'))<div class="invalid-feedback">{{ $fieldError('paid_on') }}</div>@endif
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="sp-file" class="form-label small">Foto kwitansi / struk EDC (opsional)</label>
+                                            <input type="file" id="sp-file" name="file" accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                                   @class(['form-control form-control-sm', 'is-invalid' => $fieldError('file')])>
+                                            @if ($fieldError('file'))<div class="invalid-feedback">{{ $fieldError('file') }}</div>@endif
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="sp-note" class="form-label small">Catatan (opsional)</label>
+                                            <input type="text" id="sp-note" name="note" maxlength="500" value="{{ old('note') }}" placeholder="Contoh: No. kwitansi 0123, diterima kasir Rina"
+                                                   @class(['form-control form-control-sm', 'is-invalid' => $fieldError('note')])>
+                                            @if ($fieldError('note'))<div class="invalid-feedback">{{ $fieldError('note') }}</div>@endif
+                                        </div>
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-sm mt-3">
+                                        <i class="bi bi-check-lg"></i>Simpan Pembayaran
+                                    </button>
+                                </form>
+                            </div>
+                        @endif
+
+                        <p class="small text-muted mt-3 mb-0">
+                            <i class="bi bi-info-circle me-1"></i>Cocokkan dengan mutasi rekening sebelum menerima. Status pengajuan tetap diubah manual.
+                        </p>
+                    </div>
+                </div>
+            @endif
+
             @if ($awaitingDecision && ! $car->inStock())
                 <div class="alert alert-warning small">
                     <i class="bi bi-exclamation-triangle me-1"></i>Stok mobil ini 0. Pengajuan tidak bisa disetujui sampai stok tersedia.
@@ -123,7 +299,8 @@
                             ->mapWithKeys(fn ($status) => [$status => PurchaseRequest::STATUS_LABELS[$status]])
                             ->all(),
                         'adminNote' => $purchaseRequest->admin_note,
-                        'noteHelp' => 'Wajib diisi saat menolak atau membatalkan (alasan untuk customer). Maksimal 1000 karakter.',
+                        'noteHelp' => 'Terisi otomatis sesuai status yang dipilih dan boleh diubah. Saat menolak/membatalkan, ganti tanda … dengan alasan untuk customer. Maksimal 1000 karakter.',
+                        'noteTemplates' => PurchaseRequest::NOTE_TEMPLATES,
                     ])
 
                     <div class="small text-muted mt-3">
