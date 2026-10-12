@@ -114,10 +114,12 @@
                                                     <div class="d-flex flex-wrap align-items-center gap-2">
                                                         <span class="fw-semibold">{{ $proof->typeLabel() }}</span>
                                                         <x-price :amount="$proof->amount" />
-                                                        <span class="text-muted">· {{ $proof->paid_on->translatedFormat('d M Y') }}</span>
+                                                        <span class="text-muted">· {{ $proof->paid_on->translatedFormat('d M Y') }}@if ($proof->isShowroomPayment()) · {{ $proof->methodLabel() }}@endif</span>
                                                         <x-status-badge :status="$proof->status" :label="$proof->statusLabel()" />
-                                                        <a href="{{ route('account.payment-proofs.file', [$purchase, $proof]) }}" target="_blank" rel="noopener"
-                                                           class="ms-auto">Lihat file</a>
+                                                        @if ($proof->hasFile())
+                                                            <a href="{{ route('account.payment-proofs.file', [$purchase, $proof]) }}" target="_blank" rel="noopener"
+                                                               class="ms-auto">Lihat file</a>
+                                                        @endif
                                                     </div>
                                                     @if ($proof->status === \App\Models\PaymentProof::STATUS_REJECTED && $proof->admin_note)
                                                         <p class="text-danger mb-0 mt-1"><span class="fw-semibold">Ditolak:</span> {{ $proof->admin_note }}</p>

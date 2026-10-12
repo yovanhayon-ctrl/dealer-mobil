@@ -416,9 +416,31 @@ class PurchaseRequestManagementTest extends TestCase
         $this->assertSame('processing', $purchase->fresh()->status);
         $this->assertSame(3, $this->stock());
 
+        // Catatan kosong saat menyetujui: memakai catatan otomatis status tersebut.
         $this->changeStatus($purchase, ['status' => 'approved', 'admin_note' => ''])->assertSessionHasNoErrors();
         $this->assertSame('approved', $purchase->fresh()->status);
-        $this->assertNull($purchase->fresh()->admin_note);
+        $this->assertSame(PurchaseRequest::NOTE_TEMPLATES['approved'], $purchase->fresh()->admin_note);
+    }
+
+    public function test_catatan_otomatis_dengan_tanda_alasan_wajib_dilengkapi(): void
+    {
+        $purchase = $this->purchase(['status' => 'processing']);
+
+        $this->changeStatus($purchase, ['status' => 'rejected', 'admin_note' => PurchaseRequest::NOTE_TEMPLATES['rejected']])
+            ->assertSessionHasErrors(['admin_note' => 'Lengkapi catatan admin: ganti tanda … dengan alasan untuk customer.']);
+        $this->assertSame('processing', $purchase->fresh()->status);
+
+        $this->changeStatus($purchase, ['status' => 'rejected', 'admin_note' => 'Mohon maaf, pengajuan Anda belum dapat kami setujui karena stok warna biru habis.'])
+            ->assertSessionHasNoErrors();
+        $this->assertSame('rejected', $purchase->fresh()->status);
+    }
+
+    public function test_form_status_membawa_catatan_otomatis(): void
+    {
+        $purchase = $this->purchase(['status' => 'processing']);
+
+        $this->actingAs($this->admin)->get(route('admin.purchase-requests.show', $purchase))
+            ->assertSee('data-note-templates=\''.json_encode(PurchaseRequest::NOTE_TEMPLATES).'\'', false);
     }
 
     public function test_hanya_mengubah_catatan_tidak_mengubah_stok(): void

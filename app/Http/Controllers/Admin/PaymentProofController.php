@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\ShowroomPaymentRequest;
 use App\Models\PaymentProof;
 use App\Models\PurchaseRequest;
 use App\Support\PaymentProofFile;
@@ -19,6 +20,38 @@ class PaymentProofController extends Controller
     public function file(PurchaseRequest $purchaseRequest, PaymentProof $paymentProof): StreamedResponse
     {
         return PaymentProofFile::response($paymentProof);
+    }
+
+    /**
+     * Pembayaran langsung di showroom (tunai / EDC / transfer di tempat): dicatat admin dan langsung diterima.
+     */
+    public function store(ShowroomPaymentRequest $request, PurchaseRequest $purchaseRequest): RedirectResponse
+    {
+        $redirect = $this->backToProofs($purchaseRequest);
+
+        if ($purchaseRequest->status !== PurchaseRequest::STATUS_APPROVED) {
+            return $redirect->with('error', 'Pembayaran hanya bisa dicatat untuk pengajuan yang berstatus Disetujui.');
+        }
+
+        if ($purchaseRequest->isPaidOff()) {
+            return $redirect->with('status', 'Pembayaran pengajuan ini sudah '.mb_strtolower($purchaseRequest->paymentStatusLabel()).'.');
+        }
+
+        $file = $request->file('file');
+
+        $purchaseRequest->paymentProofs()->create([
+            ...$request->safe()->only(['type', 'method', 'amount', 'paid_on', 'note']),
+            'user_id' => $purchaseRequest->user_id,
+            'recorded_by' => $request->user()->id,
+            'file_path' => $file?->store(PaymentProof::directory($purchaseRequest->id), PaymentProof::DISK),
+            'file_name' => $file ? mb_substr($file->getClientOriginalName(), 0, 255) : null,
+            'status' => PaymentProof::STATUS_APPROVED,
+            'verified_at' => now(),
+        ]);
+        $purchaseRequest->load('paymentProofs');
+
+        return $redirect->with('success', 'Pembayaran di showroom Rp '.number_format((int) $request->validated('amount'), 0, ',', '.')
+            ." dicatat. Status pembayaran: {$purchaseRequest->paymentStatusLabel()}.");
     }
 
     public function approve(PurchaseRequest $purchaseRequest, PaymentProof $paymentProof): RedirectResponse

@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * File ada di disk privat dan hanya bisa dibuka pemilik pengajuan atau admin.
  */
 #[Fillable([
-    'purchase_request_id', 'user_id', 'type', 'amount', 'paid_on', 'file_path', 'file_name', 'note',
+    'purchase_request_id', 'user_id', 'recorded_by', 'type', 'method', 'amount', 'paid_on', 'file_path', 'file_name', 'note',
     'status', 'admin_note', 'verified_at',
 ])]
 class PaymentProof extends Model
@@ -34,6 +34,24 @@ class PaymentProof extends Model
         self::TYPE_BOOKING_FEE => 'Tanda jadi',
         self::TYPE_DOWN_PAYMENT => 'DP',
         self::TYPE_SETTLEMENT => 'Pelunasan',
+    ];
+
+    /** Transfer dengan bukti dari customer (bawaan); lainnya dicatat admin saat bayar di showroom. */
+    public const METHOD_TRANSFER = 'transfer';
+
+    public const METHOD_CASH = 'cash';
+
+    public const METHOD_CARD = 'card';
+
+    public const METHOD_ONSITE_TRANSFER = 'onsite_transfer';
+
+    public const SHOWROOM_METHODS = [self::METHOD_CASH, self::METHOD_CARD, self::METHOD_ONSITE_TRANSFER];
+
+    public const METHOD_LABELS = [
+        self::METHOD_TRANSFER => 'Transfer',
+        self::METHOD_CASH => 'Tunai di showroom',
+        self::METHOD_CARD => 'Debit/kartu kredit (EDC) di showroom',
+        self::METHOD_ONSITE_TRANSFER => 'Transfer di showroom',
     ];
 
     public const STATUS_PENDING = 'pending';
@@ -75,6 +93,29 @@ class PaymentProof extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function recorder(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'recorded_by');
+    }
+
+    /**
+     * Dibayar langsung di showroom dan dicatat admin (bukan bukti unggahan customer).
+     */
+    public function isShowroomPayment(): bool
+    {
+        return in_array($this->method, self::SHOWROOM_METHODS, true);
+    }
+
+    public function hasFile(): bool
+    {
+        return filled($this->file_path);
+    }
+
+    public function methodLabel(): string
+    {
+        return self::METHOD_LABELS[$this->method] ?? $this->method;
+    }
+
     public function isPending(): bool
     {
         return $this->status === self::STATUS_PENDING;
@@ -82,7 +123,8 @@ class PaymentProof extends Model
 
     public function isImage(): bool
     {
-        return in_array(strtolower(pathinfo($this->file_path, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'webp'], true);
+        return $this->hasFile()
+            && in_array(strtolower(pathinfo($this->file_path, PATHINFO_EXTENSION)), ['jpg', 'jpeg', 'png', 'webp'], true);
     }
 
     public function typeLabel(): string

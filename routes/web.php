@@ -232,6 +232,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     // Verifikasi bukti pembayaran customer (bukti harus milik pengajuan di URL).
     Route::controller(AdminPaymentProofController::class)->prefix('pengajuan/{purchaseRequest}/bukti-pembayaran')
         ->name('payment-proofs.')->scopeBindings()->group(function () {
+            Route::post('/', 'store')->name('store');
             Route::get('{paymentProof}', 'file')->name('file');
             Route::patch('{paymentProof}/terima', 'approve')->name('approve');
             Route::patch('{paymentProof}/tolak', 'reject')->name('reject');

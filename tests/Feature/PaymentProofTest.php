@@ -400,6 +400,95 @@ class PaymentProofTest extends TestCase
         $this->assertStringNotContainsString('Rp 1.000.000<', $html);
     }
 
+    public function test_admin_mencatat_pembayaran_tunai_di_showroom_langsung_diterima(): void
+    {
+        $this->actingAs($this->admin)->get(route('admin.purchase-requests.show', $this->cash))
+            ->assertSee('Catat Pembayaran di Showroom')
+            ->assertSee(route('admin.payment-proofs.store', $this->cash), false);
+
+        $this->post(route('admin.payment-proofs.store', $this->cash), [
+            'type' => PaymentProof::TYPE_SETTLEMENT, 'method' => PaymentProof::METHOD_CASH,
+            'amount' => '505.000.000', 'paid_on' => '2026-10-12', 'note' => 'Kwitansi 0123',
+        ])
+            ->assertRedirect(route('admin.purchase-requests.show', $this->cash).'#bukti-pembayaran')
+            ->assertSessionHas('success', 'Pembayaran di showroom Rp 505.000.000 dicatat. Status pembayaran: Lunas.');
+
+        $payment = PaymentProof::query()->sole();
+        $this->assertSame(PaymentProof::STATUS_APPROVED, $payment->status);
+        $this->assertSame(PaymentProof::METHOD_CASH, $payment->method);
+        $this->assertSame($this->admin->id, $payment->recorded_by);
+        $this->assertSame($this->customer->id, $payment->user_id);
+        $this->assertNull($payment->file_path);
+        $this->assertTrue($this->cash->fresh()->isPaidOff());
+
+        $this->get(route('admin.purchase-requests.show', $this->cash))
+            ->assertSee('Tunai di showroom')
+            ->assertSee('dicatat '.$this->admin->name)
+            ->assertDontSee('Catat Pembayaran di Showroom');
+        $this->get(route('admin.payment-proofs.file', [$this->cash, $payment]))->assertNotFound();
+
+        $this->actingAs($this->customer)->get(route('account.purchase-requests.index'))
+            ->assertSee('Tunai di showroom')
+            ->assertSee('Lunas')
+            ->assertDontSee('Lihat file');
+
+        $html = app(PurchaseRequestPdf::class)->html($this->cash->fresh());
+        $this->assertStringContainsString('Tunai di showroom', $html);
+    }
+
+    public function test_pembayaran_showroom_dengan_foto_kwitansi(): void
+    {
+        $this->actingAs($this->admin)->post(route('admin.payment-proofs.store', $this->cash), [
+            'type' => PaymentProof::TYPE_BOOKING_FEE, 'method' => PaymentProof::METHOD_CARD,
+            'amount' => '10.000.000', 'paid_on' => '2026-10-12', 'file' => UploadedFile::fake()->image('struk-edc.jpg'),
+        ])->assertSessionHas('success', 'Pembayaran di showroom Rp 10.000.000 dicatat. Status pembayaran: Dibayar sebagian.');
+
+        $payment = PaymentProof::query()->sole();
+        Storage::disk(PaymentProof::DISK)->assertExists($payment->file_path);
+        $this->get(route('admin.payment-proofs.file', [$this->cash, $payment]))->assertOk();
+    }
+
+    /**
+     * @return array<string, array{array<string, mixed>, string}>
+     */
+    public static function invalidShowroomPayments(): array
+    {
+        return [
+            'cara bayar transfer biasa' => [['method' => PaymentProof::METHOD_TRANSFER], 'method'],
+            'melebihi sisa tagihan' => [['amount' => '505.000.001'], 'amount'],
+            'nominal berhuruf' => [['amount' => '5jt'], 'amount'],
+            'tanggal masa depan' => [['paid_on' => '2026-10-13'], 'paid_on'],
+            'DP untuk cash' => [['type' => PaymentProof::TYPE_DOWN_PAYMENT], 'type'],
+            'file svg' => [['file' => UploadedFile::fake()->create('kwitansi.svg', 10, 'image/svg+xml')], 'file'],
+        ];
+    }
+
+    #[DataProvider('invalidShowroomPayments')]
+    public function test_validasi_pembayaran_showroom(array $overrides, string $field): void
+    {
+        $this->actingAs($this->admin)->from(route('admin.purchase-requests.show', $this->cash))
+            ->post(route('admin.payment-proofs.store', $this->cash), [
+                'type' => PaymentProof::TYPE_BOOKING_FEE, 'method' => PaymentProof::METHOD_CASH,
+                'amount' => '5.000.000', 'paid_on' => '2026-10-12', ...$overrides,
+            ])
+            ->assertSessionHasErrorsIn('showroomPayment', $field);
+
+        $this->assertSame(0, PaymentProof::query()->count());
+    }
+
+    public function test_pembayaran_showroom_hanya_untuk_disetujui_dan_hanya_admin(): void
+    {
+        $payload = ['type' => 'booking_fee', 'method' => 'cash', 'amount' => '5.000.000', 'paid_on' => '2026-10-12'];
+
+        $this->actingAs($this->customer)->post(route('admin.payment-proofs.store', $this->cash), $payload)->assertForbidden();
+
+        $this->cash->update(['status' => PurchaseRequest::STATUS_PROCESSING]);
+        $this->actingAs($this->admin)->post(route('admin.payment-proofs.store', $this->cash), $payload)
+            ->assertSessionHas('error', 'Pembayaran hanya bisa dicatat untuk pengajuan yang berstatus Disetujui.');
+
+        $this->assertSame(0, PaymentProof::query()->count());
+    }
+
     public function test_detail_admin_tanpa_kartu_bila_belum_disetujui_dan_belum_ada_bukti(): void
     {
         $this->cash->update(['status' => PurchaseRequest::STATUS_PROCESSING]);

@@ -2,6 +2,47 @@
  * Dealer Mobil — script kecil untuk halaman admin.
  */
 document.addEventListener('DOMContentLoaded', function () {
+    // <form data-confirm="Pesan?">: minta konfirmasi sebelum dikirim (mis. menerima bukti / mencatat pembayaran).
+    document.querySelectorAll('form[data-confirm]').forEach(function (form) {
+        form.addEventListener('submit', function (event) {
+            if (!window.confirm(form.getAttribute('data-confirm'))) {
+                event.preventDefault();
+            }
+        });
+    });
+
+    // Form status: pilih status => catatan admin terisi kalimat bawaan status itu. Catatan yang sudah diketik
+    // admin tidak ditimpa; catatan lama (belum diubah) atau isian otomatis sebelumnya boleh diganti.
+    document.querySelectorAll('form[data-note-templates]').forEach(function (form) {
+        var templates = JSON.parse(form.getAttribute('data-note-templates'));
+        var select = form.querySelector('select[name="status"]');
+        var note = form.querySelector('textarea[name="admin_note"]');
+
+        if (!select || !note) {
+            return;
+        }
+
+        var replaceable = [note.value];
+
+        select.addEventListener('change', function () {
+            if (replaceable.indexOf(note.value) === -1) {
+                return;
+            }
+
+            var next = templates[select.value] || replaceable[0];
+            note.value = next;
+            replaceable.push(next);
+
+            // Kursor ke tanda "…" agar admin langsung menulis alasan.
+            var placeholder = next.indexOf('\u2026');
+
+            if (placeholder !== -1) {
+                note.focus();
+                note.setSelectionRange(placeholder, placeholder + 1);
+            }
+        });
+    });
+
     // Modal konfirmasi hapus: isi action form & nama item dari tombol pemicu.
     var deleteModal = document.getElementById('deleteModal');
 
