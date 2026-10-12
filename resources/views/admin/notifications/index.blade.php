@@ -29,20 +29,14 @@
         <div class="list-group">
             @foreach ($notifications as $notification)
                 @php($data = $notification->data)
-                @php($record = $records[($data['route'] ?? '').':'.($data['params'][0] ?? '')] ?? null)
                 <a href="{{ route('admin.notifications.open', $notification->id) }}"
                    @class(['list-group-item list-group-item-action notification-item p-3', 'is-unread' => $notification->unread()])>
                     <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
                         <span @class(['fw-semibold' => $notification->unread()])>{{ $data['title'] ?? 'Notifikasi' }}</span>
-                        {{-- Status terkini datanya; status saat notifikasi dibuat hanya bila datanya sudah tidak ada. --}}
-                        @if ($record)
-                            <x-status-badge :status="$record->status" />
-                            @if ($record instanceof \App\Models\PurchaseRequest && $record->hasPaymentSection())
-                                <x-status-badge :status="$record->paymentStatusBadge()" :label="$record->paymentStatusLabel()" />
-                            @endif
-                        @elseif (isset($data['status']))
-                            <x-status-badge :status="$data['status']" />
-                        @endif
+                        {{-- Status terkini datanya (lihat NotificationController::statusBadges). --}}
+                        @foreach ($badges[$notification->id] ?? [] as $badge)
+                            <x-status-badge :status="$badge['status']" :label="$badge['label']" />
+                        @endforeach
                         @if ($notification->unread())
                             <span class="notification-new">Baru<span class="visually-hidden"> (belum dibaca)</span></span>
                         @endif
