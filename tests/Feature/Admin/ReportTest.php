@@ -434,5 +434,7 @@ class ReportTest extends TestCase
         $this->assertContains('Ringkasan Pengajuan', $values);
         $this->assertContains('Stok Menipis (mobil aktif, stok maksimal 1)', $values);
         $this->assertGreaterThan(30, $sheet->getColumnDimension('A')->getWidth());
+        // Nilai rupiah besar (Rp 11.430.000.000) muat di kolom C tanpa tampil "#####".
+        $this->assertGreaterThanOrEqual(20, $sheet->getColumnDimension('C')->getWidth());
     }
 }

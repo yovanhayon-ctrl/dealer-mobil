@@ -18,8 +18,8 @@ use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
  */
 class AdminReportXlsx
 {
-    /** Kolom A-D: label/mobil, angka atau nama mobil (5 terlaris), angka, nilai rupiah. */
-    private const COLUMN_WIDTHS = ['A' => 40, 'B' => 32, 'C' => 16, 'D' => 22];
+    /** Kolom A-D: label/mobil, angka atau nama mobil (5 terlaris), angka/nilai rupiah, nilai rupiah. */
+    private const COLUMN_WIDTHS = ['A' => 40, 'B' => 32, 'C' => 22, 'D' => 22];
 
     private const LAST_COLUMN = 'D';
 
@@ -27,6 +27,7 @@ class AdminReportXlsx
         'number' => '#,##0',
         'rupiah' => '"Rp" #,##0',
         'percent' => '0.0%',
+        'rank' => '0',
     ];
 
     private const BRAND_DARK = '1C1C1E';
@@ -95,6 +96,7 @@ class AdminReportXlsx
             $this->text($sheet, "B{$row}", $value);
             $sheet->mergeCells("B{$row}:".self::LAST_COLUMN.$row);
             $sheet->getStyle("A{$row}")->getFont()->setBold(true)->getColor()->setRGB('6C757D');
+            $sheet->getStyle("A{$row}")->getAlignment()->setVertical(Alignment::VERTICAL_TOP);
             $sheet->getStyle("B{$row}")->getAlignment()->setWrapText(true)->setVertical(Alignment::VERTICAL_TOP);
 
             // Sel gabungan tidak menghitung tinggi otomatis: catatan panjang diberi ruang 2 baris.
@@ -182,7 +184,8 @@ class AdminReportXlsx
     private function alignForFormat(Worksheet $sheet, string $cell, string $format): void
     {
         $sheet->getStyle($cell)->getAlignment()->setHorizontal(
-            $format === 'text' ? Alignment::HORIZONTAL_LEFT : Alignment::HORIZONTAL_RIGHT
+            // Teks & peringkat rata kiri (peringkat di kolom lebar), angka lain rata kanan.
+            in_array($format, ['text', 'rank'], true) ? Alignment::HORIZONTAL_LEFT : Alignment::HORIZONTAL_RIGHT
         );
     }
 
