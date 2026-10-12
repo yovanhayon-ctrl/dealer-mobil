@@ -31,7 +31,7 @@
 
         <div class="mb-3">
             <label for="phone" class="form-label">Nomor WhatsApp</label>
-            <input type="tel" id="phone" name="phone" value="{{ old('phone') }}"
+            <input type="tel" id="phone" name="phone" data-number="phone" inputmode="tel" value="{{ old('phone') }}"
                    class="form-control @error('phone') is-invalid @enderror"
                    placeholder="081234567890" autocomplete="tel" required>
             @error('phone')

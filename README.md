@@ -496,7 +496,7 @@ Wajib saat production (Phase 19):
 
 - **Demo lokal / presentasi:** [docs/DEMO.md](docs/DEMO.md) — persiapan, akun demo, alur demo ±15 menit, dan solusi masalah saat demo.
 - **Shared hosting (cPanel):** [docs/DEPLOY-CPANEL.md](docs/DEPLOY-CPANEL.md) — syarat hosting (**PHP ≥ 8.4**), upload, document root, database, `.env` production, HTTPS, dan pembaruan.
-- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md), [docs/RELEASE-v1.1.0.md](docs/RELEASE-v1.1.0.md), [docs/RELEASE-v1.2.0.md](docs/RELEASE-v1.2.0.md), [docs/RELEASE-v1.3.0.md](docs/RELEASE-v1.3.0.md), [docs/RELEASE-v1.4.0.md](docs/RELEASE-v1.4.0.md), [docs/RELEASE-v1.5.0.md](docs/RELEASE-v1.5.0.md), [docs/RELEASE-v1.6.0.md](docs/RELEASE-v1.6.0.md), [docs/RELEASE-v1.7.0.md](docs/RELEASE-v1.7.0.md), [docs/RELEASE-v1.7.1.md](docs/RELEASE-v1.7.1.md), [docs/RELEASE-v1.7.2.md](docs/RELEASE-v1.7.2.md), [docs/RELEASE-v1.7.3.md](docs/RELEASE-v1.7.3.md), [docs/RELEASE-v1.8.0.md](docs/RELEASE-v1.8.0.md), [docs/RELEASE-v1.9.0.md](docs/RELEASE-v1.9.0.md).
+- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md), [docs/RELEASE-v1.1.0.md](docs/RELEASE-v1.1.0.md), [docs/RELEASE-v1.2.0.md](docs/RELEASE-v1.2.0.md), [docs/RELEASE-v1.3.0.md](docs/RELEASE-v1.3.0.md), [docs/RELEASE-v1.4.0.md](docs/RELEASE-v1.4.0.md), [docs/RELEASE-v1.5.0.md](docs/RELEASE-v1.5.0.md), [docs/RELEASE-v1.6.0.md](docs/RELEASE-v1.6.0.md), [docs/RELEASE-v1.7.0.md](docs/RELEASE-v1.7.0.md), [docs/RELEASE-v1.7.1.md](docs/RELEASE-v1.7.1.md), [docs/RELEASE-v1.7.2.md](docs/RELEASE-v1.7.2.md), [docs/RELEASE-v1.7.3.md](docs/RELEASE-v1.7.3.md), [docs/RELEASE-v1.8.0.md](docs/RELEASE-v1.8.0.md), [docs/RELEASE-v1.9.0.md](docs/RELEASE-v1.9.0.md), [docs/RELEASE-v1.10.0.md](docs/RELEASE-v1.10.0.md).
 
 ## Performa
 
@@ -556,6 +556,7 @@ php artisan optimize
 | +     | Rilis v1.7.3                   | ✅ Selesai (test tidak lagi menghapus foto asli, petunjuk upload 8 MB, perapian halaman akun & login/daftar; 814 test) |
 | +     | Rilis v1.8.0                   | ✅ Selesai (banner promo otomatis WebP lebar maks. 1600 px, batas upload 8 MB; 818 test) |
 | +     | Rilis v1.9.0                   | ✅ Selesai (mode terang/gelap halaman publik & akun, export laporan Excel rapi; 824 test) |
+| +     | Rilis v1.10.0                  | ✅ Selesai (isian harga, kilometer, tahun, nomor WhatsApp hanya angka di publik & admin; 842 test) |
 
 > **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`. Promo berjalan tampil di `/promo` (filter Semua/Khusus Mobil/Promo Umum) dan detailnya di `/promo/{slug}`. Simulasi kredit bunga flat di `/simulasi-kredit` (tanpa login; pilih mobil atau isi harga, DP, tenor). Customer mengajukan pembelian cash/kredit di `/mobil/{slug}/ajukan` (hasil simulasi bisa ikut terbawa) dan memantau/membatalkan di `/akun/pengajuan`. Halaman `/tentang-kami` dan `/kontak` (alamat, telepon, WhatsApp, email, jam operasional, Google Maps) membaca data dealer dari `.env` (`DEALER_*`). Setiap akun bisa mengubah data diri dan kata sandi di `/akun/profil`.
 
@@ -584,6 +585,8 @@ php artisan optimize
 > **Rilis v1.8.0:** banner promo yang diunggah otomatis diperkecil (lebar maks. 1600 px) dan disimpan sebagai WebP, batas upload banner naik ke 8 MB. Tidak ada migration baru; hosting perlu `upload_max_filesize` ≥ 8M. Detail: [docs/RELEASE-v1.8.0.md](docs/RELEASE-v1.8.0.md).
 
 > **Rilis v1.9.0:** mode terang/gelap (tombol ☾/☀ di navbar, mengikuti pengaturan perangkat; admin tetap terang) dan tombol **Export Excel** di Admin > Laporan (file `.xlsx` rapi: judul, format ribuan/Rp/%, siap cetak). Setelah pull **wajib** `composer install` (dependency baru `phpoffice/phpspreadsheet`, butuh ekstensi PHP `zip` dan `xml`). Tidak ada migration baru. Detail: [docs/RELEASE-v1.9.0.md](docs/RELEASE-v1.9.0.md).
+
+> **Rilis v1.10.0:** isian angka (harga, DP, diskon, kilometer, tahun, stok, durasi, nomor WhatsApp) hanya menerima angka: browser mencegah huruf sejak diketik (titik ribuan otomatis), server menolak isian seperti `45rb` dengan pesan "… hanya boleh berisi angka." Tidak ada dependency, migration, atau `.env` baru. Detail: [docs/RELEASE-v1.10.0.md](docs/RELEASE-v1.10.0.md).
 
 > **Urutan kerja:** semua halaman **admin** dikerjakan dulu (sudah selesai), lalu halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 

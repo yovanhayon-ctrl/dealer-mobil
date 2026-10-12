@@ -2,15 +2,16 @@
 
 namespace App\Http\Requests\Concerns;
 
+use App\Support\NumberInput;
+
 /**
- * Angka boleh ditulis dengan titik ribuan ("285.000.000"): ambil digitnya saja sebelum validasi.
+ * Angka boleh ditulis dengan titik ribuan atau awalan "Rp" ("Rp 285.000.000"): diambil digitnya sebelum validasi.
+ * Isian berhuruf ("45rb") diteruskan apa adanya sehingga aturan "integer" menolaknya ("… hanya boleh berisi angka.").
  */
 trait NormalizesDigits
 {
     private function digitsOnly(string $key): ?string
     {
-        $value = preg_replace('/\D/', '', (string) $this->input($key));
-
-        return $value === '' ? null : $value;
+        return NumberInput::normalize($this->input($key));
     }
 }

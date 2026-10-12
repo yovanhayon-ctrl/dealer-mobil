@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Car;
 use App\Support\CreditCalculator;
+use App\Support\NumberInput;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\View as ViewFactory;
@@ -34,10 +35,10 @@ class CreditSimulationController extends Controller
         $car = $slug !== null ? $cars->firstWhere('slug', $slug) : null;
         $errors = new MessageBag;
 
-        $price = $car?->finalPrice() ?? $this->digits($request, 'harga');
+        $price = $car?->finalPrice() ?? $this->digits($request, 'harga', $errors, 'Harga');
         $tenor = (int) $request->query('tenor');
         $tenor = in_array($tenor, $credit->tenors(), true) ? $tenor : self::DEFAULT_TENOR;
-        $downPayment = $this->digits($request, 'dp');
+        $downPayment = $this->digits($request, 'dp', $errors, 'Uang muka');
 
         if ($car === null && $price !== null && ($price < self::MIN_PRICE || $price > self::MAX_PRICE)) {
             $errors->add('harga', 'Harga harus antara '.self::rupiah(self::MIN_PRICE).' dan '.self::rupiah(self::MAX_PRICE).'.');
@@ -108,14 +109,23 @@ class CreditSimulationController extends Controller
     }
 
     /**
-     * Angka boleh memakai titik ribuan ("60.000.000"); maksimal 13 digit agar tidak overflow.
+     * Angka boleh memakai titik ribuan atau awalan "Rp" ("Rp 60.000.000"); maksimal 13 digit agar tidak overflow.
+     * Isian berhuruf ("60jt") ditolak dengan pesan dan dianggap kosong.
      */
-    private function digits(Request $request, string $key): ?int
+    private function digits(Request $request, string $key, MessageBag $errors, string $label): ?int
     {
-        $digits = ltrim((string) preg_replace('/\D/', '', (string) $this->text($request, $key)), '0');
+        $text = $this->text($request, $key);
+
+        if ($text !== null && ! NumberInput::isValid($text)) {
+            $errors->add($key, "{$label} hanya boleh berisi angka.");
+
+            return null;
+        }
+
+        $digits = ltrim((string) preg_replace('/\D/', '', (string) $text), '0');
 
         if ($digits === '') {
-            return $this->text($request, $key) !== null ? 0 : null;
+            return $text !== null ? 0 : null;
         }
 
         return strlen($digits) <= 13 ? (int) $digits : PHP_INT_MAX;
