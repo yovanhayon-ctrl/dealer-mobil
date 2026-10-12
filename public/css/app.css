@@ -293,6 +293,13 @@ main {
         padding: .5rem 0 1rem;
     }
 
+    /* Menu lebih tinggi dari layar (HP miring): digulir di dalam menu, halaman di belakangnya tidak ikut. */
+    .navbar-dealer .navbar-collapse.show {
+        max-height: calc(100dvh - 4.5rem);
+        overflow-y: auto;
+        overscroll-behavior: contain;
+    }
+
     .navbar-dealer .navbar-nav .nav-link {
         padding: .65rem .75rem;
         border-bottom: 1px solid rgba(255, 255, 255, .08);
