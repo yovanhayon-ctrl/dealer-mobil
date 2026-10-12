@@ -11,7 +11,7 @@ use App\Models\TestDrive;
  * Isi laporan admin dalam bentuk bagian-bagian tabel, dipakai bersama oleh export CSV dan Excel.
  *
  * Setiap baris boleh membawa format angka sendiri (mis. "Nilai penjualan" berformat rupiah di kolom Jumlah)
- * dan penanda baris total. Format: text, number, rupiah, percent (nilai persen, mis. 33.3).
+ * dan penanda baris total. Format: text, number, rupiah, percent (nilai persen, mis. 33.3), rank (nomor urut).
  *
  * @phpstan-type Row array{cells: list<mixed>, formats?: list<string>, total?: bool}
  * @phpstan-type Section array{title: string, columns: list<string>, formats: list<string>, rows: list<Row>}
@@ -62,7 +62,7 @@ class AdminReportSections
                 $items->map(fn ($item) => self::row([$item->name, $item->units, $item->value]))->values()->all());
         }
 
-        $sections[] = self::section('5 Mobil Terlaris', ['Peringkat', 'Mobil', 'Unit', 'Nilai (Rp)'], ['number', 'text', 'number', 'rupiah'],
+        $sections[] = self::section('5 Mobil Terlaris', ['Peringkat', 'Mobil', 'Unit', 'Nilai (Rp)'], ['rank', 'text', 'number', 'rupiah'],
             $this->report->topCars()->values()->map(fn ($car, $index) => self::row([$index + 1, $car->name, $car->units, $car->value]))->all());
 
         $testDriveRows = [];
