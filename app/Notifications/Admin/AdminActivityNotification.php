@@ -89,6 +89,8 @@ abstract class AdminActivityNotification extends Notification
             'admin_note' => null,
             'route' => $this->routeName(),
             'params' => $this->routeParams(),
+            // Jenis & id data: daftar notifikasi admin menampilkan status terkininya.
+            'record' => ['type' => class_basename($this->record), 'id' => $this->record->getKey()],
         ];
     }
 }
