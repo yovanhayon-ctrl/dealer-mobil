@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\Account\FavoriteController;
 use App\Http\Controllers\Account\NotificationController;
+use App\Http\Controllers\Account\PaymentProofController as AccountPaymentProofController;
 use App\Http\Controllers\Account\ProfileController;
 use App\Http\Controllers\Account\PurchaseRequestController as AccountPurchaseRequestController;
 use App\Http\Controllers\Account\ServiceBookingController as AccountServiceBookingController;
@@ -13,6 +14,7 @@ use App\Http\Controllers\Admin\CarImageController;
 use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
+use App\Http\Controllers\Admin\PaymentProofController as AdminPaymentProofController;
 use App\Http\Controllers\Admin\PromoController as AdminPromoController;
 use App\Http\Controllers\Admin\PurchaseRequestController as AdminPurchaseRequestController;
 use App\Http\Controllers\Admin\ReportController;
@@ -143,6 +145,16 @@ Route::middleware('auth')->group(function () {
             ->middleware('throttle:10,1')
             ->name('testimonials.update');
 
+        // Bukti pembayaran (pengajuan disetujui). File di disk privat; bukti harus milik pengajuan di URL.
+        Route::get('pengajuan/{purchaseRequest}/bukti-pembayaran', [AccountPaymentProofController::class, 'create'])
+            ->name('payment-proofs.create');
+        Route::post('pengajuan/{purchaseRequest}/bukti-pembayaran', [AccountPaymentProofController::class, 'store'])
+            ->middleware('throttle:10,1')
+            ->name('payment-proofs.store');
+        Route::get('pengajuan/{purchaseRequest}/bukti-pembayaran/{paymentProof}', [AccountPaymentProofController::class, 'file'])
+            ->scopeBindings()
+            ->name('payment-proofs.file');
+
         Route::get('servis', [AccountServiceBookingController::class, 'index'])->name('service-bookings.index');
         Route::patch('servis/{serviceBooking}/batal', [AccountServiceBookingController::class, 'cancel'])->name('service-bookings.cancel');
 
@@ -216,6 +228,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('{purchaseRequest}/pdf', 'pdf')->middleware('throttle:20,1')->name('pdf');
         Route::patch('{purchaseRequest}/status', 'updateStatus')->name('update-status');
     });
+
+    // Verifikasi bukti pembayaran customer (bukti harus milik pengajuan di URL).
+    Route::controller(AdminPaymentProofController::class)->prefix('pengajuan/{purchaseRequest}/bukti-pembayaran')
+        ->name('payment-proofs.')->scopeBindings()->group(function () {
+            Route::get('{paymentProof}', 'file')->name('file');
+            Route::patch('{paymentProof}/terima', 'approve')->name('approve');
+            Route::patch('{paymentProof}/tolak', 'reject')->name('reject');
+        });
 
     // JAF Service: master layanan (CRUD) + booking servis dari customer (lihat & ubah status).
     Route::resource('layanan', AdminServiceController::class)

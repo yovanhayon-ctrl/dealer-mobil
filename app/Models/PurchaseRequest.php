@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable([
@@ -108,6 +109,49 @@ class PurchaseRequest extends Model
         return $this->hasOne(Testimonial::class);
     }
 
+    public function paymentProofs(): HasMany
+    {
+        return $this->hasMany(PaymentProof::class)->latest()->orderByDesc('id');
+    }
+
+    /**
+     * Bukti pembayaran hanya bisa dikirim setelah pengajuan disetujui dealer.
+     */
+    public function canReceivePaymentProofs(): bool
+    {
+        return $this->status === self::STATUS_APPROVED;
+    }
+
+    /**
+     * Jenis pembayaran ke dealer: cash = tanda jadi & pelunasan; kredit = tanda jadi & DP (sisanya dibayar leasing).
+     *
+     * @return array<string, string>
+     */
+    public function paymentProofTypes(): array
+    {
+        $types = $this->isCredit()
+            ? [PaymentProof::TYPE_BOOKING_FEE, PaymentProof::TYPE_DOWN_PAYMENT]
+            : [PaymentProof::TYPE_BOOKING_FEE, PaymentProof::TYPE_SETTLEMENT];
+
+        return array_intersect_key(PaymentProof::TYPE_LABELS, array_flip($types));
+    }
+
+    /**
+     * Total yang dibayar customer langsung ke dealer: harga mobil (cash) atau DP (kredit).
+     */
+    public function amountPayableToDealer(): int
+    {
+        return $this->isCredit() ? (int) $this->down_payment : (int) $this->car_price;
+    }
+
+    /**
+     * Jumlah bukti pembayaran yang sudah diterima admin.
+     */
+    public function verifiedPaymentTotal(): int
+    {
+        return (int) $this->paymentProofs->where('status', PaymentProof::STATUS_APPROVED)->sum('amount');
+    }
+
     /**
      * Nomor dokumen untuk bukti pengajuan: PB-{tahun pengajuan}-{id 6 digit}, mis. PB-2026-000123.
      */
@@ -151,8 +195,8 @@ class PurchaseRequest extends Model
                 ? 'Siapkan KTP, KK, NPWP, dan slip gaji atau rekening koran untuk survei leasing.'
                 : 'Atur jadwal cek unit di showroom. Pembayaran dilakukan setelah Anda cocok dengan unitnya.',
             self::STATUS_APPROVED => $this->isCredit()
-                ? 'Bayar DP dan tanda tangani perjanjian kredit, lalu jadwalkan serah terima.'
-                : 'Lakukan pelunasan di showroom atau transfer ke rekening atas nama dealer, lalu konfirmasi lewat WhatsApp.',
+                ? 'Bayar DP dan tanda tangani perjanjian kredit, lalu kirim bukti transfer DP di menu Pengajuan Saya.'
+                : 'Lakukan pelunasan di showroom atau transfer ke rekening atas nama dealer, lalu kirim bukti transfernya di menu Pengajuan Saya.',
             default => null,
         };
     }

@@ -85,6 +85,49 @@
                                 </div>
                             @endif
 
+                            {{-- Pembayaran: setelah disetujui customer mengirim bukti transfer; riwayatnya tetap tampil setelahnya. --}}
+                            @if ($purchase->canReceivePaymentProofs() || $purchase->paymentProofs->isNotEmpty())
+                                <div class="payment-box small rounded-3 p-3 mt-3" id="pembayaran-{{ $purchase->id }}">
+                                    <div class="d-flex flex-wrap justify-content-between gap-1 mb-2">
+                                        <span class="fw-semibold">Pembayaran ke dealer</span>
+                                        <span class="text-muted">
+                                            Terverifikasi <x-price :amount="$purchase->verifiedPaymentTotal()" />
+                                            dari <x-price :amount="$purchase->amountPayableToDealer()" />{{ $purchase->isCredit() ? ' (DP)' : '' }}
+                                        </span>
+                                    </div>
+
+                                    @if ($purchase->canReceivePaymentProofs())
+                                        <x-payment-bank />
+                                    @endif
+
+                                    @if ($purchase->paymentProofs->isNotEmpty())
+                                        <ul class="payment-proof-list list-unstyled mb-2">
+                                            @foreach ($purchase->paymentProofs as $proof)
+                                                <li>
+                                                    <div class="d-flex flex-wrap align-items-center gap-2">
+                                                        <span class="fw-semibold">{{ $proof->typeLabel() }}</span>
+                                                        <x-price :amount="$proof->amount" />
+                                                        <span class="text-muted">· {{ $proof->paid_on->translatedFormat('d M Y') }}</span>
+                                                        <x-status-badge :status="$proof->status" :label="$proof->statusLabel()" />
+                                                        <a href="{{ route('account.payment-proofs.file', [$purchase, $proof]) }}" target="_blank" rel="noopener"
+                                                           class="ms-auto">Lihat file</a>
+                                                    </div>
+                                                    @if ($proof->status === \App\Models\PaymentProof::STATUS_REJECTED && $proof->admin_note)
+                                                        <p class="text-danger mb-0 mt-1"><span class="fw-semibold">Ditolak:</span> {{ $proof->admin_note }}</p>
+                                                    @endif
+                                                </li>
+                                            @endforeach
+                                        </ul>
+                                    @endif
+
+                                    @if ($purchase->canReceivePaymentProofs())
+                                        <a href="{{ route('account.payment-proofs.create', $purchase) }}" class="btn btn-outline-primary btn-sm">
+                                            <i class="bi bi-upload"></i>Kirim Bukti Pembayaran
+                                        </a>
+                                    @endif
+                                </div>
+                            @endif
+
                             <details class="account-item-details">
                                 <summary>Lihat rincian</summary>
                                 <div class="small pt-2">

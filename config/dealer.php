@@ -29,6 +29,14 @@ return [
 
     'maps_embed_url' => env('DEALER_MAPS_EMBED_URL', ''),
 
+    // Rekening resmi dealer, tampil untuk customer yang pengajuannya sudah disetujui (kirim bukti pembayaran).
+    // Kosongkan bila belum ada; form bukti pembayaran tetap bisa dipakai.
+    'bank' => [
+        'name' => env('DEALER_BANK_NAME', ''),
+        'account' => env('DEALER_BANK_ACCOUNT', ''),
+        'holder' => env('DEALER_BANK_HOLDER', ''),
+    ],
+
     // Notifikasi (status untuk customer, booking baru untuk admin) juga dikirim lewat email.
     // Pengiriman memakai pengaturan MAIL_* (MAIL_MAILER=log = hanya dicatat di storage/logs/laravel.log).
     'mail_notifications' => (bool) env('DEALER_MAIL_NOTIFICATIONS', true),

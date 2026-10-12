@@ -31,5 +31,7 @@ abstract class TestCase extends BaseTestCase
         // Pengaman file: disk "public" selalu palsu di test. Id mobil di database test mulai dari 1, jadi tanpa ini
         // test hapus mobil/gambar ikut menghapus folder foto asli (storage/app/public/cars/{id}) di komputer lokal.
         Storage::fake('public');
+        // Disk privat (bukti pembayaran customer) juga palsu agar test tidak menulis/menghapus file asli.
+        Storage::fake('local');
     }
 }
