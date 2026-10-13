@@ -36,9 +36,9 @@ class PurchaseRequestController extends Controller
 
         return view('pages.purchase-requests.create', [
             'car' => $car,
-            'isAdmin' => $user->isAdmin(),
+            'isAdmin' => $user->isStaff(),
             'price' => $price,
-            'existing' => $user->isAdmin() ? null : $submit->activeRequest($user, $car),
+            'existing' => $user->isStaff() ? null : $submit->activeRequest($user, $car),
             'defaultMethod' => $request->query('metode') === 'kredit' ? PurchaseRequest::PAYMENT_CREDIT : PurchaseRequest::PAYMENT_CASH,
             'defaultDownPayment' => $downPayment >= $credit->minDownPayment($price) && $downPayment <= $credit->maxDownPayment($price)
                 ? $downPayment

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -44,11 +45,16 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('email', 'password'), $this->boolean('remember'))) {
+        // Akun staf yang dinonaktifkan owner dianggap gagal login (pesan khusus di bawah).
+        if (! Auth::attemptWhen($this->only('email', 'password'), fn ($user) => $user->isActive(), $this->boolean('remember'))) {
+            $inactive = User::where('email', $this->input('email'))->where('is_active', false)->exists();
+
             RateLimiter::hit($this->throttleKey(), self::DECAY_SECONDS);
 
             throw ValidationException::withMessages([
-                'email' => __('auth.failed'),
+                'email' => $inactive && Auth::validate($this->only('email', 'password'))
+                    ? 'Akun Anda dinonaktifkan. Hubungi pemilik dealer.'
+                    : __('auth.failed'),
             ]);
         }
 

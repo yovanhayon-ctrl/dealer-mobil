@@ -69,6 +69,6 @@ class FavoriteController extends Controller
      */
     private function ensureCustomer(Request $request): void
     {
-        abort_if($request->user()->isAdmin(), 403);
+        abort_if($request->user()->isStaff(), 403);
     }
 }

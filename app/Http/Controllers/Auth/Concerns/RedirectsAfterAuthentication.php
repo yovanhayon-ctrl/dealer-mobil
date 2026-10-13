@@ -47,18 +47,19 @@ trait RedirectsAfterAuthentication
     }
 
     /**
-     * Admin selalu ke dashboard. Customer ke halaman sebelumnya atau beranda,
-     * tetapi tidak pernah ke area /admin.
+     * Owner/admin selalu ke dashboard, mekanik ke Pekerjaan Saya. Customer ke halaman sebelumnya atau beranda,
+     * tetapi tidak pernah ke area /admin atau /mekanik.
      */
     protected function redirectAfterAuthentication(Request $request, User $user, ?string $message = null): RedirectResponse
     {
         $intended = $request->session()->pull('url.intended', route('home'));
 
-        if ($user->isAdmin()) {
-            $redirect = redirect()->route('admin.dashboard');
+        if ($user->isStaff()) {
+            $redirect = redirect()->to($user->homeRoute());
         } else {
             $path = (string) parse_url($intended, PHP_URL_PATH);
-            $isAdminArea = $path === '/admin' || str_starts_with($path, '/admin/');
+            $isAdminArea = in_array($path, ['/admin', '/mekanik'], true)
+                || str_starts_with($path, '/admin/') || str_starts_with($path, '/mekanik/');
             // Lapisan kedua: tujuan di luar aplikasi (dari sumber mana pun) diganti beranda.
             $redirect = redirect()->to($isAdminArea || ! $this->isInternalUrl($intended) ? route('home') : $intended);
         }

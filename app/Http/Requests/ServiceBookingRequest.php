@@ -18,7 +18,7 @@ class ServiceBookingRequest extends FormRequest
 {
     use NormalizesDigits, NormalizesPhone;
 
-    public const ADMIN_MESSAGE = 'Akun admin tidak dapat booking servis. Gunakan akun customer.';
+    public const ADMIN_MESSAGE = 'Akun staf dealer tidak dapat booking servis. Gunakan akun customer.';
 
     public const MAX_COMPLAINT_LENGTH = 500;
 
@@ -32,7 +32,7 @@ class ServiceBookingRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return ! $this->user()->isAdmin();
+        return ! $this->user()->isStaff();
     }
 
     protected function failedAuthorization(): void

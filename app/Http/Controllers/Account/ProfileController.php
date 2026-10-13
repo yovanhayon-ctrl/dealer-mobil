@@ -19,7 +19,7 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        if (! $user->isAdmin()) {
+        if (! $user->isStaff()) {
             $user->loadCount(['testDrives', 'purchaseRequests', 'serviceBookings', 'favoriteCars']);
         }
 

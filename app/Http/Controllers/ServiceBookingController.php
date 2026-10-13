@@ -21,7 +21,7 @@ class ServiceBookingController extends Controller
 
     public function create(Request $request): View
     {
-        if ($request->user()->isAdmin()) {
+        if ($request->user()->isStaff()) {
             return view('pages.service-bookings.create', ['isAdmin' => true]);
         }
 

@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Middleware\EnsureUserHasRole;
+use App\Http\Middleware\EnsureUserIsActive;
 use App\Http\Middleware\EnsureUserIsAdmin;
 use App\Http\Middleware\SecurityHeaders;
 use Illuminate\Foundation\Application;
@@ -16,18 +18,18 @@ return Application::configure(basePath: dirname(__DIR__))
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->alias([
             'admin' => EnsureUserIsAdmin::class,
+            'role' => EnsureUserHasRole::class,
         ]);
+
+        // Staf yang dinonaktifkan owner langsung keluar.
+        $middleware->web(append: [EnsureUserIsActive::class]);
 
         // Header keamanan (CSP, X-Frame-Options, dll.) untuk semua response, termasuk 404
         // (URL tanpa route tidak melewati grup middleware "web").
         $middleware->append(SecurityHeaders::class);
 
         // User yang sudah login dan membuka /login atau /register.
-        $middleware->redirectUsersTo(
-            fn (Request $request) => $request->user()?->isAdmin()
-                ? route('admin.dashboard')
-                : route('home'),
-        );
+        $middleware->redirectUsersTo(fn (Request $request) => $request->user()?->homeRoute() ?? route('home'));
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

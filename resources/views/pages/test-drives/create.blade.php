@@ -19,7 +19,7 @@
                         <i class="bi bi-exclamation-circle-fill me-2"></i>
                         <div>
                             {{ \App\Http\Requests\TestDriveRequest::ADMIN_MESSAGE }}
-                            <a href="{{ route('admin.test-drives.index') }}" class="alert-link">Kelola test drive di dashboard admin</a>.
+                            @if (auth()->user()->isAdmin())<a href="{{ route('admin.test-drives.index') }}" class="alert-link">Kelola test drive di dashboard admin</a>.@endif
                         </div>
                     </div>
                 @elseif ($cars->isEmpty())
