@@ -55,6 +55,10 @@
                         <a href="{{ route('admin.dashboard') }}" class="btn btn-accent btn-sm" title="Dashboard Admin">
                             <i class="bi bi-speedometer2"></i>Admin
                         </a>
+                    @elseif (auth()->user()->isMechanic() && Route::has('mechanic.jobs.index'))
+                        <a href="{{ route('mechanic.jobs.index') }}" class="btn btn-accent btn-sm">
+                            <i class="bi bi-wrench-adjustable"></i>Pekerjaan
+                        </a>
                     @endif
                     @if (! auth()->user()->isAdmin() && Route::has('account.notifications.index'))
                         @php($unreadNotifications = auth()->user()->unreadNotifications()->count())
@@ -79,29 +83,35 @@
                                         <i class="bi bi-speedometer2 me-2"></i>Dashboard Admin
                                     </a>
                                 </li>
+                            @elseif (auth()->user()->isMechanic() && Route::has('mechanic.jobs.index'))
+                                <li>
+                                    <a class="dropdown-item" href="{{ route('mechanic.jobs.index') }}">
+                                        <i class="bi bi-wrench-adjustable me-2"></i>Pekerjaan Saya
+                                    </a>
+                                </li>
                             @endif
-                            @if (! auth()->user()->isAdmin() && Route::has('account.favorites.index'))
+                            @if (! auth()->user()->isStaff() && Route::has('account.favorites.index'))
                                 <li>
                                     <a class="dropdown-item" href="{{ route('account.favorites.index') }}">
                                         <i class="bi bi-heart me-2"></i>Favorit Saya
                                     </a>
                                 </li>
                             @endif
-                            @if (! auth()->user()->isAdmin() && Route::has('account.test-drives.index'))
+                            @if (! auth()->user()->isStaff() && Route::has('account.test-drives.index'))
                                 <li>
                                     <a class="dropdown-item" href="{{ route('account.test-drives.index') }}">
                                         <i class="bi bi-calendar-check me-2"></i>Test Drive Saya
                                     </a>
                                 </li>
                             @endif
-                            @if (! auth()->user()->isAdmin() && Route::has('account.service-bookings.index'))
+                            @if (! auth()->user()->isStaff() && Route::has('account.service-bookings.index'))
                                 <li>
                                     <a class="dropdown-item" href="{{ route('account.service-bookings.index') }}">
                                         <i class="bi bi-wrench-adjustable me-2"></i>Servis Saya
                                     </a>
                                 </li>
                             @endif
-                            @if (! auth()->user()->isAdmin() && Route::has('account.purchase-requests.index'))
+                            @if (! auth()->user()->isStaff() && Route::has('account.purchase-requests.index'))
                                 <li>
                                     <a class="dropdown-item" href="{{ route('account.purchase-requests.index') }}">
                                         <i class="bi bi-card-checklist me-2"></i>Pengajuan Saya

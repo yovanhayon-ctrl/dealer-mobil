@@ -39,7 +39,7 @@ abstract class AdminActivityNotification extends Notification
      */
     public static function notifyAdmins(self $notification): void
     {
-        Notifier::send(User::where('role', User::ROLE_ADMIN)->get(), $notification);
+        Notifier::send(User::whereIn('role', User::PANEL_ROLES)->where('is_active', true)->get(), $notification);
     }
 
     /**

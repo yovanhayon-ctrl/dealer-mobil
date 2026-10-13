@@ -26,7 +26,7 @@
                         <i class="bi bi-exclamation-circle-fill me-2"></i>
                         <div>
                             {{ \App\Http\Requests\ServiceBookingRequest::ADMIN_MESSAGE }}
-                            <a href="{{ route('admin.service-bookings.index') }}" class="alert-link">Kelola booking servis di dashboard admin</a>.
+                            @if (auth()->user()->isAdmin())<a href="{{ route('admin.service-bookings.index') }}" class="alert-link">Kelola booking servis di dashboard admin</a>.@endif
                         </div>
                     </div>
                 @elseif ($services->isEmpty())

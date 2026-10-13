@@ -20,6 +20,7 @@ use App\Http\Controllers\Admin\PurchaseRequestController as AdminPurchaseRequest
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ServiceBookingController as AdminServiceBookingController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
+use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TestDriveController as AdminTestDriveController;
 use App\Http\Controllers\Admin\TestimonialController as AdminTestimonialController;
 use App\Http\Controllers\Admin\UserController;
@@ -31,6 +32,7 @@ use App\Http\Controllers\CarController;
 use App\Http\Controllers\CompareController;
 use App\Http\Controllers\CreditSimulationController;
 use App\Http\Controllers\HomeController;
+use App\Http\Controllers\Mechanic\JobController as MechanicJobController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\PurchaseRequestController;
@@ -267,4 +269,22 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->only(['index', 'show'])
         ->parameters(['pengguna' => 'user'])
         ->names('users');
+
+    // Kelola akun staf (admin & mekanik): khusus owner.
+    Route::resource('staf', StaffController::class)
+        ->only(['index', 'create', 'store', 'edit', 'update'])
+        ->parameters(['staf' => 'user'])
+        ->names('staff')
+        ->middleware('role:owner');
+});
+
+/*
+|--------------------------------------------------------------------------
+| Mekanik
+|--------------------------------------------------------------------------
+*/
+
+Route::middleware(['auth', 'role:mechanic'])->prefix('mekanik')->name('mechanic.')->group(function () {
+    Route::redirect('/', '/mekanik/pekerjaan')->name('home');
+    Route::get('pekerjaan', [MechanicJobController::class, 'index'])->name('jobs.index');
 });
