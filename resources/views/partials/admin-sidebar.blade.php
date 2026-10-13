@@ -4,6 +4,7 @@
     $panelUser = auth()->user();
     $mechanicMenu = [
         ['label' => 'Pekerjaan Saya', 'icon' => 'bi-wrench-adjustable', 'route' => 'mechanic.jobs.index', 'active' => 'mechanic.jobs.*'],
+        ['label' => 'Rating Saya', 'icon' => 'bi-star', 'route' => 'mechanic.ratings.index', 'active' => 'mechanic.ratings.*'],
         ['label' => 'Profil', 'icon' => 'bi-person', 'route' => 'account.profile', 'active' => 'account.profile*'],
     ];
     $menu = [

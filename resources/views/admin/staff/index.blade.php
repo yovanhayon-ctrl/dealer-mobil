@@ -30,6 +30,7 @@
                         <th>Nama</th>
                         <th>Role</th>
                         <th>WhatsApp</th>
+                        <th>Kinerja Mekanik</th>
                         <th>Status</th>
                         <th class="text-end">Aksi</th>
                     </tr>
@@ -48,6 +49,20 @@
                             </td>
                             <td>@include('admin.users._role-badge', ['user' => $member, 'hideInactive' => true])</td>
                             <td class="text-nowrap">{{ $member->phone ?: '-' }}</td>
+                            <td class="text-nowrap small">
+                                @if ($member->isMechanic())
+                                    @if ($member->mechanic_ratings_count)
+                                        <i class="bi bi-star-fill text-warning" aria-hidden="true"></i>
+                                        <span class="fw-semibold">{{ \App\Models\MechanicRating::formatAverage((float) $member->mechanic_ratings_avg_rating) }}</span>
+                                        <span class="text-muted">({{ $member->mechanic_ratings_count }} rating)</span>
+                                    @else
+                                        <span class="text-muted">Belum ada rating</span>
+                                    @endif
+                                    <div class="text-muted">{{ $member->completed_jobs_count }} servis selesai</div>
+                                @else
+                                    <span class="text-muted">-</span>
+                                @endif
+                            </td>
                             <td><x-status-badge :status="$member->isActive() ? 'active' : 'inactive'" /></td>
                             <td class="text-end">
                                 @if (in_array($member->role, User::ASSIGNABLE_STAFF_ROLES, true))

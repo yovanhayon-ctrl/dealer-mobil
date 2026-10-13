@@ -2271,6 +2271,27 @@ tr[data-row-link] {
     min-height: 2.5rem;
 }
 
+/* Rating Saya (mekanik): batang tipis tanpa track, panjang = porsi rating. */
+.rating-share {
+    display: block;
+    height: .4rem;
+}
+
+.rating-share-label {
+    width: 3rem;
+}
+
+.rating-share-count {
+    width: 2rem;
+}
+
+.rating-share span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background-color: var(--bs-warning);
+}
+
 /* Admin: daftar bukti pembayaran dengan pratinjau kecil (gambar) atau ikon PDF. */
 .admin-proof + .admin-proof {
     margin-top: 1rem;

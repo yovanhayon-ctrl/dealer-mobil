@@ -118,5 +118,15 @@
                 <span class="fw-semibold">Temuan mekanik:</span> {{ $booking->findings }}
             </div>
         @endif
+
+        @if ($booking->mechanicRating)
+            <div class="small mt-3">
+                <span class="fw-semibold">Rating customer untuk mekanik:</span>
+                <x-rating-stars :rating="$booking->mechanicRating->rating" class="text-warning ms-1" />
+                @if ($booking->mechanicRating->comment)
+                    <div class="text-muted mt-1">“{{ $booking->mechanicRating->comment }}”</div>
+                @endif
+            </div>
+        @endif
     </div>
 </div>

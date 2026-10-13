@@ -60,6 +60,7 @@ class ServiceBookingController extends Controller
             'service:id,name,price_from,duration_minutes,is_active,checklist',
             'mechanic:id,name,is_active',
             'tasks',
+            'mechanicRating',
         ]);
 
         return view('admin.service-bookings.show', [

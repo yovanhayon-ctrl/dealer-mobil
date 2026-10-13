@@ -101,6 +101,49 @@
                                 </div>
                             @endif
 
+                            {{-- Rating mekanik: setelah servis selesai, satu kali per booking. --}}
+                            @if ($booking->status === \App\Models\ServiceBooking::STATUS_COMPLETED && $booking->mechanic)
+                                @if ($booking->mechanicRating)
+                                    <div class="small mt-3">
+                                        <span class="fw-semibold">Rating Anda untuk {{ $booking->mechanic->name }}:</span>
+                                        <x-rating-stars :rating="$booking->mechanicRating->rating" class="text-warning ms-1" />
+                                        @if ($booking->mechanicRating->comment)
+                                            <div class="text-muted mt-1">“{{ $booking->mechanicRating->comment }}”</div>
+                                        @endif
+                                    </div>
+                                @else
+                                    @php($ratingErrors = $errors->getBag("rating{$booking->id}"))
+                                    <form method="POST" action="{{ route('account.mechanic-ratings.store', $booking) }}"
+                                          class="payment-box rounded-3 p-3 mt-3" novalidate data-disable-on-submit>
+                                        @csrf
+                                        <p class="small fw-semibold mb-2">Bagaimana pekerjaan {{ $booking->mechanic->name }}?</p>
+                                        <div class="d-flex flex-wrap gap-2 rating-input mb-2" role="radiogroup" aria-label="Rating mekanik">
+                                            @for ($i = \App\Models\Testimonial::MAX_RATING; $i >= \App\Models\Testimonial::MIN_RATING; $i--)
+                                                <input type="radio" class="btn-check" name="rating" id="rating-{{ $booking->id }}-{{ $i }}" value="{{ $i }}"
+                                                       @checked($ratingErrors->any() && (int) old('rating') === $i)>
+                                                <label class="btn btn-outline-warning btn-sm" for="rating-{{ $booking->id }}-{{ $i }}">
+                                                    {{ $i }} <i class="bi bi-star-fill ms-1 me-0"></i>
+                                                </label>
+                                            @endfor
+                                        </div>
+                                        @if ($ratingErrors->has('rating'))
+                                            <div class="invalid-feedback d-block mb-2">{{ $ratingErrors->first('rating') }}</div>
+                                        @endif
+                                        <label for="comment-{{ $booking->id }}" class="visually-hidden">Komentar untuk mekanik</label>
+                                        <textarea id="comment-{{ $booking->id }}" name="comment" rows="2" maxlength="{{ \App\Models\MechanicRating::MAX_COMMENT_LENGTH }}"
+                                                  placeholder="Komentar (opsional), mis. penjelasannya jelas dan mobil kembali bersih."
+                                                  @class(['form-control form-control-sm mb-2', 'is-invalid' => $ratingErrors->has('comment')])>{{ $ratingErrors->any() ? old('comment') : '' }}</textarea>
+                                        @if ($ratingErrors->has('comment'))
+                                            <div class="invalid-feedback d-block mb-2">{{ $ratingErrors->first('comment') }}</div>
+                                        @endif
+                                        <div class="d-flex flex-wrap align-items-center gap-2">
+                                            <button type="submit" class="btn btn-accent btn-sm"><i class="bi bi-send"></i>Kirim Rating</button>
+                                            <span class="small text-muted">Hanya dilihat bengkel, tidak tampil di website.</span>
+                                        </div>
+                                    </form>
+                                @endif
+                            @endif
+
                             <details class="account-item-details">
                                 <summary>Lihat rincian</summary>
                                 <div class="small pt-2">
