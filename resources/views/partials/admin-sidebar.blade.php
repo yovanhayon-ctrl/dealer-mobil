@@ -19,10 +19,10 @@
         ['label' => 'Layanan Servis', 'icon' => 'bi-tools', 'route' => 'admin.services.index', 'active' => 'admin.services.*'],
         ['label' => 'Ulasan', 'icon' => 'bi-star', 'route' => 'admin.testimonials.index', 'active' => 'admin.testimonials.*'],
         ['label' => 'Pengguna', 'icon' => 'bi-people', 'route' => 'admin.users.index', 'active' => 'admin.users.*'],
-        ['label' => 'Laporan', 'icon' => 'bi-bar-chart', 'route' => 'admin.reports.index', 'active' => 'admin.reports.*'],
     ];
 
     if ($panelUser->isOwner()) {
+        $menu[] = ['label' => 'Laporan', 'icon' => 'bi-bar-chart', 'route' => 'admin.reports.index', 'active' => 'admin.reports.*'];
         $menu[] = ['label' => 'Staf', 'icon' => 'bi-person-badge', 'route' => 'admin.staff.index', 'active' => 'admin.staff.*'];
     }
 

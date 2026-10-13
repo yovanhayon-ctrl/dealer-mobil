@@ -71,6 +71,8 @@
                 </div>
             </div>
 
+            @include('admin.service-bookings._work')
+
             @if ($booking->status === \App\Models\ServiceBooking::STATUS_CONFIRMED && $booking->preferred_date->isAfter(today()))
                 <div class="alert alert-info small">
                     <i class="bi bi-info-circle me-1"></i>Status <strong>Dikerjakan</strong> baru bisa dipilih pada tanggal jadwal servis.

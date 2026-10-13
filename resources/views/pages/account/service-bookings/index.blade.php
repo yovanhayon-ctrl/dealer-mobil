@@ -62,6 +62,45 @@
                                 </div>
                             @endif
 
+                            {{-- Mekanik, progres checklist, dan temuan setelah booking dikonfirmasi. --}}
+                            @if ($booking->mechanic || $booking->findings)
+                                @php([$handled, $total] = $booking->taskProgress())
+                                <div class="payment-box small rounded-3 p-3 mt-3">
+                                    <div class="d-flex flex-wrap justify-content-between gap-1">
+                                        <span><i class="bi bi-person-gear me-1"></i>Mekanik: <span class="fw-semibold">{{ $booking->mechanic?->name ?? '-' }}</span></span>
+                                        @if ($total > 0 && $booking->status !== \App\Models\ServiceBooking::STATUS_CANCELLED)
+                                            <span class="text-muted">{{ $handled }} dari {{ $total }} pekerjaan ditangani</span>
+                                        @endif
+                                    </div>
+                                    @if ($booking->findings)
+                                        <p class="mb-0 mt-2"><span class="fw-semibold">Temuan mekanik:</span> {{ $booking->findings }}</p>
+                                    @endif
+                                    @if ($total > 0 && in_array($booking->status, [\App\Models\ServiceBooking::STATUS_IN_PROGRESS, \App\Models\ServiceBooking::STATUS_COMPLETED], true))
+                                        <details class="mt-2">
+                                            <summary>Lihat pekerjaan</summary>
+                                            <ul class="service-task-list list-unstyled mb-0 mt-1">
+                                                @foreach ($booking->tasks as $task)
+                                                    <li @class(['is-done' => $task->isDone(), 'is-skipped' => $task->isSkipped()])>
+                                                        <i @class([
+                                                            'bi',
+                                                            'bi-check-circle-fill text-success' => $task->isDone(),
+                                                            'bi-dash-circle text-muted' => $task->isSkipped(),
+                                                            'bi-circle text-muted' => $task->isPending(),
+                                                        ]) aria-hidden="true"></i>
+                                                        <div class="min-w-0">
+                                                            <span class="service-task-name">{{ $task->name }}</span>
+                                                            @if ($task->isSkipped() && $task->note)
+                                                                <div class="text-muted">Dilewati: {{ $task->note }}</div>
+                                                            @endif
+                                                        </div>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </details>
+                                    @endif
+                                </div>
+                            @endif
+
                             <details class="account-item-details">
                                 <summary>Lihat rincian</summary>
                                 <div class="small pt-2">

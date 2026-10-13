@@ -9,10 +9,12 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 #[Fillable([
     'user_id', 'service_id', 'vehicle_model', 'plate_number', 'vehicle_year', 'mileage',
     'preferred_date', 'preferred_time', 'phone', 'complaint', 'status', 'admin_note',
+    'mechanic_id', 'findings', 'started_at', 'finished_at',
 ])]
 class ServiceBooking extends Model
 {
@@ -72,6 +74,8 @@ class ServiceBooking extends Model
             'preferred_date' => 'date',
             'vehicle_year' => 'integer',
             'mileage' => 'integer',
+            'started_at' => 'datetime',
+            'finished_at' => 'datetime',
         ];
     }
 
@@ -92,6 +96,73 @@ class ServiceBooking extends Model
     public function service(): BelongsTo
     {
         return $this->belongsTo(Service::class);
+    }
+
+    /** Mekanik yang ditugaskan admin. */
+    public function mechanic(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'mechanic_id');
+    }
+
+    /** Checklist pekerjaan booking ini, urut sesuai posisi. */
+    public function tasks(): HasMany
+    {
+        return $this->hasMany(ServiceBookingTask::class)->orderBy('position')->orderBy('id');
+    }
+
+    /** Batas temuan / rekomendasi mekanik. */
+    public const MAX_FINDINGS_LENGTH = 2000;
+
+    /** Mekanik ditugaskan / checklist diubah selama booking belum selesai atau batal. */
+    public function canBeAssigned(): bool
+    {
+        return in_array($this->status, self::ACTIVE_STATUSES, true);
+    }
+
+    public function isAssignedTo(?User $user): bool
+    {
+        return $user !== null && $this->mechanic_id === $user->id;
+    }
+
+    /**
+     * Salin daftar pekerjaan bawaan layanan bila booking belum punya checklist.
+     */
+    public function copyChecklistFromService(): void
+    {
+        if ($this->tasks()->exists()) {
+            return;
+        }
+
+        foreach ($this->service->checklistItems() as $position => $name) {
+            $this->tasks()->create(['name' => $name, 'position' => $position + 1]);
+        }
+    }
+
+    /**
+     * [jumlah pekerjaan yang sudah ditangani (selesai / dilewati), total pekerjaan].
+     *
+     * @return array{int, int}
+     */
+    public function taskProgress(): array
+    {
+        $this->loadMissing('tasks');
+
+        return [$this->tasks->reject->isPending()->count(), $this->tasks->count()];
+    }
+
+    public function hasPendingTasks(): bool
+    {
+        $this->loadMissing('tasks');
+
+        return $this->tasks->contains->isPending();
+    }
+
+    /**
+     * Mekanik boleh mulai pada tanggal jadwal (sama dengan aturan admin).
+     */
+    public function canBeStarted(): bool
+    {
+        return $this->status === self::STATUS_CONFIRMED && ! $this->preferred_date->isAfter(today());
     }
 
     /**

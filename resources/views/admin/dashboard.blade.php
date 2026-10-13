@@ -7,8 +7,8 @@
     $quickActions = array_filter([
         ['admin.cars.create', 'bi-plus-lg', 'Tambah Mobil', 'btn-accent'],
         ['admin.promos.create', 'bi-percent', 'Tambah Promo', 'btn-outline-primary'],
-        ['admin.reports.index', 'bi-bar-chart', 'Laporan', 'btn-outline-primary'],
-    ], fn (array $action) => Route::has($action[0]));
+        auth()->user()->isOwner() ? ['admin.reports.index', 'bi-bar-chart', 'Laporan', 'btn-outline-primary'] : null,
+    ], fn (?array $action) => $action !== null && Route::has($action[0]));
 @endphp
 
 @section('content')

@@ -200,22 +200,30 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('mobil', AdminCarController::class)
         ->except('show')
         ->parameters(['mobil' => 'car'])
-        ->names('cars');
+        ->names('cars')
+        // Menghapus data master khusus owner; admin cukup menambah & mengubah.
+        ->middlewareFor('destroy', 'role:owner');
 
     Route::resource('merek', BrandController::class)
         ->except('show')
         ->parameters(['merek' => 'brand'])
-        ->names('brands');
+        ->names('brands')
+        // Menghapus data master khusus owner; admin cukup menambah & mengubah.
+        ->middlewareFor('destroy', 'role:owner');
 
     Route::resource('kategori', CategoryController::class)
         ->except('show')
         ->parameters(['kategori' => 'category'])
-        ->names('categories');
+        ->names('categories')
+        // Menghapus data master khusus owner; admin cukup menambah & mengubah.
+        ->middlewareFor('destroy', 'role:owner');
 
     Route::resource('promo', AdminPromoController::class)
         ->except('show')
         ->parameters(['promo' => 'promo'])
-        ->names('promos');
+        ->names('promos')
+        // Menghapus data master khusus owner; admin cukup menambah & mengubah.
+        ->middlewareFor('destroy', 'role:owner');
 
     // Test drive & pengajuan dibuat customer (halaman publik); admin hanya melihat & mengubah status.
     Route::controller(AdminTestDriveController::class)->prefix('test-drive')->name('test-drives.')->group(function () {
@@ -244,12 +252,17 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('layanan', AdminServiceController::class)
         ->except('show')
         ->parameters(['layanan' => 'service'])
-        ->names('services');
+        ->names('services')
+        // Menghapus data master khusus owner; admin cukup menambah & mengubah.
+        ->middlewareFor('destroy', 'role:owner');
 
     Route::controller(AdminServiceBookingController::class)->prefix('servis')->name('service-bookings.')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('{serviceBooking}', 'show')->name('show');
         Route::patch('{serviceBooking}/status', 'updateStatus')->name('update-status');
+        Route::patch('{serviceBooking}/mekanik', 'assignMechanic')->name('assign-mechanic');
+        Route::post('{serviceBooking}/pekerjaan', 'addTask')->name('tasks.store');
+        Route::delete('{serviceBooking}/pekerjaan/{task}', 'removeTask')->scopeBindings()->name('tasks.destroy');
     });
 
     // Moderasi ulasan customer (tampil di beranda setelah disetujui).
@@ -260,9 +273,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     });
 
     // Laporan (hanya baca) + export Excel (rapi) / CSV (data mentah) dengan periode yang sama.
-    Route::get('laporan', [ReportController::class, 'index'])->name('reports.index');
-    Route::get('laporan/export', [ReportController::class, 'export'])->name('reports.export');
-    Route::get('laporan/export/excel', [ReportController::class, 'exportExcel'])->name('reports.export-excel');
+    // Khusus owner: data keuangan & penjualan.
+    Route::middleware('role:owner')->group(function () {
+        Route::get('laporan', [ReportController::class, 'index'])->name('reports.index');
+        Route::get('laporan/export', [ReportController::class, 'export'])->name('reports.export');
+        Route::get('laporan/export/excel', [ReportController::class, 'exportExcel'])->name('reports.export-excel');
+    });
 
     // Hanya baca: hapus user akan ikut menghapus riwayat test drive & pengajuan (cascade).
     Route::resource('pengguna', UserController::class)
@@ -286,5 +302,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
 Route::middleware(['auth', 'role:mechanic'])->prefix('mekanik')->name('mechanic.')->group(function () {
     Route::redirect('/', '/mekanik/pekerjaan')->name('home');
-    Route::get('pekerjaan', [MechanicJobController::class, 'index'])->name('jobs.index');
+    Route::controller(MechanicJobController::class)->prefix('pekerjaan')->name('jobs.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::get('{serviceBooking}', 'show')->name('show');
+        Route::patch('{serviceBooking}/mulai', 'start')->name('start');
+        Route::patch('{serviceBooking}/selesai', 'finish')->name('finish');
+        Route::patch('{serviceBooking}/temuan', 'updateFindings')->name('findings');
+        Route::patch('{serviceBooking}/tugas/{task}', 'updateTask')->scopeBindings()->name('tasks.update');
+    });
 });

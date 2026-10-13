@@ -18,7 +18,7 @@ class ServiceManagementTest extends TestCase
     {
         parent::setUp();
 
-        $this->admin = User::factory()->admin()->create();
+        $this->admin = User::factory()->owner()->create();
     }
 
     private function validData(array $overrides = []): array

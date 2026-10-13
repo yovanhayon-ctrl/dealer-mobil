@@ -91,7 +91,10 @@
                                     <span class="admin-truncate" title="{{ $booking->vehicle_model }}">{{ $booking->vehicle_model }}</span>
                                     <div class="small text-muted text-nowrap">{{ $booking->plate_number }}</div>
                                 </td>
-                                <td><span class="admin-truncate" title="{{ $booking->service->name }}">{{ $booking->service->name }}</span></td>
+                                <td>
+                                    <span class="admin-truncate" title="{{ $booking->service->name }}">{{ $booking->service->name }}</span>
+                                    <div class="small text-muted">{{ $booking->mechanic ? 'Mekanik: '.$booking->mechanic->name : 'Belum ada mekanik' }}</div>
+                                </td>
                                 <td><x-status-badge :status="$booking->status" /></td>
                                 <td class="text-nowrap small d-none d-xxl-table-cell">{{ $booking->created_at->translatedFormat('d M Y') }}</td>
                                 <td class="text-end">

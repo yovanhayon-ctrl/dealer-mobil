@@ -3,7 +3,11 @@
 namespace Tests\Feature\Admin;
 
 use App\Http\Requests\TestDriveRequest;
+use App\Models\Brand;
 use App\Models\Car;
+use App\Models\Category;
+use App\Models\Promo;
+use App\Models\Service;
 use App\Models\TestDrive;
 use App\Models\User;
 use App\Notifications\Admin\AdminActivityNotification;
@@ -62,6 +66,38 @@ class StaffRoleTest extends TestCase
 
         auth()->logout();
         $this->get(route($route))->assertRedirect(route('login'));
+    }
+
+    public function test_admin_tidak_bisa_menghapus_data_master_dan_membuka_laporan(): void
+    {
+        $car = Car::factory()->create();
+        $brand = Brand::factory()->create();
+        $category = Category::factory()->create();
+        $promo = Promo::factory()->create();
+        $service = Service::factory()->create();
+
+        $this->actingAs($this->admin);
+        foreach ([
+            route('admin.cars.destroy', $car), route('admin.brands.destroy', $brand), route('admin.categories.destroy', $category),
+            route('admin.promos.destroy', $promo), route('admin.services.destroy', $service),
+        ] as $url) {
+            $this->delete($url)->assertForbidden();
+        }
+        foreach ([$car, $brand, $category, $promo, $service] as $model) {
+            $this->assertModelExists($model);
+        }
+
+        foreach (['admin.reports.index', 'admin.reports.export', 'admin.reports.export-excel'] as $route) {
+            $this->get(route($route))->assertForbidden();
+        }
+
+        // Admin tetap bisa membuka daftar & form ubah, tanpa tombol hapus.
+        $this->get(route('admin.services.index'))->assertOk()->assertDontSee('data-delete-url', false);
+        $this->get(route('admin.services.edit', $service))->assertOk();
+        $this->get(route('admin.dashboard'))->assertDontSee(route('admin.reports.index'), false);
+
+        // Owner melihat tombol hapus.
+        $this->actingAs($this->owner)->get(route('admin.services.index'))->assertSee('data-delete-url', false);
     }
 
     public function test_login_diarahkan_sesuai_role(): void
