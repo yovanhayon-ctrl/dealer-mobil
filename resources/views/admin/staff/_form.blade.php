@@ -9,7 +9,7 @@
     <div class="col-md-6">
         <x-form.select name="role" label="Role" required :value="old('role', $staff->role)"
                        :options="collect(User::ASSIGNABLE_STAFF_ROLES)->mapWithKeys(fn ($role) => [$role => User::ROLE_LABELS[$role]])->all()"
-                       help="Admin: semua menu admin kecuali Staf. Mekanik: hanya panel Pekerjaan Saya." />
+                       help="Admin: menu admin tanpa Laporan, Staf, dan tombol hapus data master. Mekanik: hanya panel Pekerjaan Saya." />
     </div>
     <div class="col-md-6">
         <x-form.input name="email" type="email" label="Email (untuk login)" :value="$staff->email" required maxlength="255" autocomplete="off" />
