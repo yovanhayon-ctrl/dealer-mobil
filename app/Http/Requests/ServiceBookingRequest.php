@@ -79,6 +79,8 @@ class ServiceBookingRequest extends FormRequest
             'preferred_time' => ['required', 'string', Rule::in(ServiceBooking::TIME_SLOTS)],
             'phone' => ['required', 'regex:'.self::PHONE_REGEX],
             'complaint' => ['nullable', 'string', 'max:'.self::MAX_COMPLAINT_LENGTH],
+            // Opsional: kosong = dipilihkan bengkel. Ketersediaan & jadwal mekanik dicek di BookService::conflicts.
+            'mechanic_id' => ['nullable', 'integer'],
         ];
     }
 
@@ -91,7 +93,7 @@ class ServiceBookingRequest extends FormRequest
     {
         return [
             function (Validator $validator) {
-                if ($validator->errors()->hasAny(['service_id', 'plate_number', 'preferred_date', 'preferred_time'])) {
+                if ($validator->errors()->hasAny(['service_id', 'plate_number', 'preferred_date', 'preferred_time', 'mechanic_id'])) {
                     return;
                 }
 
@@ -101,6 +103,7 @@ class ServiceBookingRequest extends FormRequest
                     $this->string('plate_number')->value(),
                     $this->string('preferred_date')->value(),
                     $this->string('preferred_time')->value(),
+                    $this->filled('mechanic_id') ? $this->integer('mechanic_id') : null,
                 );
 
                 foreach ($conflicts as $field => $message) {
@@ -135,6 +138,7 @@ class ServiceBookingRequest extends FormRequest
             'preferred_time' => 'jam',
             'phone' => 'nomor WhatsApp',
             'complaint' => 'keluhan',
+            'mechanic_id' => 'mekanik',
         ];
     }
 
@@ -172,6 +176,7 @@ class ServiceBookingRequest extends FormRequest
             'vehicle_year' => isset($data['vehicle_year']) ? (int) $data['vehicle_year'] : null,
             'mileage' => isset($data['mileage']) ? (int) $data['mileage'] : null,
             'complaint' => ($data['complaint'] ?? null) ?: null,
+            'mechanic_id' => isset($data['mechanic_id']) ? (int) $data['mechanic_id'] : null,
         ];
     }
 }

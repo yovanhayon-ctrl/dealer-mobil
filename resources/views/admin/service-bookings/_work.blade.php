@@ -46,6 +46,9 @@
                 @unless ($booking->mechanic->isActive())
                     <span class="text-muted">(nonaktif)</span>
                 @endunless
+                @if ($booking->mechanic_chosen_by_customer)
+                    <span class="badge rounded-pill text-bg-light border ms-1">Dipilih customer</span>
+                @endif
             @else
                 <span class="text-muted">belum ditugaskan</span>
             @endif

@@ -67,7 +67,10 @@
                                 @php([$handled, $total] = $booking->taskProgress())
                                 <div class="payment-box small rounded-3 p-3 mt-3">
                                     <div class="d-flex flex-wrap justify-content-between gap-1">
-                                        <span><i class="bi bi-person-gear me-1"></i>Mekanik: <span class="fw-semibold">{{ $booking->mechanic?->name ?? '-' }}</span></span>
+                                        <span>
+                                            <i class="bi bi-person-gear me-1"></i>{{ $booking->isPending() && $booking->mechanic_chosen_by_customer ? 'Mekanik pilihan Anda' : 'Mekanik' }}:
+                                            <span class="fw-semibold">{{ $booking->mechanic?->name ?? '-' }}</span>
+                                        </span>
                                         @if ($total > 0 && $booking->status !== \App\Models\ServiceBooking::STATUS_CANCELLED)
                                             <span class="text-muted">{{ $handled }} dari {{ $total }} pekerjaan ditangani</span>
                                         @endif
