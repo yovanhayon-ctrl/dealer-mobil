@@ -19,7 +19,15 @@ class ServiceBookingActivity extends AdminActivityNotification
 
     protected function description(): string
     {
-        return ServiceBookingStatusChanged::describe($this->record);
+        $description = ServiceBookingStatusChanged::describe($this->record);
+
+        if ($this->record->mechanic_chosen_by_customer) {
+            $this->record->loadMissing('mechanic:id,name');
+        }
+
+        return $this->record->mechanic_chosen_by_customer && $this->record->mechanic
+            ? "{$description} · mekanik pilihan: {$this->record->mechanic->name}"
+            : $description;
     }
 
     protected function routeName(): string

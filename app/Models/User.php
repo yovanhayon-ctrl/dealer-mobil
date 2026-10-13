@@ -6,6 +6,7 @@ namespace App\Models;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Hidden;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
@@ -128,6 +129,16 @@ class User extends Authenticatable
     public function mechanicRatings(): HasMany
     {
         return $this->hasMany(MechanicRating::class, 'mechanic_id');
+    }
+
+    /**
+     * Mekanik aktif (pilihan customer saat booking & penugasan admin).
+     *
+     * @return Builder<self>
+     */
+    public static function activeMechanics(): Builder
+    {
+        return self::query()->where('role', self::ROLE_MECHANIC)->where('is_active', true)->orderBy('name');
     }
 
     /** Servis yang ditugaskan ke akun mekanik. */

@@ -15,7 +15,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 #[Fillable([
     'user_id', 'service_id', 'vehicle_model', 'plate_number', 'vehicle_year', 'mileage',
     'preferred_date', 'preferred_time', 'phone', 'complaint', 'status', 'admin_note',
-    'mechanic_id', 'findings', 'started_at', 'finished_at',
+    'mechanic_id', 'mechanic_chosen_by_customer', 'findings', 'started_at', 'finished_at',
 ])]
 class ServiceBooking extends Model
 {
@@ -75,6 +75,7 @@ class ServiceBooking extends Model
             'preferred_date' => 'date',
             'vehicle_year' => 'integer',
             'mileage' => 'integer',
+            'mechanic_chosen_by_customer' => 'boolean',
             'started_at' => 'datetime',
             'finished_at' => 'datetime',
         ];

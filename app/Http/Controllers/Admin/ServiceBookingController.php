@@ -65,7 +65,7 @@ class ServiceBookingController extends Controller
 
         return view('admin.service-bookings.show', [
             'booking' => $serviceBooking,
-            'mechanics' => User::where('role', User::ROLE_MECHANIC)->where('is_active', true)->orderBy('name')->pluck('name', 'id')->all(),
+            'mechanics' => User::activeMechanics()->pluck('name', 'id')->all(),
         ]);
     }
 
@@ -111,7 +111,11 @@ class ServiceBookingController extends Controller
         }
 
         $mechanic = User::findOrFail($validated['mechanic_id']);
-        $serviceBooking->update(['mechanic_id' => $mechanic->id]);
+        $serviceBooking->update([
+            'mechanic_id' => $mechanic->id,
+            // Diganti admin: bukan lagi pilihan customer.
+            'mechanic_chosen_by_customer' => $serviceBooking->mechanic_chosen_by_customer && $serviceBooking->mechanic_id === $mechanic->id,
+        ]);
         $serviceBooking->copyChecklistFromService();
 
         return $redirect->with('success', "Booking ditugaskan ke {$mechanic->name}. Checklist pekerjaan siap dikerjakan.");

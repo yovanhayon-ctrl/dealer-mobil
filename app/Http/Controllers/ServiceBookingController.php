@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Actions\BookService;
 use App\Http\Requests\ServiceBookingRequest;
 use App\Models\Service;
+use App\Models\User;
 use App\Notifications\Admin\AdminActivityNotification;
 use App\Notifications\Admin\ServiceBookingActivity;
 use Illuminate\Http\RedirectResponse;
@@ -34,6 +35,7 @@ class ServiceBookingController extends Controller
             'isAdmin' => false,
             'services' => $services,
             'selectedService' => is_string($slug) ? $services->firstWhere('slug', $slug) : null,
+            'mechanics' => User::activeMechanics()->pluck('name', 'id')->all(),
             'firstDate' => ServiceBookingRequest::firstDate(),
             'lastDate' => ServiceBookingRequest::lastDate(),
         ]);
@@ -42,7 +44,7 @@ class ServiceBookingController extends Controller
     public function store(ServiceBookingRequest $request, BookService $bookService): RedirectResponse
     {
         $booking = $bookService->handle($request->user(), $request->bookingData());
-        $booking->load('service:id,name');
+        $booking->load(['service:id,name', 'mechanic:id,name']);
         AdminActivityNotification::notifyAdmins(new ServiceBookingActivity($booking));
 
         return redirect()->route('account.service-bookings.index')->with('success', sprintf(
