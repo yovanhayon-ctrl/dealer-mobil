@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Account\FavoriteController;
+use App\Http\Controllers\Account\MechanicRatingController as AccountMechanicRatingController;
 use App\Http\Controllers\Account\NotificationController;
 use App\Http\Controllers\Account\PaymentProofController as AccountPaymentProofController;
 use App\Http\Controllers\Account\ProfileController;
@@ -33,6 +34,7 @@ use App\Http\Controllers\CompareController;
 use App\Http\Controllers\CreditSimulationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Mechanic\JobController as MechanicJobController;
+use App\Http\Controllers\Mechanic\RatingController as MechanicRatingController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\PurchaseRequestController;
@@ -159,6 +161,9 @@ Route::middleware('auth')->group(function () {
 
         Route::get('servis', [AccountServiceBookingController::class, 'index'])->name('service-bookings.index');
         Route::patch('servis/{serviceBooking}/batal', [AccountServiceBookingController::class, 'cancel'])->name('service-bookings.cancel');
+        Route::post('servis/{serviceBooking}/rating', [AccountMechanicRatingController::class, 'store'])
+            ->middleware('throttle:10,1')
+            ->name('mechanic-ratings.store');
 
         Route::get('favorit', [FavoriteController::class, 'index'])->name('favorites.index');
 
@@ -310,4 +315,5 @@ Route::middleware(['auth', 'role:mechanic'])->prefix('mekanik')->name('mechanic.
         Route::patch('{serviceBooking}/temuan', 'updateFindings')->name('findings');
         Route::patch('{serviceBooking}/tugas/{task}', 'updateTask')->scopeBindings()->name('tasks.update');
     });
+    Route::get('rating', [MechanicRatingController::class, 'index'])->name('ratings.index');
 });

@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StaffRequest;
+use App\Models\ServiceBooking;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -21,6 +22,11 @@ class StaffController extends Controller
             ->orderByRaw("CASE role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 ELSE 2 END")
             ->orderByDesc('is_active')
             ->orderBy('name')
+            ->withAvg('mechanicRatings', 'rating')
+            ->withCount([
+                'mechanicRatings',
+                'assignedServiceBookings as completed_jobs_count' => fn ($query) => $query->where('status', ServiceBooking::STATUS_COMPLETED),
+            ])
             ->get(['id', 'name', 'email', 'phone', 'role', 'is_active', 'created_at']);
 
         return view('admin.staff.index', [

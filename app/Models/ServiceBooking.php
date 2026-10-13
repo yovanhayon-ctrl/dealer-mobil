@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 #[Fillable([
     'user_id', 'service_id', 'vehicle_model', 'plate_number', 'vehicle_year', 'mileage',
@@ -108,6 +109,24 @@ class ServiceBooking extends Model
     public function tasks(): HasMany
     {
         return $this->hasMany(ServiceBookingTask::class)->orderBy('position')->orderBy('id');
+    }
+
+    /** Rating customer untuk mekanik booking ini (satu per booking). */
+    public function mechanicRating(): HasOne
+    {
+        return $this->hasOne(MechanicRating::class);
+    }
+
+    /**
+     * Customer pemilik booking boleh memberi rating satu kali setelah servis selesai dikerjakan mekanik.
+     */
+    public function canBeRatedBy(?User $user): bool
+    {
+        return $user !== null
+            && $this->user_id === $user->id
+            && $this->status === self::STATUS_COMPLETED
+            && $this->mechanic_id !== null
+            && ! $this->mechanicRating()->exists();
     }
 
     /** Batas temuan / rekomendasi mekanik. */

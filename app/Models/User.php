@@ -124,6 +124,18 @@ class User extends Authenticatable
         return $this->hasMany(ServiceBooking::class);
     }
 
+    /** Rating yang diterima akun mekanik. */
+    public function mechanicRatings(): HasMany
+    {
+        return $this->hasMany(MechanicRating::class, 'mechanic_id');
+    }
+
+    /** Servis yang ditugaskan ke akun mekanik. */
+    public function assignedServiceBookings(): HasMany
+    {
+        return $this->hasMany(ServiceBooking::class, 'mechanic_id');
+    }
+
     /**
      * Mobil favorit, terbaru ditambahkan lebih dulu.
      */
