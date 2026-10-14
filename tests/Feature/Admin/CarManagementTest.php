@@ -29,7 +29,7 @@ class CarManagementTest extends TestCase
     {
         parent::setUp();
 
-        $this->admin = User::factory()->admin()->create();
+        $this->admin = User::factory()->owner()->create();
         $this->toyota = Brand::factory()->create(['name' => 'Toyota', 'slug' => 'toyota']);
         $this->mpv = Category::factory()->create(['name' => 'MPV', 'slug' => 'mpv']);
     }

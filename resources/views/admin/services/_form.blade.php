@@ -9,6 +9,11 @@
         <x-form.textarea name="description" label="Deskripsi" :value="$service->description" rows="4" maxlength="2000"
                          help="Cakupan pekerjaan dan manfaat layanan. Tampil di halaman Servis." />
     </div>
+    <div class="col-12">
+        <x-form.textarea name="checklist" label="Daftar Pekerjaan Mekanik" :value="$service->checklist" rows="6" maxlength="5000"
+                         placeholder="Contoh: Ganti oli mesin (enter untuk pekerjaan berikutnya)"
+                         help="Satu pekerjaan per baris (maks. 30). Disalin ke booking saat mekanik ditugaskan; admin bisa menambah pekerjaan per booking. Tidak tampil di halaman publik." />
+    </div>
     <div class="col-md-6">
         <x-form.input name="price_from" data-number="thousands" label="Harga Mulai (Rp)"
                       :value="$service->price_from ? number_format($service->price_from, 0, ',', '.') : ''"

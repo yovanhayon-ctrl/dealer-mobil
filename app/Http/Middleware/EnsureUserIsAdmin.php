@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 class EnsureUserIsAdmin
 {
     /**
-     * Hanya user dengan role admin yang boleh lewat; selain itu 403.
+     * Hanya owner & admin yang boleh membuka panel admin; selain itu (customer, mekanik) 403.
      */
     public function handle(Request $request, Closure $next): Response
     {

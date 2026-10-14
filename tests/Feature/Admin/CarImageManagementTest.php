@@ -26,7 +26,7 @@ class CarImageManagementTest extends TestCase
         parent::setUp();
 
         Storage::fake('public');
-        $this->admin = User::factory()->admin()->create();
+        $this->admin = User::factory()->owner()->create();
         $this->car = Car::factory()->create(['name' => 'Avanza', 'year' => 2025]);
     }
 

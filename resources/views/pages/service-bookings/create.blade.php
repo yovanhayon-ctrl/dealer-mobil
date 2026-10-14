@@ -26,7 +26,7 @@
                         <i class="bi bi-exclamation-circle-fill me-2"></i>
                         <div>
                             {{ \App\Http\Requests\ServiceBookingRequest::ADMIN_MESSAGE }}
-                            <a href="{{ route('admin.service-bookings.index') }}" class="alert-link">Kelola booking servis di dashboard admin</a>.
+                            @if (auth()->user()->isAdmin())<a href="{{ route('admin.service-bookings.index') }}" class="alert-link">Kelola booking servis di dashboard admin</a>.@endif
                         </div>
                     </div>
                 @elseif ($services->isEmpty())
@@ -77,6 +77,13 @@
                                         <x-form.select name="preferred_time" label="Jam (WIB)" required placeholder="Pilih jam"
                                                        :options="collect($slots)->mapWithKeys(fn ($time) => [$time => $time.' WIB'])->all()" />
                                     </div>
+                                    @if ($mechanics !== [])
+                                        <div class="col-12">
+                                            <x-form.select name="mechanic_id" label="Mekanik (opsional)" placeholder="Bebas, dipilihkan bengkel"
+                                                           :options="$mechanics"
+                                                           help="Pilih bila ingin dikerjakan mekanik tertentu. Bengkel bisa menggantinya bila mekanik berhalangan." />
+                                        </div>
+                                    @endif
                                 </div>
 
                                 <x-form.input name="phone" data-number="phone" type="tel" label="Nomor WhatsApp" required

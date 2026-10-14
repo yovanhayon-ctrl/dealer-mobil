@@ -2223,6 +2223,75 @@ tr[data-row-link] {
     padding-top: 0;
 }
 
+/* Checklist pekerjaan servis (admin, mekanik, customer). */
+.service-task-list li {
+    display: flex;
+    gap: .6rem;
+    align-items: flex-start;
+    padding: .55rem 0;
+}
+
+.service-task-list li + li {
+    border-top: 1px solid var(--dm-line);
+}
+
+.service-task-list .bi {
+    margin-top: .1rem;
+}
+
+.service-task-list li.is-skipped .service-task-name {
+    color: var(--dm-muted);
+    text-decoration: line-through;
+}
+
+/* Panel mekanik: tombol centang besar agar mudah ditekan dengan tangan kotor / sarung tangan. */
+.mechanic-task {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    align-items: center;
+    padding: .9rem 0;
+}
+
+.mechanic-task + .mechanic-task {
+    border-top: 1px solid var(--dm-line);
+}
+
+.mechanic-task-name {
+    flex: 1 1 14rem;
+    min-width: 0;
+}
+
+.mechanic-task.is-done .mechanic-task-name,
+.mechanic-task.is-skipped .mechanic-task-name {
+    color: var(--dm-muted);
+}
+
+.mechanic-task-actions .btn {
+    min-height: 2.5rem;
+}
+
+/* Rating Saya (mekanik): batang tipis tanpa track, panjang = porsi rating. */
+.rating-share {
+    display: block;
+    height: .4rem;
+}
+
+.rating-share-label {
+    width: 3rem;
+}
+
+.rating-share-count {
+    width: 2rem;
+}
+
+.rating-share span {
+    display: block;
+    height: 100%;
+    border-radius: 999px;
+    background-color: var(--bs-warning);
+}
+
 /* Admin: daftar bukti pembayaran dengan pratinjau kecil (gambar) atau ikon PDF. */
 .admin-proof + .admin-proof {
     margin-top: 1rem;

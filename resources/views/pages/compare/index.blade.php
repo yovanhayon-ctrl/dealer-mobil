@@ -194,7 +194,7 @@
                                                     <i class="bi bi-cart-check"></i>Ajukan
                                                 </a>
                                             @endif
-                                            @if (Route::has('test-drives.create') && $car->canBeTestDriven() && ! auth()->user()?->isAdmin())
+                                            @if (Route::has('test-drives.create') && $car->canBeTestDriven() && ! auth()->user()?->isStaff())
                                                 <a href="{{ route('test-drives.create', ['mobil' => $car->slug]) }}" class="btn btn-outline-primary btn-sm">
                                                     <i class="bi bi-calendar-check"></i>Test Drive
                                                 </a>

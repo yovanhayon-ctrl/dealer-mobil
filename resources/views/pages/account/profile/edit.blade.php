@@ -12,8 +12,8 @@
                     <h2 class="h5 mb-0">{{ $user->name }}</h2>
                     <p class="small text-muted text-break mb-0">{{ $user->email }} · terdaftar sejak {{ $user->created_at->translatedFormat('d F Y') }}</p>
                 </div>
-                <span class="badge rounded-pill {{ $user->isAdmin() ? 'badge-status-dark' : 'badge-status-muted' }}">
-                    {{ $user->isAdmin() ? 'Admin' : 'Customer' }}
+                <span class="badge rounded-pill {{ $user->isStaff() ? 'badge-status-dark' : 'badge-status-muted' }}">
+                    {{ $user->roleLabel() }}
                 </span>
             </div>
         </div>

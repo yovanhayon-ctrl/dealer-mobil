@@ -19,7 +19,7 @@ class CategoryManagementTest extends TestCase
     {
         parent::setUp();
 
-        $this->admin = User::factory()->admin()->create();
+        $this->admin = User::factory()->owner()->create();
     }
 
     public function test_tamu_diarahkan_ke_login(): void

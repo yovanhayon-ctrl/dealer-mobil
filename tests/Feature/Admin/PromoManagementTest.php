@@ -33,7 +33,7 @@ class PromoManagementTest extends TestCase
         $this->travelTo(Carbon::parse('2026-09-26 10:00:00', 'Asia/Jakarta'));
         Storage::fake('public');
 
-        $this->admin = User::factory()->admin()->create();
+        $this->admin = User::factory()->owner()->create();
         $this->car = Car::factory()->create(['name' => 'Avanza', 'year' => 2025, 'price' => 285_000_000]);
     }
 

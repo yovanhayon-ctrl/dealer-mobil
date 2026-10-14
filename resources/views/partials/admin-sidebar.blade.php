@@ -1,5 +1,12 @@
 @php
     // Menu hanya tampil jika route-nya sudah terdaftar (lihat Route::has di bawah).
+    // Mekanik: panel Pekerjaan Saya. Owner: menu admin + Staf.
+    $panelUser = auth()->user();
+    $mechanicMenu = [
+        ['label' => 'Pekerjaan Saya', 'icon' => 'bi-wrench-adjustable', 'route' => 'mechanic.jobs.index', 'active' => 'mechanic.jobs.*'],
+        ['label' => 'Rating Saya', 'icon' => 'bi-star', 'route' => 'mechanic.ratings.index', 'active' => 'mechanic.ratings.*'],
+        ['label' => 'Profil', 'icon' => 'bi-person', 'route' => 'account.profile', 'active' => 'account.profile*'],
+    ];
     $menu = [
         ['label' => 'Dashboard', 'icon' => 'bi-speedometer2', 'route' => 'admin.dashboard', 'active' => 'admin.dashboard'],
         ['label' => 'Notifikasi', 'icon' => 'bi-bell', 'route' => 'admin.notifications.index', 'active' => 'admin.notifications.*', 'badge' => $adminUnreadNotifications ?? 0],
@@ -13,8 +20,16 @@
         ['label' => 'Layanan Servis', 'icon' => 'bi-tools', 'route' => 'admin.services.index', 'active' => 'admin.services.*'],
         ['label' => 'Ulasan', 'icon' => 'bi-star', 'route' => 'admin.testimonials.index', 'active' => 'admin.testimonials.*'],
         ['label' => 'Pengguna', 'icon' => 'bi-people', 'route' => 'admin.users.index', 'active' => 'admin.users.*'],
-        ['label' => 'Laporan', 'icon' => 'bi-bar-chart', 'route' => 'admin.reports.index', 'active' => 'admin.reports.*'],
     ];
+
+    if ($panelUser->isOwner()) {
+        $menu[] = ['label' => 'Laporan', 'icon' => 'bi-bar-chart', 'route' => 'admin.reports.index', 'active' => 'admin.reports.*'];
+        $menu[] = ['label' => 'Staf', 'icon' => 'bi-person-badge', 'route' => 'admin.staff.index', 'active' => 'admin.staff.*'];
+    }
+
+    if ($panelUser->isMechanic()) {
+        $menu = $mechanicMenu;
+    }
 @endphp
 
 <div class="admin-sidebar">
@@ -28,11 +43,11 @@
         </div>
 
         <div class="offcanvas-body flex-column p-3">
-            <a href="{{ route('admin.dashboard') }}" class="d-none d-lg-flex align-items-center gap-2 text-white text-decoration-none fw-bold font-heading fs-5 mb-4 px-2">
+            <a href="{{ $panelUser->homeRoute() }}" class="d-none d-lg-flex align-items-center gap-2 text-white text-decoration-none fw-bold font-heading fs-5 mb-4 px-2">
                 <x-brand-logo :size="36" /> {{ config('dealer.name') }}
             </a>
 
-            <nav class="nav flex-column gap-1" aria-label="Menu admin">
+            <nav class="nav flex-column gap-1" aria-label="{{ $panelUser->isMechanic() ? 'Menu mekanik' : 'Menu admin' }}">
                 @foreach ($menu as $item)
                     @continue(! Route::has($item['route']))
 

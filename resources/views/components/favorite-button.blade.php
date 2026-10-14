@@ -19,7 +19,7 @@
     $showLabel = $variant !== 'icon';
 @endphp
 
-@if (Route::has('favorites.store') && ! $user?->isAdmin())
+@if (Route::has('favorites.store') && ! $user?->isStaff())
     @guest
         <a href="{{ route('login') }}" @class($classes) aria-label="{{ $label }}: {{ $title }}" title="Masuk untuk menyimpan favorit">
             <i class="bi bi-heart"></i>@if ($showLabel){{ $label }}@endif

@@ -3,6 +3,8 @@
 namespace App\Http\Requests\Admin;
 
 use App\Http\Requests\Concerns\NormalizesDigits;
+use App\Models\Service;
+use App\Models\ServiceBookingTask;
 use App\Rules\UniqueIgnoringCase;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
@@ -42,6 +44,22 @@ class ServiceRequest extends FormRequest
                 new UniqueIgnoringCase('services', 'name', $this->route('service')),
             ],
             'description' => ['nullable', 'string', 'max:2000'],
+            // Satu pekerjaan per baris; disalin ke booking saat mekanik ditugaskan.
+            'checklist' => ['nullable', 'string', 'max:5000', function (string $attribute, mixed $value, \Closure $fail) {
+                $items = Service::parseChecklist((string) $value);
+
+                if (count($items) > Service::MAX_CHECKLIST_ITEMS) {
+                    $fail('Daftar pekerjaan maksimal '.Service::MAX_CHECKLIST_ITEMS.' baris.');
+                }
+
+                foreach ($items as $item) {
+                    if (mb_strlen($item) > ServiceBookingTask::MAX_NAME_LENGTH) {
+                        $fail('Setiap pekerjaan maksimal '.ServiceBookingTask::MAX_NAME_LENGTH.' karakter.');
+
+                        return;
+                    }
+                }
+            }],
             // Kosong = harga tidak ditampilkan ("Hubungi dealer").
             'price_from' => ['nullable', 'integer', 'min:1', 'max:999999999999'],
             'duration_minutes' => ['nullable', 'integer', 'min:15', 'max:1440'],
@@ -57,6 +75,7 @@ class ServiceRequest extends FormRequest
         return [
             'name' => 'nama layanan',
             'description' => 'deskripsi',
+            'checklist' => 'daftar pekerjaan',
             'price_from' => 'harga mulai',
             'duration_minutes' => 'estimasi durasi',
         ];
@@ -81,11 +100,13 @@ class ServiceRequest extends FormRequest
      */
     public function serviceData(): array
     {
-        $data = $this->safe()->only(['name', 'description', 'price_from', 'duration_minutes']);
+        $data = $this->safe()->only(['name', 'description', 'checklist', 'price_from', 'duration_minutes']);
+        $checklist = Service::parseChecklist((string) ($data['checklist'] ?? ''));
 
         return [
             'name' => $data['name'],
             'description' => $data['description'] ?? null,
+            'checklist' => $checklist === [] ? null : implode("\n", $checklist),
             'price_from' => $data['price_from'] ?? null,
             'duration_minutes' => $data['duration_minutes'] ?? null,
             'is_active' => $this->boolean('is_active'),

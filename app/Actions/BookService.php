@@ -11,8 +11,9 @@ use Illuminate\Validation\ValidationException;
 /**
  * Booking servis oleh customer (JAF Service).
  *
- * Aturan: layanan aktif, satu plat nomor hanya punya satu booking aktif, dan jumlah booking aktif
- * per slot (tanggal + jam) tidak melebihi kapasitas bengkel (config dealer.service_slot_capacity).
+ * Aturan: layanan aktif, satu plat nomor hanya punya satu booking aktif, jumlah booking aktif
+ * per slot (tanggal + jam) tidak melebihi kapasitas bengkel (config dealer.service_slot_capacity),
+ * dan mekanik pilihan customer (opsional) hanya punya satu booking aktif per slot.
  * Aturan dicek di ServiceBookingRequest (pesan ramah) lalu dicek ulang di sini dalam transaksi:
  * baris layanan dikunci dan pembacaan slot/plat memakai lockForUpdate, sehingga dua booking
  * bersamaan tidak lolos keduanya.
@@ -20,7 +21,7 @@ use Illuminate\Validation\ValidationException;
 class BookService
 {
     /**
-     * @param  array{service_id: int|string, vehicle_model: string, plate_number: string, vehicle_year: ?int, mileage: ?int, preferred_date: string, preferred_time: string, phone: string, complaint: ?string}  $data
+     * @param  array{service_id: int|string, vehicle_model: string, plate_number: string, vehicle_year: ?int, mileage: ?int, preferred_date: string, preferred_time: string, phone: string, complaint: ?string, mechanic_id?: ?int}  $data
      *
      * @throws ValidationException jika aturan booking dilanggar
      */
@@ -29,13 +30,14 @@ class BookService
         return DB::transaction(function () use ($user, $data) {
             $service = Service::whereKey($data['service_id'])->lockForUpdate()->firstOrFail();
 
-            $errors = $this->conflicts($user, $service, $data['plate_number'], $data['preferred_date'], $data['preferred_time'], lock: true);
+            $mechanicId = isset($data['mechanic_id']) ? (int) $data['mechanic_id'] : null;
+            $errors = $this->conflicts($user, $service, $data['plate_number'], $data['preferred_date'], $data['preferred_time'], $mechanicId, lock: true);
 
             if ($errors !== []) {
                 throw ValidationException::withMessages($errors);
             }
 
-            return ServiceBooking::create([
+            $booking = ServiceBooking::create([
                 'user_id' => $user->id,
                 'service_id' => $service->id,
                 'vehicle_model' => $data['vehicle_model'],
@@ -47,7 +49,17 @@ class BookService
                 'phone' => $data['phone'],
                 'complaint' => ($data['complaint'] ?? null) ?: null,
                 'status' => ServiceBooking::STATUS_PENDING,
+                'mechanic_id' => $mechanicId,
+                'mechanic_chosen_by_customer' => $mechanicId !== null,
             ]);
+
+            // Mekanik pilihan customer: checklist layanan langsung disalin (sama seperti penugasan admin).
+            if ($mechanicId !== null) {
+                $booking->setRelation('service', $service);
+                $booking->copyChecklistFromService();
+            }
+
+            return $booking;
         });
     }
 
@@ -56,7 +68,7 @@ class BookService
      *
      * @return array<string, string>
      */
-    public function conflicts(User $user, Service $service, string $plate, string $date, string $time, bool $lock = false): array
+    public function conflicts(User $user, Service $service, string $plate, string $date, string $time, ?int $mechanicId = null, bool $lock = false): array
     {
         if (! $service->is_active) {
             return ['service_id' => 'Layanan ini sedang tidak tersedia. Silakan pilih layanan lain.'];
@@ -87,6 +99,26 @@ class BookService
 
         if ($booked >= ServiceBooking::slotCapacity()) {
             return ['preferred_time' => 'Slot bengkel pada jam ini sudah penuh, silakan pilih jam atau tanggal lain.'];
+        }
+
+        if ($mechanicId !== null) {
+            $mechanic = User::activeMechanics()->whereKey($mechanicId)->first(['id', 'name']);
+
+            if (! $mechanic) {
+                return ['mechanic_id' => 'Mekanik ini tidak tersedia. Pilih mekanik lain atau biarkan dipilihkan bengkel.'];
+            }
+
+            $mechanicBusy = ServiceBooking::query()
+                ->active()
+                ->where('mechanic_id', $mechanicId)
+                ->whereDate('preferred_date', $date)
+                ->whereTime('preferred_time', '=', "{$time}:00")
+                ->when($lock, fn ($query) => $query->lockForUpdate())
+                ->exists();
+
+            if ($mechanicBusy) {
+                return ['mechanic_id' => "{$mechanic->name} sudah ada jadwal di jam itu. Pilih jam lain atau mekanik lain."];
+            }
         }
 
         return [];

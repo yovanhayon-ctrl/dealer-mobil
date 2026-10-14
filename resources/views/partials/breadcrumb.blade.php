@@ -6,7 +6,10 @@
     "Dashboard" selalu menjadi item pertama; item terakhir tanpa link.
 --}}
 @php
-    $items = array_merge([['label' => 'Dashboard', 'url' => route('admin.dashboard')]], $items ?? []);
+    $root = auth()->user()?->isMechanic()
+        ? ['label' => 'Pekerjaan Saya', 'url' => route('mechanic.jobs.index')]
+        : ['label' => 'Dashboard', 'url' => route('admin.dashboard')];
+    $items = array_merge([$root], $items ?? []);
 @endphp
 
 <nav aria-label="breadcrumb" class="mb-3">
