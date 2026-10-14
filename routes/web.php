@@ -213,15 +213,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->except('show')
         ->parameters(['merek' => 'brand'])
         ->names('brands')
-        // Menghapus data master khusus owner; admin cukup menambah & mengubah.
-        ->middlewareFor('destroy', 'role:owner');
+        // Merek jarang berubah tapi memengaruhi filter katalog: seluruhnya khusus owner.
+        ->middleware('role:owner');
 
     Route::resource('kategori', CategoryController::class)
         ->except('show')
         ->parameters(['kategori' => 'category'])
         ->names('categories')
-        // Menghapus data master khusus owner; admin cukup menambah & mengubah.
-        ->middlewareFor('destroy', 'role:owner');
+        // Kategori jarang berubah tapi memengaruhi filter katalog: seluruhnya khusus owner.
+        ->middleware('role:owner');
 
     Route::resource('promo', AdminPromoController::class)
         ->except('show')
