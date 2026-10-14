@@ -497,7 +497,7 @@ Wajib saat production (Phase 19):
 
 - **Demo lokal / presentasi:** [docs/DEMO.md](docs/DEMO.md) — persiapan, akun demo, alur demo ±15 menit, dan solusi masalah saat demo.
 - **Shared hosting (cPanel):** [docs/DEPLOY-CPANEL.md](docs/DEPLOY-CPANEL.md) — syarat hosting (**PHP ≥ 8.4**), upload, document root, database, `.env` production, HTTPS, dan pembaruan.
-- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md), [docs/RELEASE-v1.1.0.md](docs/RELEASE-v1.1.0.md), [docs/RELEASE-v1.2.0.md](docs/RELEASE-v1.2.0.md), [docs/RELEASE-v1.3.0.md](docs/RELEASE-v1.3.0.md), [docs/RELEASE-v1.4.0.md](docs/RELEASE-v1.4.0.md), [docs/RELEASE-v1.5.0.md](docs/RELEASE-v1.5.0.md), [docs/RELEASE-v1.6.0.md](docs/RELEASE-v1.6.0.md), [docs/RELEASE-v1.7.0.md](docs/RELEASE-v1.7.0.md), [docs/RELEASE-v1.7.1.md](docs/RELEASE-v1.7.1.md), [docs/RELEASE-v1.7.2.md](docs/RELEASE-v1.7.2.md), [docs/RELEASE-v1.7.3.md](docs/RELEASE-v1.7.3.md), [docs/RELEASE-v1.8.0.md](docs/RELEASE-v1.8.0.md), [docs/RELEASE-v1.9.0.md](docs/RELEASE-v1.9.0.md), [docs/RELEASE-v1.10.0.md](docs/RELEASE-v1.10.0.md), [docs/RELEASE-v1.11.0.md](docs/RELEASE-v1.11.0.md), [docs/RELEASE-v1.11.1.md](docs/RELEASE-v1.11.1.md).
+- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md), [docs/RELEASE-v1.1.0.md](docs/RELEASE-v1.1.0.md), [docs/RELEASE-v1.2.0.md](docs/RELEASE-v1.2.0.md), [docs/RELEASE-v1.3.0.md](docs/RELEASE-v1.3.0.md), [docs/RELEASE-v1.4.0.md](docs/RELEASE-v1.4.0.md), [docs/RELEASE-v1.5.0.md](docs/RELEASE-v1.5.0.md), [docs/RELEASE-v1.6.0.md](docs/RELEASE-v1.6.0.md), [docs/RELEASE-v1.7.0.md](docs/RELEASE-v1.7.0.md), [docs/RELEASE-v1.7.1.md](docs/RELEASE-v1.7.1.md), [docs/RELEASE-v1.7.2.md](docs/RELEASE-v1.7.2.md), [docs/RELEASE-v1.7.3.md](docs/RELEASE-v1.7.3.md), [docs/RELEASE-v1.8.0.md](docs/RELEASE-v1.8.0.md), [docs/RELEASE-v1.9.0.md](docs/RELEASE-v1.9.0.md), [docs/RELEASE-v1.10.0.md](docs/RELEASE-v1.10.0.md), [docs/RELEASE-v1.11.0.md](docs/RELEASE-v1.11.0.md), [docs/RELEASE-v1.11.1.md](docs/RELEASE-v1.11.1.md), [docs/RELEASE-v1.11.2.md](docs/RELEASE-v1.11.2.md).
 
 ## Performa
 
@@ -560,6 +560,7 @@ php artisan optimize
 | +     | Rilis v1.10.0                  | ✅ Selesai (isian harga, kilometer, tahun, nomor WhatsApp hanya angka di publik & admin; 842 test) |
 | +     | Rilis v1.11.0                  | ✅ Selesai (bukti & status pembayaran, bayar di showroom, role owner/admin/mekanik, checklist & rating mekanik; 951 test) |
 | +     | Rilis v1.11.1                  | ✅ Selesai (dealer khusus Nissan, kategori SUV/MPV/Hatchback/Pickup/Sport/EV, info halaman admin dirapikan; 954 test) |
+| +     | Rilis v1.11.2                  | ✅ Selesai (kelola Merek & Kategori khusus owner; 960 test) |
 
 > **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`. Promo berjalan tampil di `/promo` (filter Semua/Khusus Mobil/Promo Umum) dan detailnya di `/promo/{slug}`. Simulasi kredit bunga flat di `/simulasi-kredit` (tanpa login; pilih mobil atau isi harga, DP, tenor). Customer mengajukan pembelian cash/kredit di `/mobil/{slug}/ajukan` (hasil simulasi bisa ikut terbawa) dan memantau/membatalkan di `/akun/pengajuan`. Halaman `/tentang-kami` dan `/kontak` (alamat, telepon, WhatsApp, email, jam operasional, Google Maps) membaca data dealer dari `.env` (`DEALER_*`). Setiap akun bisa mengubah data diri dan kata sandi di `/akun/profil`.
 
@@ -595,12 +596,14 @@ php artisan optimize
 
 > **Rilis v1.11.1:** JAF Dealer khusus Nissan (data awal 1 merek & 14 mobil Nissan; filter dan kartu merek otomatis disembunyikan selama hanya ada satu merek), kategori SUV, MPV, Hatchback, Pickup, Sport, dan EV (Sedan dihapus), serta info halaman admin tidak tampil bila data cuma satu halaman. Tidak ada migration atau `.env` baru; data lama di hosting disesuaikan lewat admin (lihat catatan rilis). Detail: [docs/RELEASE-v1.11.1.md](docs/RELEASE-v1.11.1.md).
 
+> **Rilis v1.11.2:** menu **Merek** dan **Kategori** khusus owner (admin tidak melihat menunya dan mendapat 403); admin tetap mengelola mobil, promo, dan layanan. Tidak ada migration atau `.env` baru. Detail: [docs/RELEASE-v1.11.2.md](docs/RELEASE-v1.11.2.md).
+
 > **Urutan kerja:** semua halaman **admin** dikerjakan dulu (sudah selesai), lalu halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 
 ### Keputusan desain
 
 - Customer **wajib login** untuk booking test drive dan mengajukan pembelian.
-- Identitas **JAF Dealer, Nissan Heritage & Performance**: dealer khusus Nissan (baru & heritage). Filter dan pintasan merek otomatis disembunyikan selama mobil aktif hanya dari satu merek; menu Merek di admin tetap ada bila kelak menambah merek lain.
+- Identitas **JAF Dealer, Nissan Heritage & Performance**: dealer khusus Nissan (baru & heritage). Filter dan pintasan merek otomatis disembunyikan selama mobil aktif hanya dari satu merek; menu Merek di admin (khusus owner) tetap ada bila kelak menambah merek lain.
 - Dealer menjual mobil **baru dan bekas**.
 - Simulasi kredit hanya berupa perhitungan (tanpa tabel). Hasilnya disimpan ke pengajuan pembelian.
 - Kontak dealer melalui WhatsApp dan halaman kontak.
