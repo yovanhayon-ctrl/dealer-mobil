@@ -107,6 +107,10 @@ DEALER_PHONE="…"
 DEALER_WHATSAPP=62…
 DEALER_EMAIL=…
 DEALER_HOURS="Senin-Sabtu 08.00-17.00 WIB"
+# Rekening resmi dealer (tampil untuk customer setelah pengajuan disetujui)
+DEALER_BANK_NAME="BCA"
+DEALER_BANK_ACCOUNT="…"
+DEALER_BANK_HOLDER="PT …"
 DEALER_MAPS_EMBED_URL="https://www.google.com/maps/embed?pb=…"
 
 ADMIN_EMAIL=admin@domain-anda.com
@@ -130,6 +134,7 @@ php -v
 php artisan key:generate --force
 php artisan migrate --force
 php artisan db:seed --force
+php artisan user:make-owner email-admin@dealer.com
 php artisan storage:link
 php artisan optimize
 ```
@@ -137,6 +142,7 @@ php artisan optimize
 - `db:seed --force` di production membuat: akun admin (dari `ADMIN_EMAIL`/`ADMIN_PASSWORD`), merek, kategori, 21 mobil contoh, 5 promo, dan 6 layanan servis. Data dummy customer, transaksi, dan ulasan contoh **tidak** dibuat (hanya local/testing), sehingga bagian *Kata Pelanggan* di beranda baru muncul setelah ada ulasan customer sungguhan yang disetujui admin. Lewati perintah ini bila ingin mengisi data sendiri lewat admin (akun admin tetap dibutuhkan: jalankan `php artisan db:seed --class=AdminUserSeeder --force`).
 - Opsi B (`public_html`): perintah `artisan` di terminal **tidak** membaca `public_html/index.php`, jadi `storage:link` membuat tautan di `dealer-mobil/public/storage` (tidak dipakai). Buat tautan untuk `public_html` secara manual:
   `ln -s ~/dealer-mobil/storage/app/public ~/public_html/storage`
+- `user:make-owner` menjadikan akun admin dari `ADMIN_EMAIL` sebagai **owner** (pemilik dealer). Hanya owner yang bisa membuka Laporan dan menu **Staf** untuk membuat akun admin dan mekanik.
 - Izin folder (bila muncul error "Permission denied"): `chmod -R 775 storage bootstrap/cache`.
 
 ## 8. HTTPS
@@ -171,9 +177,10 @@ Header keamanan (CSP, HSTS saat HTTPS, dll.) sudah dipasang aplikasi; aturan cac
 
 ## 11. Memperbarui aplikasi (rilis berikutnya)
 
-1. Siapkan paket baru seperti bagian 2 dan upload/ekstrak menimpa folder `dealer-mobil` (**jangan** menimpa `.env` dan `storage/app/public`). Folder `vendor` ikut diganti, sehingga dependency baru (mis. dompdf di v1.4.0) ikut terpasang. Bila memakai Terminal dengan `composer`, boleh juga `composer install --no-dev --optimize-autoloader` di server.
+1. Siapkan paket baru seperti bagian 2 dan upload/ekstrak menimpa folder `dealer-mobil` (**jangan** menimpa `.env`, `storage/app/public`, dan `storage/app/private` yang berisi bukti pembayaran customer). Folder `vendor` ikut diganti, sehingga dependency baru (mis. dompdf di v1.4.0) ikut terpasang. Bila memakai Terminal dengan `composer`, boleh juga `composer install --no-dev --optimize-autoloader` di server.
 2. Di Terminal: `cd ~/dealer-mobil && php artisan down && php artisan migrate --force && php artisan optimize && php artisan up`.
 3. Opsi B: salin ulang isi `dealer-mobil/public` ke `public_html` (kecuali `index.php` yang sudah diedit).
+4. Ikuti langkah khusus di catatan rilis versi tersebut. Contoh v1.11.0: `php artisan user:make-owner email-admin@dealer.com` dan isi `DEALER_BANK_*` di `.env` (lihat [RELEASE-v1.11.0.md](RELEASE-v1.11.0.md)).
 
 ## 12. Masalah umum
 
@@ -187,6 +194,8 @@ Header keamanan (CSP, HSTS saat HTTPS, dll.) sudah dipasang aplikasi; aturan cac
 | **Cetak PDF** error *Class "Dompdf\Dompdf" not found* | Folder `vendor` lama → upload paket baru (bagian 2) atau `composer install --no-dev`. |
 | **Export Excel** error *Class "PhpOffice\PhpSpreadsheet\..." not found* atau file gagal dibuat | Folder `vendor` lama → upload paket baru / `composer install --no-dev`; pastikan ekstensi PHP `zip` dan `xml` aktif. |
 | Isian harga/kilometer tidak otomatis bertitik ribuan, huruf masih bisa diketik | File `public/js/number-input.js` belum terunggah → upload paket terbaru (server tetap menolak isian berhuruf). |
+| Menu **Laporan** / **Staf** tidak ada, semua akun staf mendapat 403 | Belum ada owner → `php artisan user:make-owner email-admin@dealer.com`. |
+| Bukti pembayaran gagal diunggah / tidak bisa dibuka | Folder `storage/app/private` harus bisa ditulis (`chmod -R 775 storage`) dan ikut dicadangkan; batas upload sama dengan foto (≥ 8M). |
 | Upload foto gagal / halaman error saat mengunggah | Batas `upload_max_filesize` / `post_max_size` hosting terlalu kecil → naikkan (lihat bagian 1). Foto lama: jalankan `php artisan cars:optimize-images` sekali. |
 | **Cetak PDF** error terkait `DOMDocument` | Ekstensi PHP `dom` belum aktif → cPanel → *Select PHP Version* → *Extensions* → centang `dom`. |
 | Email notifikasi tidak terkirim / aksi lambat | `MAIL_*` salah atau port SMTP diblokir hosting → cek `laravel.log`, perbaiki lalu `php artisan optimize`, atau sementara `DEALER_MAIL_NOTIFICATIONS=false`. |
