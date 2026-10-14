@@ -296,7 +296,8 @@ ADMIN_PASSWORD=isi-kata-sandi-admin
 SEED_CUSTOMER_PASSWORD=isi-kata-sandi-customer-dummy
 ```
 
-- `ADMIN_EMAIL` & `ADMIN_PASSWORD` wajib diisi sebelum `php artisan db:seed` (akun admin pertama).
+- `ADMIN_EMAIL` & `ADMIN_PASSWORD` wajib diisi sebelum `php artisan db:seed` (akun admin pertama). Setelah itu jadikan akun ini **owner** dengan `php artisan user:make-owner admin@dealer.test`; owner yang membuat akun admin dan mekanik lain di menu **Admin > Staf**.
+- `DEALER_BANK_NAME`, `DEALER_BANK_ACCOUNT`, `DEALER_BANK_HOLDER` (opsional): rekening resmi dealer yang tampil untuk customer setelah pengajuan disetujui.
 - `SEED_CUSTOMER_PASSWORD` opsional, hanya untuk laptop masing-masing (local). Dipakai sebagai kata sandi 8 customer dummy `@example.test`. Jika kosong, customer dummy (dan test drive/pengajuan dummy) tidak dibuat. Jangan pernah diisi di server production (di production seeder ini selalu dilewati).
 
 > - Jangan ada spasi setelah tanda `=`.
@@ -496,7 +497,7 @@ Wajib saat production (Phase 19):
 
 - **Demo lokal / presentasi:** [docs/DEMO.md](docs/DEMO.md) — persiapan, akun demo, alur demo ±15 menit, dan solusi masalah saat demo.
 - **Shared hosting (cPanel):** [docs/DEPLOY-CPANEL.md](docs/DEPLOY-CPANEL.md) — syarat hosting (**PHP ≥ 8.4**), upload, document root, database, `.env` production, HTTPS, dan pembaruan.
-- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md), [docs/RELEASE-v1.1.0.md](docs/RELEASE-v1.1.0.md), [docs/RELEASE-v1.2.0.md](docs/RELEASE-v1.2.0.md), [docs/RELEASE-v1.3.0.md](docs/RELEASE-v1.3.0.md), [docs/RELEASE-v1.4.0.md](docs/RELEASE-v1.4.0.md), [docs/RELEASE-v1.5.0.md](docs/RELEASE-v1.5.0.md), [docs/RELEASE-v1.6.0.md](docs/RELEASE-v1.6.0.md), [docs/RELEASE-v1.7.0.md](docs/RELEASE-v1.7.0.md), [docs/RELEASE-v1.7.1.md](docs/RELEASE-v1.7.1.md), [docs/RELEASE-v1.7.2.md](docs/RELEASE-v1.7.2.md), [docs/RELEASE-v1.7.3.md](docs/RELEASE-v1.7.3.md), [docs/RELEASE-v1.8.0.md](docs/RELEASE-v1.8.0.md), [docs/RELEASE-v1.9.0.md](docs/RELEASE-v1.9.0.md), [docs/RELEASE-v1.10.0.md](docs/RELEASE-v1.10.0.md).
+- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md), [docs/RELEASE-v1.1.0.md](docs/RELEASE-v1.1.0.md), [docs/RELEASE-v1.2.0.md](docs/RELEASE-v1.2.0.md), [docs/RELEASE-v1.3.0.md](docs/RELEASE-v1.3.0.md), [docs/RELEASE-v1.4.0.md](docs/RELEASE-v1.4.0.md), [docs/RELEASE-v1.5.0.md](docs/RELEASE-v1.5.0.md), [docs/RELEASE-v1.6.0.md](docs/RELEASE-v1.6.0.md), [docs/RELEASE-v1.7.0.md](docs/RELEASE-v1.7.0.md), [docs/RELEASE-v1.7.1.md](docs/RELEASE-v1.7.1.md), [docs/RELEASE-v1.7.2.md](docs/RELEASE-v1.7.2.md), [docs/RELEASE-v1.7.3.md](docs/RELEASE-v1.7.3.md), [docs/RELEASE-v1.8.0.md](docs/RELEASE-v1.8.0.md), [docs/RELEASE-v1.9.0.md](docs/RELEASE-v1.9.0.md), [docs/RELEASE-v1.10.0.md](docs/RELEASE-v1.10.0.md), [docs/RELEASE-v1.11.0.md](docs/RELEASE-v1.11.0.md).
 
 ## Performa
 
@@ -557,6 +558,7 @@ php artisan optimize
 | +     | Rilis v1.8.0                   | ✅ Selesai (banner promo otomatis WebP lebar maks. 1600 px, batas upload 8 MB; 818 test) |
 | +     | Rilis v1.9.0                   | ✅ Selesai (mode terang/gelap halaman publik & akun, export laporan Excel rapi; 824 test) |
 | +     | Rilis v1.10.0                  | ✅ Selesai (isian harga, kilometer, tahun, nomor WhatsApp hanya angka di publik & admin; 842 test) |
+| +     | Rilis v1.11.0                  | ✅ Selesai (bukti & status pembayaran, bayar di showroom, role owner/admin/mekanik, checklist & rating mekanik; 951 test) |
 
 > **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`. Promo berjalan tampil di `/promo` (filter Semua/Khusus Mobil/Promo Umum) dan detailnya di `/promo/{slug}`. Simulasi kredit bunga flat di `/simulasi-kredit` (tanpa login; pilih mobil atau isi harga, DP, tenor). Customer mengajukan pembelian cash/kredit di `/mobil/{slug}/ajukan` (hasil simulasi bisa ikut terbawa) dan memantau/membatalkan di `/akun/pengajuan`. Halaman `/tentang-kami` dan `/kontak` (alamat, telepon, WhatsApp, email, jam operasional, Google Maps) membaca data dealer dari `.env` (`DEALER_*`). Setiap akun bisa mengubah data diri dan kata sandi di `/akun/profil`.
 
@@ -588,6 +590,8 @@ php artisan optimize
 
 > **Rilis v1.10.0:** isian angka (harga, DP, diskon, kilometer, tahun, stok, durasi, nomor WhatsApp) hanya menerima angka: browser mencegah huruf sejak diketik (titik ribuan otomatis), server menolak isian seperti `45rb` dengan pesan "… hanya boleh berisi angka." Tidak ada dependency, migration, atau `.env` baru. Detail: [docs/RELEASE-v1.10.0.md](docs/RELEASE-v1.10.0.md).
 
+> **Rilis v1.11.0:** pembayaran pengajuan (bukti transfer diverifikasi admin, status Belum dibayar/Sebagian/Lunas otomatis, bayar di showroom), role **owner** (Laporan, Staf, hapus data master), **admin** (operasional), dan **mekanik** (panel Pekerjaan Saya dengan checklist per layanan), rating mekanik dari customer, serta pilih mekanik saat booking servis. Setelah pull **wajib** `php artisan migrate` (6 migration) dan `php artisan user:make-owner email`; isi `DEALER_BANK_*` di `.env`. Detail: [docs/RELEASE-v1.11.0.md](docs/RELEASE-v1.11.0.md).
+
 > **Urutan kerja:** semua halaman **admin** dikerjakan dulu (sudah selesai), lalu halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 
 ### Keputusan desain
@@ -603,7 +607,7 @@ php artisan optimize
 
 | Tabel               | Fungsi                                            |
 | ------------------- | ------------------------------------------------- |
-| `users`             | Admin & customer (kolom `role`, `phone`)          |
+| `users`             | Owner, admin, mekanik & customer (`role`, `phone`, `is_active`) |
 | `brands`            | Merek mobil                                       |
 | `categories`        | Jenis mobil (SUV, MPV, Sedan, dan lain-lain)      |
 | `cars`              | Data mobil (baru/bekas, harga, spesifikasi, stok) |
@@ -612,7 +616,10 @@ php artisan optimize
 | `test_drives`       | Booking test drive                                |
 | `purchase_requests` | Pengajuan pembelian cash/kredit                   |
 | `services`          | Master layanan JAF Service                        |
-| `service_bookings`  | Booking servis customer                           |
+| `service_bookings`  | Booking servis customer (+ mekanik, temuan)       |
+| `service_booking_tasks` | Checklist pekerjaan mekanik per booking       |
+| `mechanic_ratings`  | Rating mekanik dari customer                      |
+| `payment_proofs`    | Bukti pembayaran & pembayaran di showroom         |
 
 ## Alur Kerja Git (Kerja Tim)
 
