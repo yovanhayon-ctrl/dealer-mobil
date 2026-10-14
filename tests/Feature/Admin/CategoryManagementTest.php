@@ -167,9 +167,9 @@ class CategoryManagementTest extends TestCase
         $this->seed(CategorySeeder::class);
         $this->seed(CategorySeeder::class);
 
-        // Kategori mobil Nissan: SUV, MPV, Hatchback, Pickup, Mobil Sport, EV (tanpa Sedan).
-        $this->assertEqualsCanonicalizing(['SUV', 'MPV', 'Hatchback', 'Pickup', 'Mobil Sport', 'EV'], Category::pluck('name')->all());
-        $this->assertDatabaseHas('categories', ['name' => 'Mobil Sport', 'slug' => 'mobil-sport']);
+        // Kategori mobil Nissan: SUV, MPV, Hatchback, Pickup, Sport, EV (tanpa Sedan).
+        $this->assertEqualsCanonicalizing(['SUV', 'MPV', 'Hatchback', 'Pickup', 'Sport', 'EV'], Category::pluck('name')->all());
+        $this->assertDatabaseHas('categories', ['name' => 'Sport', 'slug' => 'sport']);
         $this->assertDatabaseHas('categories', ['name' => 'EV', 'slug' => 'ev']);
         $this->assertDatabaseMissing('categories', ['name' => 'Sedan']);
     }
