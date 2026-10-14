@@ -4,8 +4,10 @@
     @include('partials.head', ['noindex' => true, 'forceLight' => true])
 </head>
 <body class="admin-body">
-    {{-- Dihitung sekali; dipakai lonceng topbar & menu sidebar. --}}
-    @php($adminUnreadNotifications = Route::has('admin.notifications.index') ? auth()->user()->unreadNotifications()->count() : 0)
+    {{-- Layout panel staf: owner & admin (panel admin) dan mekanik (Pekerjaan Saya). --}}
+    @php($panelUser = auth()->user())
+    {{-- Dihitung sekali; dipakai lonceng topbar & menu sidebar (hanya panel admin). --}}
+    @php($adminUnreadNotifications = $panelUser->isAdmin() && Route::has('admin.notifications.index') ? $panelUser->unreadNotifications()->count() : 0)
 
     <div class="admin-wrapper">
         @include('partials.admin-sidebar')
@@ -19,10 +21,10 @@
                         <i class="bi bi-list fs-4 m-0"></i>
                     </button>
 
-                    <h1 class="h5 mb-0 text-truncate">@yield('title', 'Admin')</h1>
+                    <h1 class="h5 mb-0 text-truncate">@yield('title', $panelUser->isAdmin() ? 'Admin' : 'Pekerjaan Saya')</h1>
 
                     <div class="d-flex align-items-center gap-2 gap-sm-3 ms-auto">
-                        @if (Route::has('admin.notifications.index'))
+                        @if ($panelUser->isAdmin() && Route::has('admin.notifications.index'))
                             <a href="{{ route('admin.notifications.index') }}"
                                @class(['btn btn-sm btn-outline-secondary notification-bell', 'active' => request()->routeIs('admin.notifications.*')])
                                aria-label="Notifikasi{{ $adminUnreadNotifications ? ", {$adminUnreadNotifications} belum dibaca" : '' }}">
@@ -36,7 +38,7 @@
                             <i class="bi bi-box-arrow-up-right"></i><span class="d-none d-md-inline">Lihat Website</span>
                         </a>
                         <span class="text-muted small d-none d-sm-inline text-truncate admin-user-name">
-                            <i class="bi bi-person-circle"></i> {{ auth()->user()->name }}
+                            <i class="bi bi-person-circle"></i> {{ $panelUser->name }} ({{ $panelUser->roleLabel() }})
                         </span>
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf

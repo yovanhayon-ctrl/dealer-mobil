@@ -62,6 +62,91 @@
                                 </div>
                             @endif
 
+                            {{-- Mekanik, progres checklist, dan temuan setelah booking dikonfirmasi. --}}
+                            @if ($booking->mechanic || $booking->findings)
+                                @php([$handled, $total] = $booking->taskProgress())
+                                <div class="payment-box small rounded-3 p-3 mt-3">
+                                    <div class="d-flex flex-wrap justify-content-between gap-1">
+                                        <span>
+                                            <i class="bi bi-person-gear me-1"></i>{{ $booking->isPending() && $booking->mechanic_chosen_by_customer ? 'Mekanik pilihan Anda' : 'Mekanik' }}:
+                                            <span class="fw-semibold">{{ $booking->mechanic?->name ?? '-' }}</span>
+                                        </span>
+                                        @if ($total > 0 && $booking->status !== \App\Models\ServiceBooking::STATUS_CANCELLED)
+                                            <span class="text-muted">{{ $handled }} dari {{ $total }} pekerjaan ditangani</span>
+                                        @endif
+                                    </div>
+                                    @if ($booking->findings)
+                                        <p class="mb-0 mt-2"><span class="fw-semibold">Temuan mekanik:</span> {{ $booking->findings }}</p>
+                                    @endif
+                                    @if ($total > 0 && in_array($booking->status, [\App\Models\ServiceBooking::STATUS_IN_PROGRESS, \App\Models\ServiceBooking::STATUS_COMPLETED], true))
+                                        <details class="mt-2">
+                                            <summary>Lihat pekerjaan</summary>
+                                            <ul class="service-task-list list-unstyled mb-0 mt-1">
+                                                @foreach ($booking->tasks as $task)
+                                                    <li @class(['is-done' => $task->isDone(), 'is-skipped' => $task->isSkipped()])>
+                                                        <i @class([
+                                                            'bi',
+                                                            'bi-check-circle-fill text-success' => $task->isDone(),
+                                                            'bi-dash-circle text-muted' => $task->isSkipped(),
+                                                            'bi-circle text-muted' => $task->isPending(),
+                                                        ]) aria-hidden="true"></i>
+                                                        <div class="min-w-0">
+                                                            <span class="service-task-name">{{ $task->name }}</span>
+                                                            @if ($task->isSkipped() && $task->note)
+                                                                <div class="text-muted">Dilewati: {{ $task->note }}</div>
+                                                            @endif
+                                                        </div>
+                                                    </li>
+                                                @endforeach
+                                            </ul>
+                                        </details>
+                                    @endif
+                                </div>
+                            @endif
+
+                            {{-- Rating mekanik: setelah servis selesai, satu kali per booking. --}}
+                            @if ($booking->status === \App\Models\ServiceBooking::STATUS_COMPLETED && $booking->mechanic)
+                                @if ($booking->mechanicRating)
+                                    <div class="small mt-3">
+                                        <span class="fw-semibold">Rating Anda untuk {{ $booking->mechanic->name }}:</span>
+                                        <x-rating-stars :rating="$booking->mechanicRating->rating" class="text-warning ms-1" />
+                                        @if ($booking->mechanicRating->comment)
+                                            <div class="text-muted mt-1">“{{ $booking->mechanicRating->comment }}”</div>
+                                        @endif
+                                    </div>
+                                @else
+                                    @php($ratingErrors = $errors->getBag("rating{$booking->id}"))
+                                    <form method="POST" action="{{ route('account.mechanic-ratings.store', $booking) }}"
+                                          class="payment-box rounded-3 p-3 mt-3" novalidate data-disable-on-submit>
+                                        @csrf
+                                        <p class="small fw-semibold mb-2">Bagaimana pekerjaan {{ $booking->mechanic->name }}?</p>
+                                        <div class="d-flex flex-wrap gap-2 rating-input mb-2" role="radiogroup" aria-label="Rating mekanik">
+                                            @for ($i = \App\Models\Testimonial::MAX_RATING; $i >= \App\Models\Testimonial::MIN_RATING; $i--)
+                                                <input type="radio" class="btn-check" name="rating" id="rating-{{ $booking->id }}-{{ $i }}" value="{{ $i }}"
+                                                       @checked($ratingErrors->any() && (int) old('rating') === $i)>
+                                                <label class="btn btn-outline-warning btn-sm" for="rating-{{ $booking->id }}-{{ $i }}">
+                                                    {{ $i }} <i class="bi bi-star-fill ms-1 me-0"></i>
+                                                </label>
+                                            @endfor
+                                        </div>
+                                        @if ($ratingErrors->has('rating'))
+                                            <div class="invalid-feedback d-block mb-2">{{ $ratingErrors->first('rating') }}</div>
+                                        @endif
+                                        <label for="comment-{{ $booking->id }}" class="visually-hidden">Komentar untuk mekanik</label>
+                                        <textarea id="comment-{{ $booking->id }}" name="comment" rows="2" maxlength="{{ \App\Models\MechanicRating::MAX_COMMENT_LENGTH }}"
+                                                  placeholder="Komentar (opsional), mis. penjelasannya jelas dan mobil kembali bersih."
+                                                  @class(['form-control form-control-sm mb-2', 'is-invalid' => $ratingErrors->has('comment')])>{{ $ratingErrors->any() ? old('comment') : '' }}</textarea>
+                                        @if ($ratingErrors->has('comment'))
+                                            <div class="invalid-feedback d-block mb-2">{{ $ratingErrors->first('comment') }}</div>
+                                        @endif
+                                        <div class="d-flex flex-wrap align-items-center gap-2">
+                                            <button type="submit" class="btn btn-accent btn-sm"><i class="bi bi-send"></i>Kirim Rating</button>
+                                            <span class="small text-muted">Hanya dilihat bengkel, tidak tampil di website.</span>
+                                        </div>
+                                    </form>
+                                @endif
+                            @endif
+
                             <details class="account-item-details">
                                 <summary>Lihat rincian</summary>
                                 <div class="small pt-2">

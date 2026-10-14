@@ -168,7 +168,7 @@
                             @endif
                         @endif
 
-                        @if ($testDriveRoute && ! auth()->user()?->isAdmin())
+                        @if ($testDriveRoute && ! auth()->user()?->isStaff())
                             @if ($car->canBeTestDriven())
                                 <a href="{{ route('test-drives.create', ['mobil' => $car->slug]) }}" class="btn btn-outline-primary btn-lg">
                                     <i class="bi bi-calendar-check"></i>Booking Test Drive
@@ -185,7 +185,7 @@
                         <p class="small text-muted mt-2 mb-0">Stok habis, pengajuan belum bisa dilakukan.</p>
                     @endif
                     @if ($testDriveRoute)
-                        @if (auth()->user()?->isAdmin())
+                        @if (auth()->user()?->isStaff())
                             <p class="small text-muted mt-2 mb-0"><i class="bi bi-info-circle me-1"></i>Booking test drive hanya untuk akun customer.</p>
                         @elseif (! $car->canBeTestDriven())
                             <p class="small text-muted mt-2 mb-0">Unit bekas ini sudah terjual, test drive tidak tersedia.</p>

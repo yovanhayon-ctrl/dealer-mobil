@@ -27,7 +27,7 @@ class ServiceReportingTest extends TestCase
         parent::setUp();
 
         $this->travelTo(Carbon::parse('2026-09-20 10:00:00', 'Asia/Jakarta'));
-        $this->admin = User::factory()->admin()->create();
+        $this->admin = User::factory()->owner()->create();
         $this->customer = User::factory()->create(['name' => 'Budi Santoso']);
     }
 

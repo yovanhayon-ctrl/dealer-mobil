@@ -25,10 +25,13 @@ class AdminUserSeeder extends Seeder
         $user = User::firstWhere('email', $email);
 
         if ($user) {
-            $user->role = User::ROLE_ADMIN;
-            $user->save();
+            // Owner tetap owner; role lain dinaikkan menjadi admin.
+            if (! $user->isAdmin()) {
+                $user->role = User::ROLE_ADMIN;
+                $user->save();
+            }
 
-            $this->command?->info("Akun admin {$email} sudah ada, role dipastikan admin.");
+            $this->command?->info("Akun {$email} sudah ada (role {$user->roleLabel()}).");
 
             return;
         }

@@ -3,6 +3,7 @@
 namespace Tests\Feature\Public;
 
 use App\Http\Controllers\TestDriveController;
+use App\Http\Requests\TestDriveRequest;
 use App\Models\Brand;
 use App\Models\Car;
 use App\Models\Category;
@@ -106,12 +107,12 @@ class TestDriveBookingTest extends TestCase
 
         $this->actingAs($admin)->get(route('test-drives.create'))
             ->assertOk()
-            ->assertSee('Akun admin tidak dapat booking test drive')
+            ->assertSee(TestDriveRequest::ADMIN_MESSAGE)
             ->assertDontSee('name="car_id"', false);
 
         $this->book(user: $admin)
             ->assertRedirect(route('test-drives.create'))
-            ->assertSessionHas('error', 'Akun admin tidak dapat booking test drive. Gunakan akun customer.');
+            ->assertSessionHas('error', TestDriveRequest::ADMIN_MESSAGE);
 
         $this->assertSame(0, TestDrive::count());
     }

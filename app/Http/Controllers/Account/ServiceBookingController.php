@@ -33,7 +33,7 @@ class ServiceBookingController extends Controller
         $group = $this->statusGroup($request);
 
         $bookings = $request->user()->serviceBookings()
-            ->with('service:id,name')
+            ->with(['service:id,name', 'mechanic:id,name', 'tasks', 'mechanicRating'])
             ->latest()
             ->orderByDesc('id')
             ->when($group, fn ($query, $group) => $query->whereIn('status', self::STATUS_GROUPS[$group]))

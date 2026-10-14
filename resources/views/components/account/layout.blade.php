@@ -11,7 +11,8 @@
 
 @php
     $user = auth()->user();
-    $isAdmin = $user->isAdmin();
+    // Staf (owner, admin, mekanik) tidak memakai menu customer.
+    $isAdmin = $user->isStaff();
 
     if (! $isAdmin) {
         // Satu query (subselect) untuk semua angka menu.
@@ -24,7 +25,7 @@
         $isAdmin ? null : ['account.test-drives.index', 'account.test-drives.*', 'bi-calendar-check', 'Test Drive', $user->test_drives_count],
         $isAdmin ? null : ['account.service-bookings.index', 'account.service-bookings.*', 'bi-wrench-adjustable', 'Servis', $user->service_bookings_count],
         $isAdmin ? null : ['account.favorites.index', 'account.favorites.*', 'bi-heart', 'Favorit', $user->favorite_cars_count],
-        $isAdmin ? null : ['account.notifications.index', 'account.notifications.*', 'bi-bell', 'Notifikasi', null],
+        $user->isAdmin() ? null : ['account.notifications.index', 'account.notifications.*', 'bi-bell', 'Notifikasi', null],
     ]);
 @endphp
 
@@ -45,9 +46,13 @@
                         @endif
                     </a>
                 @endforeach
-                @if ($isAdmin && Route::has('admin.dashboard'))
+                @if ($user->isAdmin() && Route::has('admin.dashboard'))
                     <a href="{{ route('admin.dashboard') }}" class="account-nav-link">
                         <i class="bi bi-speedometer2"></i><span class="flex-grow-1">Dashboard Admin</span>
+                    </a>
+                @elseif ($user->isMechanic() && Route::has('mechanic.jobs.index'))
+                    <a href="{{ route('mechanic.jobs.index') }}" class="account-nav-link">
+                        <i class="bi bi-wrench-adjustable"></i><span class="flex-grow-1">Pekerjaan Saya</span>
                     </a>
                 @endif
             </nav>

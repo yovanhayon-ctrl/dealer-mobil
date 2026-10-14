@@ -52,7 +52,7 @@
                         <i class="bi bi-exclamation-circle-fill me-2"></i>
                         <div>
                             {{ PurchaseRequestRequest::ADMIN_MESSAGE }}
-                            <a href="{{ route('admin.purchase-requests.index') }}" class="alert-link">Kelola pengajuan di dashboard admin</a>.
+                            @if (auth()->user()->isAdmin())<a href="{{ route('admin.purchase-requests.index') }}" class="alert-link">Kelola pengajuan di dashboard admin</a>.@endif
                         </div>
                     </div>
                 @elseif ($existing)

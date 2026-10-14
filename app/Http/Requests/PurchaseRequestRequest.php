@@ -17,7 +17,7 @@ class PurchaseRequestRequest extends FormRequest
 {
     use NormalizesDigits, NormalizesPhone;
 
-    public const ADMIN_MESSAGE = 'Akun admin tidak dapat mengajukan pembelian. Gunakan akun customer.';
+    public const ADMIN_MESSAGE = 'Akun staf dealer tidak dapat mengajukan pembelian. Gunakan akun customer.';
 
     public const MAX_ADDRESS_LENGTH = 500;
 
@@ -28,7 +28,7 @@ class PurchaseRequestRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return ! $this->user()->isAdmin();
+        return ! $this->user()->isStaff();
     }
 
     protected function failedAuthorization(): void

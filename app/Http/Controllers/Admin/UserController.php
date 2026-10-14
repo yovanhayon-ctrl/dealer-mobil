@@ -23,7 +23,9 @@ class UserController extends Controller
     /** Nilai filter role => label. Default customer. */
     public const ROLE_FILTERS = [
         User::ROLE_CUSTOMER => 'Customer',
+        User::ROLE_OWNER => 'Owner',
         User::ROLE_ADMIN => 'Admin',
+        User::ROLE_MECHANIC => 'Mekanik',
         'semua' => 'Semua',
     ];
 
@@ -34,7 +36,7 @@ class UserController extends Controller
 
         $users = User::query()
             // Password & remember_token tidak pernah diambil dari database.
-            ->select(['id', 'name', 'email', 'phone', 'role', 'created_at'])
+            ->select(['id', 'name', 'email', 'phone', 'role', 'is_active', 'created_at'])
             ->withCount(['testDrives', 'purchaseRequests', 'serviceBookings'])
             ->tap(fn (Builder $query) => $this->applyFilters($query, $filters))
             ->orderBy($sortColumn, $sortDirection)
