@@ -1,6 +1,6 @@
 @php
     // Menu hanya tampil jika route-nya sudah terdaftar (lihat Route::has di bawah).
-    // Mekanik: panel Pekerjaan Saya. Owner: menu admin + Staf.
+    // Mekanik: panel Pekerjaan Saya. Owner: menu admin + Merek, Kategori, Laporan, Staf.
     $panelUser = auth()->user();
     $mechanicMenu = [
         ['label' => 'Pekerjaan Saya', 'icon' => 'bi-wrench-adjustable', 'route' => 'mechanic.jobs.index', 'active' => 'mechanic.jobs.*'],
@@ -11,8 +11,8 @@
         ['label' => 'Dashboard', 'icon' => 'bi-speedometer2', 'route' => 'admin.dashboard', 'active' => 'admin.dashboard'],
         ['label' => 'Notifikasi', 'icon' => 'bi-bell', 'route' => 'admin.notifications.index', 'active' => 'admin.notifications.*', 'badge' => $adminUnreadNotifications ?? 0],
         ['label' => 'Mobil', 'icon' => 'bi-car-front', 'route' => 'admin.cars.index', 'active' => 'admin.cars.*'],
-        ['label' => 'Merek', 'icon' => 'bi-tags', 'route' => 'admin.brands.index', 'active' => 'admin.brands.*'],
-        ['label' => 'Kategori', 'icon' => 'bi-grid', 'route' => 'admin.categories.index', 'active' => 'admin.categories.*'],
+        ['label' => 'Merek', 'icon' => 'bi-tags', 'route' => 'admin.brands.index', 'active' => 'admin.brands.*', 'owner' => true],
+        ['label' => 'Kategori', 'icon' => 'bi-grid', 'route' => 'admin.categories.index', 'active' => 'admin.categories.*', 'owner' => true],
         ['label' => 'Promo', 'icon' => 'bi-percent', 'route' => 'admin.promos.index', 'active' => 'admin.promos.*'],
         ['label' => 'Test Drive', 'icon' => 'bi-calendar-check', 'route' => 'admin.test-drives.index', 'active' => 'admin.test-drives.*'],
         ['label' => 'Pengajuan', 'icon' => 'bi-file-earmark-text', 'route' => 'admin.purchase-requests.index', 'active' => 'admin.purchase-requests.*'],
@@ -21,6 +21,9 @@
         ['label' => 'Ulasan', 'icon' => 'bi-star', 'route' => 'admin.testimonials.index', 'active' => 'admin.testimonials.*'],
         ['label' => 'Pengguna', 'icon' => 'bi-people', 'route' => 'admin.users.index', 'active' => 'admin.users.*'],
     ];
+
+    // Merek & Kategori khusus owner (rutenya juga dikunci role:owner).
+    $menu = array_values(array_filter($menu, fn ($item) => ! ($item['owner'] ?? false) || $panelUser->isOwner()));
 
     if ($panelUser->isOwner()) {
         $menu[] = ['label' => 'Laporan', 'icon' => 'bi-bar-chart', 'route' => 'admin.reports.index', 'active' => 'admin.reports.*'];
