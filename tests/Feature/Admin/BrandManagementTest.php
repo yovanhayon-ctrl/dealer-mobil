@@ -89,6 +89,16 @@ class BrandManagementTest extends TestCase
             ->assertViewHas('brands', fn ($brands) => $brands->count() === 2);
     }
 
+    public function test_info_halaman_tidak_tampil_bila_cukup_satu_halaman(): void
+    {
+        Brand::factory()->count(3)->create();
+
+        $this->actingAs($this->admin)->get(route('admin.brands.index'))
+            ->assertOk()
+            ->assertDontSeeText('Menampilkan')
+            ->assertDontSee('aria-label="Halaman 2"', false);
+    }
+
     public function test_empty_state_saat_kosong_dan_saat_pencarian_tidak_cocok(): void
     {
         $this->actingAs($this->admin)->get(route('admin.brands.index'))
@@ -254,7 +264,8 @@ class BrandManagementTest extends TestCase
         $this->seed(BrandSeeder::class);
         $this->seed(BrandSeeder::class);
 
-        $this->assertSame(6, Brand::count());
+        // JAF Dealer khusus Nissan.
+        $this->assertSame(1, Brand::count());
         $this->assertDatabaseHas('brands', ['name' => 'Nissan', 'slug' => 'nissan', 'logo' => null]);
     }
 }

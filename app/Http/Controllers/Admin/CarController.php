@@ -54,8 +54,14 @@ class CarController extends Controller
 
     public function create(): View
     {
+        // Dealer satu merek (semua mobil aktif bermerek sama, mis. Nissan): merek itu langsung terpilih.
+        $activeBrandIds = Car::query()->where('is_active', true)->distinct()->pluck('brand_id');
+
         return view('admin.cars.create', [
-            'car' => new Car(['vehicle_condition' => Car::CONDITION_NEW, 'is_active' => true, 'stock' => 1]),
+            'car' => new Car([
+                'vehicle_condition' => Car::CONDITION_NEW, 'is_active' => true, 'stock' => 1,
+                'brand_id' => $activeBrandIds->count() === 1 ? $activeBrandIds->first() : null,
+            ]),
             ...$this->formOptions(),
         ]);
     }

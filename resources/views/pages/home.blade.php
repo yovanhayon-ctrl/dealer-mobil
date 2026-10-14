@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Beranda')
-@section('meta_description', config('dealer.name').', Nissan Heritage & Performance: mobil Nissan baru, koleksi klasik Jepang, promo, cicilan ringan, dan layanan servis.')
+@section('meta_description', config('dealer.name').', Nissan Heritage & Performance: mobil Nissan baru dan heritage, promo, cicilan ringan, dan layanan servis.')
 
 @php
     $dealer = config('dealer');
@@ -190,13 +190,15 @@
         </section>
     @endif
 
-    @if ($brands->isNotEmpty() || $categories->isNotEmpty())
+    {{-- Kartu merek hanya bila ada lebih dari satu merek (dealer satu merek cukup kategori). --}}
+    @php($showBrands = $brands->count() > 1)
+    @if ($showBrands || $categories->isNotEmpty())
         <section class="container home-section" aria-labelledby="shortcut-title">
             <div class="home-section-head">
                 <h2 id="shortcut-title" class="h4 mb-0">Jelajahi Mobil</h2>
             </div>
             <div class="row g-4">
-                @if ($brands->isNotEmpty())
+                @if ($showBrands)
                     <div class="col-lg-6">
                         <div class="card h-100 shortcut-card">
                             <div class="card-body p-3 p-lg-4">
@@ -213,7 +215,7 @@
                     </div>
                 @endif
                 @if ($categories->isNotEmpty())
-                    <div class="col-lg-6">
+                    <div @class(['col-lg-6' => $showBrands, 'col-12' => ! $showBrands])>
                         <div class="card h-100 shortcut-card">
                             <div class="card-body p-3 p-lg-4">
                         <h3 class="shortcut-card-title">Berdasarkan kategori</h3>
