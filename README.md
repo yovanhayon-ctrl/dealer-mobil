@@ -344,7 +344,7 @@ php artisan db:seed
 
 - `storage:link` membuat folder `public/storage` yang terhubung ke `storage/app/public`, supaya logo merek dan foto mobil yang di-upload bisa tampil di browser. Cukup sekali di setiap laptop. Foto mobil disimpan di `storage/app/public/cars/{id_mobil}/`.
 - Upload galeri mobil bisa sampai 10 file × 2 MB sekaligus. Jika muncul error *Content Too Large* / *POST Content-Length exceeds the limit*, naikkan `post_max_size` (misalnya `25M`) dan `upload_max_filesize` (minimal `2M`) di `php.ini`, lalu restart Apache.
-- `db:seed` membuat akun admin (dari `ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env`, wajib diisi dulu) serta data merek (Nissan, Toyota, Honda, Mazda, Mitsubishi, Subaru), kategori (SUV, MPV, Sedan, Hatchback, Pickup, Sport), 21 mobil contoh (Nissan baru & heritage + mobil klasik Jepang), 5 promo contoh (tanggal relatif terhadap hari seeder dijalankan), dan 6 layanan JAF Service. Jika `SEED_CUSTOMER_PASSWORD` diisi dan environment `local`, juga dibuat 8 customer dummy (misalnya `budi.santoso@example.test`) beserta 10 test drive, 9 pengajuan, dan 8 booking servis dummy dengan berbagai status; stok mobil ikut disesuaikan untuk pengajuan yang disetujui/selesai. Aman dijalankan ulang: data yang sudah ada tidak digandakan dan tidak ditimpa.
+- `db:seed` membuat akun admin (dari `ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env`, wajib diisi dulu) serta merek Nissan, kategori (SUV, MPV, Sedan, Hatchback, Pickup, Sport), 14 mobil Nissan contoh (8 baru, 6 bekas/heritage seperti Skyline GT-R R34 dan Silvia S15), 5 promo contoh (tanggal relatif terhadap hari seeder dijalankan), dan 6 layanan JAF Service. Jika `SEED_CUSTOMER_PASSWORD` diisi dan environment `local`, juga dibuat 8 customer dummy (misalnya `budi.santoso@example.test`) beserta 10 test drive, 9 pengajuan, dan 8 booking servis dummy dengan berbagai status; stok mobil ikut disesuaikan untuk pengajuan yang disetujui/selesai. Aman dijalankan ulang: data yang sudah ada tidak digandakan dan tidak ditimpa.
 
 ---
 
@@ -597,7 +597,7 @@ php artisan optimize
 ### Keputusan desain
 
 - Customer **wajib login** untuk booking test drive dan mengajukan pembelian.
-- Identitas **JAF Dealer — Nissan Heritage & Performance**: fokus Nissan (baru & heritage) plus koleksi mobil klasik Jepang bekas.
+- Identitas **JAF Dealer, Nissan Heritage & Performance**: dealer khusus Nissan (baru & heritage). Filter dan pintasan merek otomatis disembunyikan selama mobil aktif hanya dari satu merek; menu Merek di admin tetap ada bila kelak menambah merek lain.
 - Dealer menjual mobil **baru dan bekas**.
 - Simulasi kredit hanya berupa perhitungan (tanpa tabel). Hasilnya disimpan ke pengajuan pembelian.
 - Kontak dealer melalui WhatsApp dan halaman kontak.
