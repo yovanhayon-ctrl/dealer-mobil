@@ -76,7 +76,7 @@ class CarSeeder extends Seeder
             ['brand' => 'Nissan', 'category' => 'SUV', 'name' => 'Magnite Premium CVT', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
                 'price' => 285_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 999, 'seats' => 5, 'color' => 'Merah', 'stock' => 6,
                 'description' => 'Compact SUV bermesin turbo 1.0 dengan ground clearance tinggi.'],
-            ['brand' => 'Nissan', 'category' => 'Hatchback', 'name' => 'Leaf', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
+            ['brand' => 'Nissan', 'category' => 'EV', 'name' => 'Leaf', 'condition' => 'baru', 'year' => 2025, 'mileage' => 0,
                 'price' => 750_000_000, 'transmission' => 'automatic', 'fuel' => 'listrik', 'cc' => null, 'seats' => 5, 'color' => 'Biru', 'stock' => 0,
                 'description' => 'Mobil listrik penuh dengan e-Pedal. Stok sedang kosong, unit display tersedia untuk test drive.'],
             ['brand' => 'Nissan', 'category' => 'Pickup', 'name' => 'Navara VL 4x4 AT', 'condition' => 'baru', 'year' => 2024, 'mileage' => 0,

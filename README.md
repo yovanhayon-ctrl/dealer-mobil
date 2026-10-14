@@ -344,7 +344,7 @@ php artisan db:seed
 
 - `storage:link` membuat folder `public/storage` yang terhubung ke `storage/app/public`, supaya logo merek dan foto mobil yang di-upload bisa tampil di browser. Cukup sekali di setiap laptop. Foto mobil disimpan di `storage/app/public/cars/{id_mobil}/`.
 - Upload galeri mobil bisa sampai 10 file × 2 MB sekaligus. Jika muncul error *Content Too Large* / *POST Content-Length exceeds the limit*, naikkan `post_max_size` (misalnya `25M`) dan `upload_max_filesize` (minimal `2M`) di `php.ini`, lalu restart Apache.
-- `db:seed` membuat akun admin (dari `ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env`, wajib diisi dulu) serta merek Nissan, kategori (SUV, MPV, Sedan, Hatchback, Pickup, Sport), 14 mobil Nissan contoh (8 baru, 6 bekas/heritage seperti Skyline GT-R R34 dan Silvia S15), 5 promo contoh (tanggal relatif terhadap hari seeder dijalankan), dan 6 layanan JAF Service. Jika `SEED_CUSTOMER_PASSWORD` diisi dan environment `local`, juga dibuat 8 customer dummy (misalnya `budi.santoso@example.test`) beserta 10 test drive, 9 pengajuan, dan 8 booking servis dummy dengan berbagai status; stok mobil ikut disesuaikan untuk pengajuan yang disetujui/selesai. Aman dijalankan ulang: data yang sudah ada tidak digandakan dan tidak ditimpa.
+- `db:seed` membuat akun admin (dari `ADMIN_EMAIL` dan `ADMIN_PASSWORD` di `.env`, wajib diisi dulu) serta merek Nissan, kategori Nissan (SUV, MPV, Hatchback, Pickup, Sport, EV), 14 mobil Nissan contoh (8 baru, 6 bekas/heritage seperti Skyline GT-R R34 dan Silvia S15), 5 promo contoh (tanggal relatif terhadap hari seeder dijalankan), dan 6 layanan JAF Service. Jika `SEED_CUSTOMER_PASSWORD` diisi dan environment `local`, juga dibuat 8 customer dummy (misalnya `budi.santoso@example.test`) beserta 10 test drive, 9 pengajuan, dan 8 booking servis dummy dengan berbagai status; stok mobil ikut disesuaikan untuk pengajuan yang disetujui/selesai. Aman dijalankan ulang: data yang sudah ada tidak digandakan dan tidak ditimpa.
 
 ---
 
@@ -609,7 +609,7 @@ php artisan optimize
 | ------------------- | ------------------------------------------------- |
 | `users`             | Owner, admin, mekanik & customer (`role`, `phone`, `is_active`) |
 | `brands`            | Merek mobil                                       |
-| `categories`        | Jenis mobil (SUV, MPV, Sedan, dan lain-lain)      |
+| `categories`        | Jenis mobil (SUV, MPV, Sport, EV, dan lain-lain) |
 | `cars`              | Data mobil (baru/bekas, harga, spesifikasi, stok) |
 | `car_images`        | Galeri foto mobil                                 |
 | `promos`            | Promo umum atau per mobil                         |
