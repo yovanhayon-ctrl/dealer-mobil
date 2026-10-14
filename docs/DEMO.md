@@ -59,7 +59,7 @@ Mengikuti *customer journey* di proposal: Temukan → Kenali → Pertimbangkan �
 
 | # | Peran | Langkah | Yang ditunjukkan |
 |---|---|---|---|
-| 1 | Tamu | Beranda → **Mobil** → filter *Kondisi: Bekas*, *Merek: Nissan*, *Warna* | Katalog, filter & urutan, harga promo, cicilan mulai |
+| 1 | Tamu | Beranda → **Mobil** → filter *Kondisi: Bekas*, *Kategori: Sport*, *Warna* | Katalog, filter & urutan, harga promo, cicilan mulai |
 | 2 | Tamu | Buka **Skyline GT-R (R34)** | Galeri, spesifikasi, mobil serupa, tombol WhatsApp |
 | 3 | Tamu | **(v1.1.0)** Klik **Bandingkan** di R34, lalu di 1–2 mobil lain dari katalog → bar bawah → **Bandingkan** | Tabel spesifikasi berdampingan, badge *Terbaik* (harga, tahun, km), tanpa login |
 | 4 | Tamu → Customer | **(v1.1.0)** Klik ikon ❤ di kartu mobil → diarahkan ke login → login customer → klik ❤ lagi → menu akun → **Favorit Saya** | Kembali ke halaman semula setelah login, daftar favorit |

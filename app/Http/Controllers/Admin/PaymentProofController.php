@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ShowroomPaymentRequest;
 use App\Models\PaymentProof;
 use App\Models\PurchaseRequest;
+use App\Notifications\Notifier;
+use App\Notifications\PaymentProofReviewed;
 use App\Support\PaymentProofFile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -13,6 +15,7 @@ use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
  * Verifikasi bukti pembayaran customer di detail pengajuan: terima atau tolak dengan alasan.
+ * Customer diberi tahu setiap pembayaran diterima / bukti ditolak (PaymentProofReviewed).
  * Status pengajuan tetap diubah manual oleh admin.
  */
 class PaymentProofController extends Controller
@@ -39,7 +42,7 @@ class PaymentProofController extends Controller
 
         $file = $request->file('file');
 
-        $purchaseRequest->paymentProofs()->create([
+        $proof = $purchaseRequest->paymentProofs()->create([
             ...$request->safe()->only(['type', 'method', 'amount', 'paid_on', 'note']),
             'user_id' => $purchaseRequest->user_id,
             'recorded_by' => $request->user()->id,
@@ -49,6 +52,7 @@ class PaymentProofController extends Controller
             'verified_at' => now(),
         ]);
         $purchaseRequest->load('paymentProofs');
+        $this->notifyCustomer($proof, $purchaseRequest);
 
         return $redirect->with('success', 'Pembayaran di showroom Rp '.number_format((int) $request->validated('amount'), 0, ',', '.')
             ." dicatat. Status pembayaran: {$purchaseRequest->paymentStatusLabel()}.");
@@ -71,6 +75,7 @@ class PaymentProofController extends Controller
 
         $paymentProof->update(['status' => PaymentProof::STATUS_APPROVED, 'admin_note' => null, 'verified_at' => now()]);
         $purchaseRequest->load('paymentProofs');
+        $this->notifyCustomer($paymentProof, $purchaseRequest);
 
         return $redirect->with('success', "Bukti {$paymentProof->typeLabel()} Rp ".number_format($paymentProof->amount, 0, ',', '.')
             ." diterima. Status pembayaran: {$purchaseRequest->paymentStatusLabel()}.");
@@ -96,8 +101,14 @@ class PaymentProofController extends Controller
             'admin_note' => $validated['admin_note'],
             'verified_at' => now(),
         ]);
+        $this->notifyCustomer($paymentProof, $purchaseRequest);
 
         return $redirect->with('success', 'Bukti pembayaran ditolak. Customer bisa melihat alasannya dan mengirim ulang.');
+    }
+
+    private function notifyCustomer(PaymentProof $paymentProof, PurchaseRequest $purchaseRequest): void
+    {
+        Notifier::send($purchaseRequest->loadMissing('user')->user, new PaymentProofReviewed($paymentProof, $purchaseRequest));
     }
 
     private function backToProofs(PurchaseRequest $purchaseRequest): RedirectResponse
