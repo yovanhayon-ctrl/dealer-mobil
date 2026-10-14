@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Account\PaymentProofRequest;
 use App\Models\PaymentProof;
 use App\Models\PurchaseRequest;
+use App\Notifications\Admin\AdminActivityNotification;
+use App\Notifications\Admin\PaymentProofActivity;
 use App\Support\PaymentProofFile;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -42,13 +44,15 @@ class PaymentProofController extends Controller
         $file = $request->file('file');
         $path = $file->store(PaymentProof::directory($purchaseRequest->id), PaymentProof::DISK);
 
-        $purchaseRequest->paymentProofs()->create([
+        $proof = $purchaseRequest->paymentProofs()->create([
             ...$request->safe()->only(['type', 'amount', 'paid_on', 'note']),
             'user_id' => $request->user()->id,
             'file_path' => $path,
             'file_name' => mb_substr($file->getClientOriginalName(), 0, 255),
             'status' => PaymentProof::STATUS_PENDING,
         ]);
+
+        AdminActivityNotification::notifyAdmins(new PaymentProofActivity($proof, $purchaseRequest));
 
         return redirect()->to(route('account.purchase-requests.index')."#pengajuan-{$purchaseRequest->id}")
             ->with('success', 'Bukti pembayaran terkirim dan menunggu verifikasi admin.');

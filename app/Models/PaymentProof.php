@@ -24,6 +24,13 @@ class PaymentProof extends Model
     /** Disk privat (storage/app/private): bukti transfer berisi data rekening, tidak boleh bisa dibuka publik. */
     public const DISK = 'local';
 
+    /**
+     * Sama dengan default kolom, agar model yang baru dibuat (bukti unggahan customer) langsung punya metode.
+     *
+     * @var array<string, mixed>
+     */
+    protected $attributes = ['method' => self::METHOD_TRANSFER];
+
     public const TYPE_BOOKING_FEE = 'booking_fee';
 
     public const TYPE_DOWN_PAYMENT = 'down_payment';

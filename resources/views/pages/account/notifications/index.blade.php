@@ -31,7 +31,8 @@
                         <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
                             <span @class(['fw-semibold' => $notification->unread()])>{{ $data['title'] ?? 'Notifikasi' }}</span>
                             @isset($data['status'])
-                                <x-status-badge :status="$data['status']" />
+                                {{-- status_label: notifikasi pembayaran (mis. "Lunas") memakai warna status yang sama. --}}
+                                <x-status-badge :status="$data['status']" :label="$data['status_label'] ?? null" />
                             @endisset
                             @if ($notification->unread())
                                 <span class="notification-new">Baru<span class="visually-hidden"> (belum dibaca)</span></span>
