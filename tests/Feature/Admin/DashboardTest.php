@@ -130,11 +130,13 @@ class DashboardTest extends TestCase
             ->assertSee('href="'.route('admin.test-drives.index').'"', false)
             ->assertSee('href="'.route('admin.purchase-requests.index').'"', false)
             ->assertDontSee('href="'.route('admin.reports.index').'"', false)
-            ->assertSeeInOrder(['Dashboard', 'Mobil', 'Merek', 'Kategori', 'Promo', 'Test Drive', 'Pengajuan', 'Pengguna']);
+            ->assertDontSee('href="'.route('admin.brands.index').'"', false)
+            ->assertDontSee('href="'.route('admin.categories.index').'"', false)
+            ->assertSeeInOrder(['Dashboard', 'Mobil', 'Promo', 'Test Drive', 'Pengajuan', 'Pengguna']);
 
-        // Laporan & Staf khusus owner.
+        // Merek, Kategori, Laporan & Staf khusus owner.
         $this->actingAs(User::factory()->owner()->create())->get('/admin/dashboard')
-            ->assertSeeInOrder(['Dashboard', 'Mobil', 'Pengguna', 'Laporan', 'Staf']);
+            ->assertSeeInOrder(['Dashboard', 'Mobil', 'Merek', 'Kategori', 'Promo', 'Pengguna', 'Laporan', 'Staf']);
     }
 
     public function test_kartu_pending_mengarah_ke_daftar_terfilter(): void
