@@ -98,6 +98,7 @@ class HomeTest extends TestCase
     {
         $this->car('Toyota', 'Sport Utility', 'Fortuner');
         $this->car('Toyota', 'Sport Utility', 'Rush');
+        $this->car('Nissan', 'Sport Utility', 'Kicks');
         $this->car('Honda', 'Hatchback', 'Brio', ['is_active' => false]);
 
         $this->get(route('home'))
@@ -109,6 +110,30 @@ class HomeTest extends TestCase
             // Merek/kategori tanpa mobil aktif tidak ditampilkan.
             ->assertDontSee(route('cars.index', ['merek' => 'honda']))
             ->assertDontSee(route('cars.index', ['kategori' => 'hatchback']));
+    }
+
+    public function test_dealer_satu_merek_tanpa_pintasan_dan_filter_merek(): void
+    {
+        $this->car('Nissan', 'Sport Utility', 'Kicks');
+        $this->car('Nissan', 'MPV', 'Serena');
+        $this->car('Honda', 'Hatchback', 'Brio', ['is_active' => false]);
+
+        $this->get(route('home'))
+            ->assertOk()
+            ->assertSee('Berdasarkan kategori')
+            ->assertDontSee('Berdasarkan merek')
+            ->assertDontSee(route('cars.index', ['merek' => 'nissan']), false);
+
+        $this->get(route('cars.index'))
+            ->assertOk()
+            ->assertDontSee('name="merek"', false)
+            ->assertSee('name="kategori"', false);
+
+        // Tautan lama dengan filter merek tetap berfungsi dan filternya tetap tampil.
+        $this->get(route('cars.index', ['merek' => 'nissan']))
+            ->assertOk()
+            ->assertSee('name="merek"', false)
+            ->assertSee('Kicks');
     }
 
     public function test_beranda_tanpa_form_cari_mobil(): void

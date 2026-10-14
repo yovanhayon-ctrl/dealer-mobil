@@ -139,7 +139,7 @@ php artisan storage:link
 php artisan optimize
 ```
 
-- `db:seed --force` di production membuat: akun admin (dari `ADMIN_EMAIL`/`ADMIN_PASSWORD`), merek, kategori, 21 mobil contoh, 5 promo, dan 6 layanan servis. Data dummy customer, transaksi, dan ulasan contoh **tidak** dibuat (hanya local/testing), sehingga bagian *Kata Pelanggan* di beranda baru muncul setelah ada ulasan customer sungguhan yang disetujui admin. Lewati perintah ini bila ingin mengisi data sendiri lewat admin (akun admin tetap dibutuhkan: jalankan `php artisan db:seed --class=AdminUserSeeder --force`).
+- `db:seed --force` di production membuat: akun admin (dari `ADMIN_EMAIL`/`ADMIN_PASSWORD`), merek Nissan, kategori, 14 mobil Nissan contoh, 5 promo, dan 6 layanan servis. Data dummy customer, transaksi, dan ulasan contoh **tidak** dibuat (hanya local/testing), sehingga bagian *Kata Pelanggan* di beranda baru muncul setelah ada ulasan customer sungguhan yang disetujui admin. Lewati perintah ini bila ingin mengisi data sendiri lewat admin (akun admin tetap dibutuhkan: jalankan `php artisan db:seed --class=AdminUserSeeder --force`).
 - Opsi B (`public_html`): perintah `artisan` di terminal **tidak** membaca `public_html/index.php`, jadi `storage:link` membuat tautan di `dealer-mobil/public/storage` (tidak dipakai). Buat tautan untuk `public_html` secara manual:
   `ln -s ~/dealer-mobil/storage/app/public ~/public_html/storage`
 - `user:make-owner` menjadikan akun admin dari `ADMIN_EMAIL` sebagai **owner** (pemilik dealer). Hanya owner yang bisa membuka Laporan dan menu **Staf** untuk membuat akun admin dan mekanik.
