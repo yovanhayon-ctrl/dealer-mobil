@@ -1,5 +1,8 @@
-{{-- Info jumlah data + nomor halaman untuk tabel admin. Teks ditulis langsung (tanpa kunci terjemahan global). --}}
-@if ($paginator->total() > 0)
+{{--
+    Info jumlah data + nomor halaman untuk tabel admin. Teks ditulis langsung (tanpa kunci terjemahan global).
+    Tidak tampil bila semua data muat di satu halaman.
+--}}
+@if ($paginator->hasPages())
     <div class="d-flex flex-column flex-md-row align-items-center justify-content-between gap-2 px-3 py-3 border-top">
         <div class="small text-muted">
             Menampilkan <span class="fw-semibold">{{ $paginator->firstItem() }}</span>
@@ -7,8 +10,6 @@
             dari <span class="fw-semibold">{{ $paginator->total() }}</span> data
         </div>
 
-        @if ($paginator->hasPages())
-            {{ $paginator->onEachSide(1)->links('partials.pagination-links') }}
-        @endif
+        {{ $paginator->onEachSide(1)->links('partials.pagination-links') }}
     </div>
 @endif
