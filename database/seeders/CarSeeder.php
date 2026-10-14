@@ -11,7 +11,7 @@ use Illuminate\Support\Str;
 class CarSeeder extends Seeder
 {
     /**
-     * 21 mobil dummy JAF Dealer (harga perkiraan, data fiktif, tanpa gambar).
+     * 14 mobil Nissan dummy JAF Dealer (harga perkiraan, data fiktif, tanpa gambar).
      * Aman dijalankan ulang: dicari berdasarkan slug, mobil yang sudah ada tidak diubah.
      */
     public function run(): void
@@ -51,7 +51,7 @@ class CarSeeder extends Seeder
     }
 
     /**
-     * Fokus Nissan (mobil baru + heritage), ditambah mobil klasik Jepang lain sebagai koleksi bekas.
+     * Khusus Nissan: mobil baru dan heritage (bekas).
      * Variasi sengaja dipertahankan: mobil baru stok 0 (Leaf, unit display), mobil bekas stok 0
      * (Silvia S15, sudah terjual), dan satu mobil nonaktif (X-Trail T32).
      *
@@ -105,29 +105,6 @@ class CarSeeder extends Seeder
             ['brand' => 'Nissan', 'category' => 'SUV', 'name' => 'X-Trail 2.5 CVT (T32)', 'condition' => 'bekas', 'year' => 2015, 'mileage' => 120_000,
                 'price' => 185_000_000, 'transmission' => 'automatic', 'fuel' => 'bensin', 'cc' => 2488, 'seats' => 7, 'color' => 'Hitam', 'stock' => 1,
                 'description' => 'Sedang dalam perbaikan bodi, belum ditampilkan di katalog.', 'active' => false],
-
-            // Klasik Jepang lainnya (bekas)
-            ['brand' => 'Toyota', 'category' => 'Sport', 'name' => 'Supra RZ (A80)', 'condition' => 'bekas', 'year' => 1997, 'mileage' => 112_000,
-                'price' => 2_800_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 2997, 'seats' => 4, 'color' => 'Hitam', 'stock' => 1,
-                'description' => 'Mesin legendaris 2JZ-GTE twin-turbo dengan transmisi manual 6 percepatan.'],
-            ['brand' => 'Toyota', 'category' => 'Hatchback', 'name' => 'Sprinter Trueno GT-Apex (AE86)', 'condition' => 'bekas', 'year' => 1986, 'mileage' => 165_000,
-                'price' => 550_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1587, 'seats' => 4, 'color' => 'Putih', 'stock' => 1,
-                'description' => 'Hachi-roku dengan lampu pop-up dan mesin 4A-GE, penggerak roda belakang.'],
-            ['brand' => 'Honda', 'category' => 'Sport', 'name' => 'NSX (NA1)', 'condition' => 'bekas', 'year' => 1991, 'mileage' => 88_000,
-                'price' => 2_400_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 2977, 'seats' => 2, 'color' => 'Merah', 'stock' => 1,
-                'description' => 'Supercar bermesin tengah dengan sasis aluminium dan V6 VTEC.'],
-            ['brand' => 'Honda', 'category' => 'Hatchback', 'name' => 'Civic Type R (EK9)', 'condition' => 'bekas', 'year' => 1998, 'mileage' => 125_000,
-                'price' => 450_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1595, 'seats' => 5, 'color' => 'Putih', 'stock' => 1,
-                'description' => 'Type R pertama dengan mesin B16B, warna Championship White.'],
-            ['brand' => 'Mazda', 'category' => 'Sport', 'name' => 'RX-7 Spirit R (FD3S)', 'condition' => 'bekas', 'year' => 2002, 'mileage' => 76_000,
-                'price' => 1_650_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1308, 'seats' => 4, 'color' => 'Kuning', 'stock' => 1,
-                'description' => 'Edisi terakhir RX-7 bermesin rotary 13B-REW twin-turbo.'],
-            ['brand' => 'Mitsubishi', 'category' => 'Sedan', 'name' => 'Lancer Evolution IX GSR', 'condition' => 'bekas', 'year' => 2006, 'mileage' => 130_000,
-                'price' => 750_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1997, 'seats' => 5, 'color' => 'Abu-abu', 'stock' => 1,
-                'description' => 'Sedan rally bermesin 4G63 turbo MIVEC dengan penggerak semua roda.'],
-            ['brand' => 'Subaru', 'category' => 'Sedan', 'name' => 'Impreza WRX STI (GC8)', 'condition' => 'bekas', 'year' => 1998, 'mileage' => 140_000,
-                'price' => 600_000_000, 'transmission' => 'manual', 'fuel' => 'bensin', 'cc' => 1994, 'seats' => 5, 'color' => 'Biru', 'stock' => 1,
-                'description' => 'Mesin boxer EJ20 turbo dan AWD simetris, warna khas WR Blue.'],
         ];
     }
 }

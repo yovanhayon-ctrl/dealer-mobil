@@ -264,7 +264,8 @@ class BrandManagementTest extends TestCase
         $this->seed(BrandSeeder::class);
         $this->seed(BrandSeeder::class);
 
-        $this->assertSame(6, Brand::count());
+        // JAF Dealer khusus Nissan.
+        $this->assertSame(1, Brand::count());
         $this->assertDatabaseHas('brands', ['name' => 'Nissan', 'slug' => 'nissan', 'logo' => null]);
     }
 }

@@ -94,6 +94,22 @@ class CarManagementTest extends TestCase
         $this->assertTrue($car->fresh()->is_active);
     }
 
+    public function test_form_tambah_memilih_merek_bila_semua_mobil_aktif_satu_merek(): void
+    {
+        $nissan = Brand::factory()->create(['name' => 'Nissan', 'slug' => 'nissan']);
+        Car::factory()->create(['brand_id' => $nissan->id, 'is_active' => true]);
+        // Merek lain hanya dipakai mobil nonaktif.
+        Car::factory()->create(['brand_id' => $this->toyota->id, 'is_active' => false]);
+
+        $this->actingAs($this->admin)->get(route('admin.cars.create'))
+            ->assertOk()
+            ->assertViewHas('car', fn (Car $car) => $car->brand_id === $nissan->id);
+
+        // Ada dua merek aktif: admin memilih sendiri.
+        Car::factory()->create(['brand_id' => $this->toyota->id, 'is_active' => true]);
+        $this->get(route('admin.cars.create'))->assertViewHas('car', fn (Car $car) => $car->brand_id === null);
+    }
+
     public function test_admin_bisa_menambah_mobil_baru(): void
     {
         $this->actingAs($this->admin)->get(route('admin.cars.create'))
@@ -430,8 +446,9 @@ class CarManagementTest extends TestCase
         $this->seed(CarSeeder::class);
         $this->seed(CarSeeder::class);
 
-        $this->assertSame(21, Car::count());
-        $this->assertGreaterThan(Car::count() / 2, Car::whereHas('brand', fn ($brand) => $brand->where('name', 'Nissan'))->count());
+        // Khusus Nissan: 8 mobil baru + 6 bekas/heritage.
+        $this->assertSame(14, Car::count());
+        $this->assertSame(Car::count(), Car::whereHas('brand', fn ($brand) => $brand->where('name', 'Nissan'))->count());
         $this->assertSame(2, Car::where('stock', 0)->count());
         $this->assertSame(1, Car::where('is_active', false)->count());
         $this->assertTrue(Car::where('vehicle_condition', 'bekas')->where('mileage', '<', 1)->doesntExist());

@@ -92,9 +92,9 @@ class SeedDataValidationTest extends TestCase
         }
     }
 
-    public function test_mobil_klasik_ae86_bisa_diubah_stoknya(): void
+    public function test_mobil_heritage_tertua_bisa_diubah_stoknya(): void
     {
-        $ae86 = Car::where('year', '<', 1990)->firstOrFail();
+        $ae86 = Car::orderBy('year')->firstOrFail();
 
         $this->actingAs($this->admin)->put(route('admin.cars.update', $ae86), [
             ...$ae86->only(['brand_id', 'category_id', 'name', 'vehicle_condition', 'year', 'mileage', 'price',

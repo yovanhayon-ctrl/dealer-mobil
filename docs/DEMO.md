@@ -33,7 +33,7 @@ Jika data lokal sudah berantakan setelah uji coba, database bisa diisi ulang den
 php artisan migrate:fresh --seed
 ```
 
-Hasilnya: 1 admin, 8 customer dummy (`…@example.test`), 21 mobil (Nissan + klasik Jepang), 5 promo, 6 layanan servis, serta contoh test drive, pengajuan, dan booking servis dengan berbagai status. Seeder **tidak** membuat notifikasi dan favorit; keduanya muncul saat demo (langkah 4 dan 13 di bawah). Seeder membuat 3 ulasan contoh yang sudah disetujui sehingga bagian **Kata Pelanggan** di beranda langsung terisi (v1.3.0). Karena semua data contoh dibuat hari ini, grafik dashboard hanya berisi bulan berjalan. Foto mobil diunggah manual lewat **Admin → Mobil → Galeri** (siapkan 5–10 foto sebelum demo agar katalog terlihat menarik).
+Hasilnya: 1 admin, 8 customer dummy (`…@example.test`), 14 mobil Nissan (baru & heritage), 5 promo, 6 layanan servis, serta contoh test drive, pengajuan, dan booking servis dengan berbagai status. Seeder **tidak** membuat notifikasi dan favorit; keduanya muncul saat demo (langkah 4 dan 13 di bawah). Seeder membuat 3 ulasan contoh yang sudah disetujui sehingga bagian **Kata Pelanggan** di beranda langsung terisi (v1.3.0). Karena semua data contoh dibuat hari ini, grafik dashboard hanya berisi bulan berjalan. Foto mobil diunggah manual lewat **Admin → Mobil → Galeri** (siapkan 5–10 foto sebelum demo agar katalog terlihat menarik).
 
 ### Mode "seperti production" saat demo (opsional)
 

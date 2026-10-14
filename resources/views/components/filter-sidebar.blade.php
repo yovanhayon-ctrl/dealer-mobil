@@ -21,6 +21,11 @@
             $filters->seats,
         ],
     ];
+
+    // Dealer satu merek (mis. khusus Nissan): filter Merek tidak punya pilihan, jadi disembunyikan.
+    if ($brands->count() <= 1 && $filters->brand === null) {
+        unset($selects['merek']);
+    }
 @endphp
 
 <form method="GET" action="{{ route('cars.index') }}" {{ $attributes->class(['filter-form']) }} role="search" aria-label="Filter mobil">

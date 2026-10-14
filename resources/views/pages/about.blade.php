@@ -1,7 +1,7 @@
 @extends('layouts.app')
 
 @section('title', 'Tentang Kami')
-@section('meta_description', config('dealer.name').', Nissan Heritage & Performance: dealer mobil Nissan baru, koleksi klasik Jepang, dan layanan servis JAF Service.')
+@section('meta_description', config('dealer.name').', Nissan Heritage & Performance: dealer khusus Nissan: mobil baru, koleksi Nissan heritage, dan layanan servis JAF Service.')
 
 @php
     $dealer = config('dealer');
@@ -39,8 +39,7 @@
                 <h2 class="h4 mb-3">Siapa Kami</h2>
                 <p>
                     {{ $dealer['name'] }} adalah dealer mobil berbasis web yang menjadikan katalog kendaraan Nissan sebagai titik awal
-                    interaksi dengan calon pembeli, dari generasi terdahulu sampai model yang tersedia saat ini, dilengkapi koleksi
-                    mobil klasik Jepang pilihan.
+                    interaksi dengan calon pembeli, dari generasi terdahulu seperti Skyline GT-R dan Silvia sampai model yang tersedia saat ini.
                 </p>
                 <p class="mb-0">
                     Website ini bukan sekadar etalase. Anda dapat menemukan kendaraan, membandingkan informasi, menghitung simulasi kredit,
