@@ -25,7 +25,7 @@ class TestDriveController extends Controller
     public const STATUS_GROUPS = [
         'berjalan' => [TestDrive::STATUS_PENDING, TestDrive::STATUS_CONFIRMED],
         'selesai' => [TestDrive::STATUS_COMPLETED],
-        'dibatalkan' => [TestDrive::STATUS_CANCELLED],
+        'dibatalkan' => [TestDrive::STATUS_CANCELLED, TestDrive::STATUS_NO_SHOW],
     ];
 
     public function index(Request $request): View

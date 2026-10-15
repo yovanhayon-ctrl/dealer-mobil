@@ -100,6 +100,9 @@ class ServiceBookingSeeder extends Seeder
             ['email' => 'maya.putri@example.test', 'service' => 'inspeksi-kendaraan', 'plate' => 'B 8901 MPT',
                 'vehicle' => 'Nissan Kicks e-Power', 'year' => 2022, 'mileage' => 25_000, 'day' => 5, 'hour' => 11,
                 'status' => ServiceBooking::STATUS_CANCELLED, 'admin_note' => 'Customer meminta pembatalan lewat telepon.'],
+            ['email' => 'dewi.lestari@example.test', 'service' => 'servis-berkala', 'plate' => 'B 9012 DWL',
+                'vehicle' => 'Nissan Grand Livina', 'year' => 2019, 'mileage' => 60_000, 'day' => -3, 'hour' => 9,
+                'status' => ServiceBooking::STATUS_NO_SHOW, 'admin_note' => 'Customer tidak hadir pada jadwal. Silakan booking ulang bila masih berminat.'],
         ];
     }
 }

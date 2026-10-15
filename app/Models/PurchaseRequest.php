@@ -115,6 +115,9 @@ class PurchaseRequest extends Model
         self::STATUS_CANCELLED => 'Pengajuan dibatalkan karena '.self::NOTE_PLACEHOLDER,
     ];
 
+    /** Pengajuan Menunggu lebih lama dari ini (hari) ditandai "Belum ditanggapi"; customer dijanjikan dihubungi dalam 1 hari kerja. */
+    public const RESPONSE_DUE_DAYS = 2;
+
     /** Catatan pembatalan bawaan untuk pengajuan yang lewat batas pembayaran pertama. */
     public const PAYMENT_OVERDUE_NOTE = 'Pengajuan dibatalkan karena melewati batas pembayaran; unit dilepas kembali.';
 
@@ -343,6 +346,21 @@ class PurchaseRequest extends Model
         $query->whereIn('purchase_requests.status', self::CLOSED_STATUSES)
             ->whereNull('purchase_requests.refund_closed_at')
             ->whereRaw("({$received}) > ({$refunded})", [PaymentProof::STATUS_APPROVED]);
+    }
+
+    /**
+     * Masih Menunggu lebih dari RESPONSE_DUE_DAYS hari sejak diajukan. Aturannya sama dengan scope awaitingResponse().
+     */
+    public function isAwaitingResponse(): bool
+    {
+        return $this->status === self::STATUS_PENDING && $this->created_at->lt(now()->subDays(self::RESPONSE_DUE_DAYS));
+    }
+
+    #[Scope]
+    protected function awaitingResponse(Builder $query): void
+    {
+        $query->where('purchase_requests.status', self::STATUS_PENDING)
+            ->where('purchase_requests.created_at', '<', now()->subDays(self::RESPONSE_DUE_DAYS));
     }
 
     public static function paymentDueDays(): int

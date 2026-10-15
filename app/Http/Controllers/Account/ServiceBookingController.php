@@ -25,7 +25,7 @@ class ServiceBookingController extends Controller
     public const STATUS_GROUPS = [
         'berjalan' => [ServiceBooking::STATUS_PENDING, ServiceBooking::STATUS_CONFIRMED, ServiceBooking::STATUS_IN_PROGRESS],
         'selesai' => [ServiceBooking::STATUS_COMPLETED],
-        'dibatalkan' => [ServiceBooking::STATUS_CANCELLED],
+        'dibatalkan' => [ServiceBooking::STATUS_CANCELLED, ServiceBooking::STATUS_NO_SHOW],
     ];
 
     public function index(Request $request): View

@@ -11,6 +11,7 @@
         'completed' => ['Selesai', 'green'],
         'rejected' => ['Ditolak', 'red'],
         'cancelled' => ['Dibatalkan', 'red'],
+        'no_show' => ['Tidak datang', 'muted'],
         'out_of_stock' => ['Stok Habis', 'dark'],
         'active' => ['Aktif', 'green'],
         'inactive' => ['Nonaktif', 'muted'],

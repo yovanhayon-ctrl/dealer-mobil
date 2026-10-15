@@ -248,6 +248,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/', 'index')->name('index');
         Route::get('{testDrive}', 'show')->name('show');
         Route::patch('{testDrive}/status', 'updateStatus')->name('update-status');
+        Route::patch('{testDrive}/jadwal', 'reschedule')->name('reschedule');
     });
 
     Route::controller(AdminPurchaseRequestController::class)->prefix('pengajuan')->name('purchase-requests.')->middleware('can:purchases.view')->group(function () {
@@ -286,6 +287,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('/', 'index')->name('index');
         Route::get('{serviceBooking}', 'show')->name('show');
         Route::patch('{serviceBooking}/status', 'updateStatus')->name('update-status');
+        Route::patch('{serviceBooking}/jadwal', 'reschedule')->name('reschedule');
         Route::patch('{serviceBooking}/mekanik', 'assignMechanic')->name('assign-mechanic');
         Route::post('{serviceBooking}/pekerjaan', 'addTask')->name('tasks.store');
         Route::delete('{serviceBooking}/pekerjaan/{task}', 'removeTask')->scopeBindings()->name('tasks.destroy');

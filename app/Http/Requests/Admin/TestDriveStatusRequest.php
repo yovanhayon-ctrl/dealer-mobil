@@ -28,6 +28,10 @@ class TestDriveStatusRequest extends FormRequest
         $this->merge([
             'status' => blank($status) || $status === $this->testDrive()->status ? null : $status,
         ]);
+
+        if ($status === TestDrive::STATUS_NO_SHOW && blank($this->input('admin_note'))) {
+            $this->merge(['admin_note' => $this->testDrive()->noShowNote()]);
+        }
     }
 
     /**

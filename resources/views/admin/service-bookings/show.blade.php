@@ -94,10 +94,44 @@
                             ->mapWithKeys(fn ($status) => [$status => \App\Models\ServiceBooking::STATUS_LABELS[$status]])
                             ->all(),
                         'adminNote' => $booking->admin_note,
+                        // Tidak datang: catatan untuk customer terisi otomatis.
+                        'noteTemplates' => [\App\Models\ServiceBooking::STATUS_NO_SHOW => $booking->noShowNote()],
                         'noteHelp' => 'Wajib diisi saat membatalkan (alasan untuk customer). Bisa juga berisi hasil pekerjaan. Maksimal 1000 karakter.',
                     ])
                 </div>
             </div>
+            @if ($booking->canBeRescheduled())
+                @php($rescheduleErrors = $errors->getBag('reschedule'))
+                <div class="card mt-4" id="jadwal-ulang">
+                    <div class="card-body p-4">
+                        <h3 class="admin-card-title">Jadwalkan Ulang</h3>
+                        <p class="small text-muted">Untuk jadwal yang disepakati ulang dengan customer. Status menjadi <span class="fw-semibold">Dikonfirmasi</span> dan customer diberi tahu.</p>
+                        <form method="POST" action="{{ route('admin.service-bookings.reschedule', $booking) }}" novalidate data-disable-on-submit>
+                            @csrf
+                            @method('PATCH')
+                            <div class="row g-2">
+                                <div class="col-sm-6">
+                                    <label for="rs-date" class="form-label small">Tanggal baru</label>
+                                    <input type="date" id="rs-date" name="preferred_date" required min="{{ \App\Http\Requests\ServiceBookingRequest::firstDate() }}" max="{{ \App\Http\Requests\ServiceBookingRequest::lastDate() }}"
+                                           value="{{ $rescheduleErrors->any() ? old('preferred_date') : '' }}"
+                                           @class(['form-control form-control-sm', 'is-invalid' => $rescheduleErrors->has('preferred_date')])>
+                                    @if ($rescheduleErrors->has('preferred_date'))<div class="invalid-feedback">{{ $rescheduleErrors->first('preferred_date') }}</div>@endif
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="rs-time" class="form-label small">Jam baru (WIB)</label>
+                                    <select id="rs-time" name="preferred_time" required @class(['form-select form-select-sm', 'is-invalid' => $rescheduleErrors->has('preferred_time')])>
+                                        @foreach (\App\Models\ServiceBooking::TIME_SLOTS as $slot)
+                                            <option value="{{ $slot }}" @selected(old('preferred_time', $booking->timeLabel()) === $slot)>{{ $slot }}</option>
+                                        @endforeach
+                                    </select>
+                                    @if ($rescheduleErrors->has('preferred_time'))<div class="invalid-feedback">{{ $rescheduleErrors->first('preferred_time') }}</div>@endif
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-outline-primary btn-sm mt-3"><i class="bi bi-calendar2-week"></i>Simpan Jadwal Baru</button>
+                        </form>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 @endsection

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Actions\ChangeServiceBookingStatus;
+use App\Actions\RescheduleBooking;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\RescheduleRequest;
 use App\Http\Requests\Admin\ServiceBookingStatusRequest;
 use App\Models\Service;
 use App\Models\ServiceBooking;
@@ -166,6 +168,22 @@ class ServiceBookingController extends Controller
         $task->delete();
 
         return $redirect->with('success', "Pekerjaan \"{$task->name}\" dihapus dari checklist.");
+    }
+
+    /**
+     * Jadwal ulang (status menjadi Dikonfirmasi, customer diberi tahu). Lihat RescheduleBooking.
+     */
+    public function reschedule(RescheduleRequest $request, ServiceBooking $serviceBooking, RescheduleBooking $reschedule): RedirectResponse
+    {
+        $redirect = redirect()->route('admin.service-bookings.show', $serviceBooking);
+
+        try {
+            $updated = $reschedule->handle($serviceBooking, $request->validated('preferred_date'), $request->validated('preferred_time'));
+        } catch (DomainException $e) {
+            return $redirect->with('error', $e->getMessage());
+        }
+
+        return $redirect->with('success', 'Jadwal diubah ke '.$updated->preferred_date->translatedFormat('d M Y')." {$updated->timeLabel()} WIB. Customer sudah diberi tahu.");
     }
 
     private function backToWork(ServiceBooking $serviceBooking): RedirectResponse
