@@ -61,6 +61,10 @@ class DashboardController extends Controller
             'pending_purchases' => PurchaseRequest::where('status', 'pending')->count(),
             'pending_service_bookings' => ServiceBooking::where('status', ServiceBooking::STATUS_PENDING)->count(),
             'customers' => User::where('role', User::ROLE_CUSTOMER)->count(),
+            // Perlu ditindaklanjuti: lewat batas bayar pertama / jadwal sudah lewat tetapi belum diselesaikan.
+            'overdue_payments' => PurchaseRequest::query()->paymentOverdue()->count(),
+            'overdue_test_drives' => TestDrive::query()->overdue()->count(),
+            'overdue_service_bookings' => ServiceBooking::query()->overdue()->count(),
         ];
     }
 }

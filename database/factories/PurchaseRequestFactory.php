@@ -61,6 +61,8 @@ class PurchaseRequestFactory extends Factory
     {
         return $this->state(fn (array $attributes) => [
             'status' => $status,
+            // Sama dengan ChangePurchaseRequestStatus: disetujui = dasar batas pembayaran pertama.
+            'approved_at' => in_array($status, ['approved', 'completed'], true) ? now() : null,
         ]);
     }
 }

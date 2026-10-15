@@ -37,6 +37,10 @@ return [
         'holder' => env('DEALER_BANK_HOLDER', ''),
     ],
 
+    // Batas pembayaran pertama (hari) setelah pengajuan disetujui. Lewat batas: admin diingatkan dan boleh
+    // membatalkan pengajuan agar unit dilepas kembali (tidak ada pembatalan otomatis).
+    'payment_due_days' => (int) env('DEALER_PAYMENT_DUE_DAYS', 3),
+
     // Notifikasi (status untuk customer, booking baru untuk admin) juga dikirim lewat email.
     // Pengiriman memakai pengaturan MAIL_* (MAIL_MAILER=log = hanya dicatat di storage/logs/laravel.log).
     'mail_notifications' => (bool) env('DEALER_MAIL_NOTIFICATIONS', true),
