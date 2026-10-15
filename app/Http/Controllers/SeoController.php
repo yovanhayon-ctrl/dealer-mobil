@@ -14,7 +14,7 @@ use Illuminate\Http\Response;
 class SeoController extends Controller
 {
     /** Halaman publik tetap (nama route). */
-    public const STATIC_ROUTES = ['home', 'cars.index', 'promos.index', 'services.index', 'credit.index', 'about', 'contact'];
+    public const STATIC_ROUTES = ['home', 'cars.index', 'promos.index', 'services.index', 'credit.index', 'about', 'contact', 'privacy', 'terms'];
 
     /** Bagian yang tidak perlu diindeks (akun, admin, form login/daftar). */
     public const DISALLOW = ['/admin', '/akun', '/login', '/register', '/lupa-kata-sandi', '/reset-kata-sandi', '/bandingkan'];

@@ -67,6 +67,8 @@ Route::middleware('throttle:60,1')->controller(CompareController::class)->group(
 });
 Route::get('/tentang-kami', [PageController::class, 'about'])->name('about');
 Route::get('/kontak', [PageController::class, 'contact'])->name('contact');
+Route::get('/kebijakan-privasi', [PageController::class, 'privacy'])->name('privacy');
+Route::get('/syarat-ketentuan', [PageController::class, 'terms'])->name('terms');
 
 // Untuk mesin pencari (public/robots.txt sengaja tidak ada agar route ini yang dipakai).
 Route::get('/sitemap.xml', [SeoController::class, 'sitemap'])->name('sitemap');
