@@ -7,11 +7,13 @@ use App\Http\Requests\Admin\StaffRequest;
 use App\Models\ServiceBooking;
 use App\Models\User;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Kelola akun staf (khusus owner): tambah admin / mekanik, ubah data & role, nonaktifkan.
- * Akun owner tidak bisa diubah di sini, jadi owner tidak bisa menurunkan atau menonaktifkan dirinya sendiri.
+ * Kelola akun staf (owner & super admin): tambah, ubah data & role, nonaktifkan.
+ * Owner mengelola semua role staf; super admin tidak bisa mengelola Owner & Super Admin (User::MANAGEABLE_STAFF_ROLES).
+ * Akun sendiri tidak bisa diubah di sini, jadi tidak ada yang bisa menurunkan atau menonaktifkan dirinya sendiri.
  */
 class StaffController extends Controller
 {
@@ -19,7 +21,7 @@ class StaffController extends Controller
     {
         $staff = User::query()
             ->whereIn('role', User::STAFF_ROLES)
-            ->orderByRaw("CASE role WHEN 'owner' THEN 0 WHEN 'admin' THEN 1 ELSE 2 END")
+            ->orderByRaw("CASE role WHEN 'owner' THEN 0 WHEN 'super_admin' THEN 1 WHEN 'admin' THEN 2 WHEN 'sales' THEN 3 WHEN 'customer_service' THEN 4 ELSE 5 END")
             ->orderByDesc('is_active')
             ->orderBy('name')
             ->withAvg('mechanicRatings', 'rating')
@@ -56,16 +58,16 @@ class StaffController extends Controller
             ->with('success', "Akun {$staff->roleLabel()} {$staff->name} dibuat. Berikan email dan kata sandinya untuk login.");
     }
 
-    public function edit(User $user): View
+    public function edit(Request $request, User $user): View
     {
-        $this->ensureEditable($user);
+        $this->ensureEditable($request, $user);
 
         return view('admin.staff.edit', ['staff' => $user]);
     }
 
     public function update(StaffRequest $request, User $user): RedirectResponse
     {
-        $this->ensureEditable($user);
+        $this->ensureEditable($request, $user);
 
         $user->fill($request->safe()->only(['name', 'email', 'phone']));
         $user->role = $request->validated('role');
@@ -82,10 +84,10 @@ class StaffController extends Controller
     }
 
     /**
-     * Hanya akun admin / mekanik; owner dan customer: 404.
+     * Hanya akun staf yang boleh dikelola user ini; akun sendiri, owner, customer, dan (bagi super admin) super admin: 404.
      */
-    private function ensureEditable(User $user): void
+    private function ensureEditable(Request $request, User $user): void
     {
-        abort_unless(in_array($user->role, User::ASSIGNABLE_STAFF_ROLES, true), 404);
+        abort_unless($request->user()->canManageStaffAccount($user), 404);
     }
 }

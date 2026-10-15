@@ -60,7 +60,7 @@
                             <i class="bi bi-wrench-adjustable"></i>Pekerjaan
                         </a>
                     @endif
-                    @if (! auth()->user()->isAdmin() && Route::has('account.notifications.index'))
+                    @if (! auth()->user()->isStaff() && Route::has('account.notifications.index'))
                         @php($unreadNotifications = auth()->user()->unreadNotifications()->count())
                         <a href="{{ route('account.notifications.index') }}"
                            @class(['btn btn-outline-light btn-sm notification-bell', 'active' => request()->routeIs('account.notifications.*')])

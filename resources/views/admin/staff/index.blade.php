@@ -9,8 +9,9 @@
 @php
     use App\Models\User;
 
-    $summary = collect([User::ROLE_OWNER, User::ROLE_ADMIN, User::ROLE_MECHANIC])
-        ->map(fn ($role) => ($counts[$role] ?? 0).' '.mb_strtolower(User::ROLE_LABELS[$role]))
+    $summary = collect(User::STAFF_ROLES)
+        ->filter(fn ($role) => ($counts[$role] ?? 0) > 0)
+        ->map(fn ($role) => ($counts[$role] ?? 0).' '.User::ROLE_LABELS[$role])
         ->implode(', ');
 @endphp
 
@@ -65,13 +66,13 @@
                             </td>
                             <td><x-status-badge :status="$member->isActive() ? 'active' : 'inactive'" /></td>
                             <td class="text-end">
-                                @if (in_array($member->role, User::ASSIGNABLE_STAFF_ROLES, true))
+                                @if (auth()->user()->canManageStaffAccount($member))
                                     <a href="{{ route('admin.staff.edit', $member) }}" class="btn btn-sm btn-outline-primary"
                                        aria-label="Ubah akun {{ $member->name }}">
                                         <i class="bi bi-pencil"></i>Ubah
                                     </a>
                                 @else
-                                    <span class="small text-muted">Pemilik</span>
+                                    <span class="small text-muted">{{ $member->id === auth()->id() ? 'Akun Anda' : ($member->isOwner() ? 'Pemilik' : 'Khusus owner') }}</span>
                                 @endif
                             </td>
                         </tr>

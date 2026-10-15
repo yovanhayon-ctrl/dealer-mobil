@@ -60,6 +60,21 @@ class UserFactory extends Factory
         return $this->state(fn (array $attributes) => ['role' => User::ROLE_OWNER]);
     }
 
+    public function superAdmin(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => User::ROLE_SUPER_ADMIN]);
+    }
+
+    public function sales(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => User::ROLE_SALES]);
+    }
+
+    public function customerService(): static
+    {
+        return $this->state(fn (array $attributes) => ['role' => User::ROLE_CUSTOMER_SERVICE]);
+    }
+
     public function mechanic(): static
     {
         return $this->state(fn (array $attributes) => ['role' => User::ROLE_MECHANIC]);
