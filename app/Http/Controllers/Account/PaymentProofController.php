@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Account;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Account\PaymentProofRequest;
 use App\Models\PaymentProof;
+use App\Models\PaymentRefund;
 use App\Models\PurchaseRequest;
 use App\Notifications\Admin\AdminActivityNotification;
 use App\Notifications\Admin\PaymentProofActivity;
@@ -66,6 +67,16 @@ class PaymentProofController extends Controller
         $this->ensureOwner($request, $purchaseRequest);
 
         return PaymentProofFile::response($paymentProof);
+    }
+
+    /**
+     * File bukti pengembalian dana (disk privat) hanya untuk pemilik pengajuan.
+     */
+    public function refundFile(Request $request, PurchaseRequest $purchaseRequest, PaymentRefund $paymentRefund): StreamedResponse
+    {
+        $this->ensureOwner($request, $purchaseRequest);
+
+        return PaymentProofFile::response($paymentRefund);
     }
 
     /**

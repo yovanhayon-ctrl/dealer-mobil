@@ -9,6 +9,12 @@
         ['admin.promos.create', 'bi-percent', 'Tambah Promo', 'btn-outline-primary'],
         auth()->user()->isOwner() ? ['admin.reports.index', 'bi-bar-chart', 'Laporan', 'btn-outline-primary'] : null,
     ], fn (?array $action) => $action !== null && Route::has($action[0]));
+    $attention = array_filter([
+        [$stats['overdue_payments'], 'pengajuan lewat tenggat bayar', 'admin.purchase-requests.index', ['pembayaran' => 'lewat-tenggat']],
+        [$stats['overdue_test_drives'], 'test drive lewat jadwal', 'admin.test-drives.index', ['jadwal' => 'lewat']],
+        [$stats['overdue_service_bookings'], 'booking servis lewat jadwal', 'admin.service-bookings.index', ['jadwal' => 'lewat']],
+        [$stats['pending_refunds'], 'pengajuan batal, dana belum dikembalikan', 'admin.purchase-requests.index', ['pembayaran' => 'dana-belum-dikembalikan']],
+    ], fn (array $item) => $item[0] > 0);
 @endphp
 
 @section('content')
@@ -26,6 +32,18 @@
             </div>
         @endif
     </div>
+
+    {{-- Perlu ditindaklanjuti: hanya tampil bila ada --}}
+    @if ($attention)
+        <div class="dashboard-attention mb-4" role="status">
+            <span class="dashboard-attention-title"><i class="bi bi-exclamation-triangle"></i>Perlu ditindaklanjuti</span>
+            <ul class="dashboard-attention-list">
+                @foreach ($attention as [$count, $label, $route, $parameters])
+                    <li><a href="{{ $routeOrNull($route, $parameters) }}"><strong>{{ $count }}</strong> {{ $label }}</a></li>
+                @endforeach
+            </ul>
+        </div>
+    @endif
 
     {{-- Ringkasan --}}
     <section class="mb-4" aria-labelledby="summary-title">

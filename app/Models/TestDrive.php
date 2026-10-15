@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSchedule;
 use Database\Factories\TestDriveFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -18,6 +19,8 @@ class TestDrive extends Model
 {
     /** @use HasFactory<TestDriveFactory> */
     use HasFactory;
+
+    use HasSchedule;
 
     public const STATUS_PENDING = 'pending';
 

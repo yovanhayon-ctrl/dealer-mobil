@@ -55,7 +55,13 @@ class DashboardTest extends TestCase
                 'pending_purchases' => 3,
                 'pending_service_bookings' => 1,
                 'customers' => 4,
+                // Semua jadwal di masa depan & pengajuan baru disetujui: belum ada yang perlu ditindaklanjuti.
+                'overdue_payments' => 0,
+                'overdue_test_drives' => 0,
+                'overdue_service_bookings' => 0,
+                'pending_refunds' => 0,
             ])
+            ->assertDontSee('class="dashboard-attention', false)
             ->assertSeeInOrder(['Mobil Aktif', 'Stok Habis', 'Test Drive Pending', 'Pengajuan Pending', 'Servis Pending', 'Customer']);
     }
 

@@ -187,6 +187,8 @@ class ServiceBookingController extends Controller
             'layanan' => $serviceId === false ? null : $serviceId,
             'dari' => $date('dari'),
             'sampai' => $date('sampai'),
+            // "lewat": masih Menunggu/Dikonfirmasi padahal tanggalnya sudah lewat.
+            'jadwal' => $pick('jadwal', ['lewat']),
             'urut' => $pick('urut', array_keys(self::SORTS)) ?? 'terbaru',
         ];
     }
@@ -203,6 +205,7 @@ class ServiceBookingController extends Controller
             ->when($filters['status'], fn ($q, $status) => $q->where('status', $status))
             ->when($filters['layanan'], fn ($q, $serviceId) => $q->where('service_id', $serviceId))
             ->when($filters['dari'], fn ($q, $date) => $q->whereDate('preferred_date', '>=', $date))
-            ->when($filters['sampai'], fn ($q, $date) => $q->whereDate('preferred_date', '<=', $date));
+            ->when($filters['sampai'], fn ($q, $date) => $q->whereDate('preferred_date', '<=', $date))
+            ->when($filters['jadwal'] === 'lewat', fn ($q) => $q->overdue());
     }
 }

@@ -18,6 +18,9 @@
     <x-admin.detail-header :title="'Test Drive #'.$testDrive->id" :subtitle="'Masuk '.$testDrive->created_at->translatedFormat('d F Y H:i').' WIB'"
                            :back-url="route('admin.test-drives.index')" back-label="Test Drive">
         <x-status-badge :status="$testDrive->status" />
+        @if ($testDrive->isOverdue())
+            <x-status-badge status="rejected" label="Lewat jadwal" />
+        @endif
     </x-admin.detail-header>
 
     <div class="row g-4">

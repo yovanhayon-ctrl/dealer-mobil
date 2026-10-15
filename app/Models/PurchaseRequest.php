@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Database\Factories\PurchaseRequestFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
 #[Fillable([
     'user_id', 'car_id', 'car_price', 'payment_method', 'down_payment', 'tenor_months',
@@ -44,6 +47,33 @@ class PurchaseRequest extends Model
     public const PAYMENT_PARTIAL = 'partial';
 
     public const PAYMENT_PAID = 'paid';
+
+    /** Status dana untuk pengajuan Dibatalkan/Ditolak yang sempat menerima pembayaran (lihat refundStatus). */
+    public const REFUND_PENDING = 'refund_pending';
+
+    public const REFUND_PARTIAL = 'refund_partial';
+
+    public const REFUND_DONE = 'refunded';
+
+    public const REFUND_WAIVED = 'refund_waived';
+
+    public const REFUND_LABELS = [
+        self::REFUND_PENDING => 'Dana belum dikembalikan',
+        self::REFUND_PARTIAL => 'Dikembalikan sebagian',
+        self::REFUND_DONE => 'Dikembalikan',
+        self::REFUND_WAIVED => 'Tidak dikembalikan',
+    ];
+
+    /** Warna badge status dana (kunci warna di komponen status-badge). */
+    public const REFUND_BADGES = [
+        self::REFUND_PENDING => 'rejected',
+        self::REFUND_PARTIAL => 'pending',
+        self::REFUND_DONE => 'completed',
+        self::REFUND_WAIVED => 'inactive',
+    ];
+
+    /** Status pengajuan yang berakhir tanpa penjualan: dana yang sudah diterima perlu dikembalikan atau ditutup. */
+    public const CLOSED_STATUSES = [self::STATUS_REJECTED, self::STATUS_CANCELLED];
 
     /** Peringatan penipuan: tampil di form pengajuan dan PDF bukti pengajuan. */
     public const SAFE_PAYMENT_NOTE = 'Kami tidak pernah meminta pembayaran sebelum Anda cek unit. Transfer hanya ke rekening atas nama dealer.';
@@ -85,6 +115,9 @@ class PurchaseRequest extends Model
         self::STATUS_CANCELLED => 'Pengajuan dibatalkan karena '.self::NOTE_PLACEHOLDER,
     ];
 
+    /** Catatan pembatalan bawaan untuk pengajuan yang lewat batas pembayaran pertama. */
+    public const PAYMENT_OVERDUE_NOTE = 'Pengajuan dibatalkan karena melewati batas pembayaran; unit dilepas kembali.';
+
     /** Dihitung "terjual" di laporan: unit sudah dipotong dari stok. */
     public const SOLD_STATUSES = [self::STATUS_APPROVED, self::STATUS_COMPLETED];
 
@@ -113,6 +146,8 @@ class PurchaseRequest extends Model
             'tenor_months' => 'integer',
             'interest_rate' => 'decimal:2',
             'monthly_installment' => 'integer',
+            'approved_at' => 'datetime',
+            'refund_closed_at' => 'datetime',
         ];
     }
 
@@ -134,6 +169,11 @@ class PurchaseRequest extends Model
     public function paymentProofs(): HasMany
     {
         return $this->hasMany(PaymentProof::class)->latest()->orderByDesc('id');
+    }
+
+    public function paymentRefunds(): HasMany
+    {
+        return $this->hasMany(PaymentRefund::class)->orderBy('refunded_on')->orderBy('id');
     }
 
     /**
@@ -210,6 +250,10 @@ class PurchaseRequest extends Model
      */
     public function paymentStatusLabel(): string
     {
+        if ($refund = $this->refundStatus()) {
+            return self::REFUND_LABELS[$refund];
+        }
+
         return match ($this->paymentStatus()) {
             self::PAYMENT_PAID => $this->isCredit() ? 'DP lunas' : 'Lunas',
             self::PAYMENT_PARTIAL => $this->isCredit() ? 'DP sebagian' : 'Dibayar sebagian',
@@ -222,6 +266,10 @@ class PurchaseRequest extends Model
      */
     public function paymentStatusBadge(): string
     {
+        if ($refund = $this->refundStatus()) {
+            return self::REFUND_BADGES[$refund];
+        }
+
         return match ($this->paymentStatus()) {
             self::PAYMENT_PAID => 'completed',
             self::PAYMENT_PARTIAL => 'processing',
@@ -234,6 +282,137 @@ class PurchaseRequest extends Model
         $this->loadMissing('paymentProofs');
 
         return $this->paymentProofs->where('status', PaymentProof::STATUS_PENDING)->count();
+    }
+
+    public function isClosed(): bool
+    {
+        return in_array($this->status, self::CLOSED_STATUSES, true);
+    }
+
+    public function refundedTotal(): int
+    {
+        $this->loadMissing('paymentRefunds');
+
+        return (int) $this->paymentRefunds->sum('amount');
+    }
+
+    /**
+     * Dana diterima yang belum dikembalikan (0 bila pengajuan belum batal).
+     */
+    public function refundableAmount(): int
+    {
+        return $this->isClosed() ? max(0, $this->verifiedPaymentTotal() - $this->refundedTotal()) : 0;
+    }
+
+    /**
+     * Status dana pengajuan Dibatalkan/Ditolak yang sempat menerima pembayaran; null untuk pengajuan lain.
+     * Dikembalikan penuh > ditutup tanpa (sisa) pengembalian > sebagian > belum.
+     */
+    public function refundStatus(): ?string
+    {
+        $received = $this->isClosed() ? $this->verifiedPaymentTotal() : 0;
+
+        if ($received === 0) {
+            return null;
+        }
+
+        $refunded = $this->refundedTotal();
+
+        return match (true) {
+            $refunded >= $received => self::REFUND_DONE,
+            $this->refund_closed_at !== null => $refunded > 0 ? self::REFUND_PARTIAL : self::REFUND_WAIVED,
+            $refunded > 0 => self::REFUND_PARTIAL,
+            default => self::REFUND_PENDING,
+        };
+    }
+
+    /**
+     * Masih ada dana yang perlu dikembalikan atau ditutup admin. Aturannya sama dengan scope refundPending().
+     */
+    public function needsRefundAction(): bool
+    {
+        return $this->refund_closed_at === null && $this->refundableAmount() > 0;
+    }
+
+    #[Scope]
+    protected function refundPending(Builder $query): void
+    {
+        $received = 'select coalesce(sum(amount), 0) from payment_proofs where payment_proofs.purchase_request_id = purchase_requests.id and payment_proofs.status = ?';
+        $refunded = 'select coalesce(sum(amount), 0) from payment_refunds where payment_refunds.purchase_request_id = purchase_requests.id';
+
+        $query->whereIn('purchase_requests.status', self::CLOSED_STATUSES)
+            ->whereNull('purchase_requests.refund_closed_at')
+            ->whereRaw("({$received}) > ({$refunded})", [PaymentProof::STATUS_APPROVED]);
+    }
+
+    public static function paymentDueDays(): int
+    {
+        return max(1, (int) config('dealer.payment_due_days', 3));
+    }
+
+    /**
+     * Batas pembayaran pertama: akhir hari ke-N (DEALER_PAYMENT_DUE_DAYS) setelah disetujui; null bila belum disetujui.
+     */
+    public function paymentDueAt(): ?Carbon
+    {
+        return $this->approved_at?->copy()->startOfDay()->addDays(self::paymentDueDays())->endOfDay();
+    }
+
+    /**
+     * Disetujui, ada tagihan ke dealer, dan belum ada pembayaran yang diterima.
+     */
+    public function awaitsFirstPayment(): bool
+    {
+        return $this->status === self::STATUS_APPROVED
+            && $this->amountPayableToDealer() > 0
+            && $this->verifiedPaymentTotal() === 0;
+    }
+
+    /**
+     * Lewat batas pembayaran pertama tanpa bukti yang sedang diverifikasi. Aturannya sama dengan scope paymentOverdue().
+     */
+    public function isPaymentOverdue(): bool
+    {
+        return $this->awaitsFirstPayment()
+            && $this->approved_at !== null
+            && $this->pendingPaymentProofCount() === 0
+            && now()->greaterThan($this->paymentDueAt());
+    }
+
+    /**
+     * Jumlah hari sejak batas pembayaran terlewati (0 bila belum lewat).
+     */
+    public function paymentOverdueDays(): int
+    {
+        return $this->isPaymentOverdue() ? (int) $this->paymentDueAt()->startOfDay()->diffInDays(today()) : 0;
+    }
+
+    #[Scope]
+    protected function paymentOverdue(Builder $query): void
+    {
+        $query->where('purchase_requests.status', self::STATUS_APPROVED)
+            ->where('purchase_requests.approved_at', '<', today()->subDays(self::paymentDueDays()))
+            ->where(fn (Builder $query) => $query
+                ->where(fn (Builder $cash) => $cash->where('payment_method', self::PAYMENT_CASH)->where('car_price', '>', 0))
+                ->orWhere(fn (Builder $credit) => $credit->where('payment_method', self::PAYMENT_CREDIT)->where('down_payment', '>', 0)))
+            ->whereDoesntHave('paymentProofs', fn (Builder $proofs) => $proofs
+                ->whereIn('status', [PaymentProof::STATUS_APPROVED, PaymentProof::STATUS_PENDING]));
+    }
+
+    /**
+     * Catatan bawaan per status untuk form admin; pengajuan lewat batas bayar memakai alasan pembatalan yang sudah terisi.
+     *
+     * @return array<string, string>
+     */
+    public function noteTemplates(): array
+    {
+        $templates = self::NOTE_TEMPLATES;
+
+        if ($this->isPaymentOverdue()) {
+            $templates[self::STATUS_CANCELLED] = self::PAYMENT_OVERDUE_NOTE;
+        }
+
+        return $templates;
     }
 
     /**

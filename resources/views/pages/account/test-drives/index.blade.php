@@ -64,6 +64,17 @@
                                 </div>
                             </div>
 
+                            @if ($testDrive->isOverdue())
+                                <div class="alert alert-warning small mt-3 mb-0" role="status">
+                                    <i class="bi bi-clock-history me-1" aria-hidden="true"></i><span class="fw-semibold">Jadwal sudah lewat.</span>
+                                    @if ($testDrive->canBeCancelledByCustomer())
+                                        Dealer akan menghubungi Anda, atau batalkan lalu booking ulang di jadwal baru.
+                                    @else
+                                        Dealer akan menghubungi Anda untuk mengatur ulang jadwal.
+                                    @endif
+                                </div>
+                            @endif
+
                             @if ($testDrive->admin_note)
                                 <div class="admin-note-box small rounded-3 p-2 mt-3">
                                     <span class="fw-semibold"><i class="bi bi-chat-left-text me-1"></i>Catatan dealer:</span>
