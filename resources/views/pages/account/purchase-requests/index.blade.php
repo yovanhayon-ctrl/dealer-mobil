@@ -78,6 +78,20 @@
                                 </p>
                             @endif
 
+                            {{-- Batas pembayaran pertama (DEALER_PAYMENT_DUE_DAYS); tidak tampil bila bukti sedang diverifikasi. --}}
+                            @if ($purchase->isPaymentOverdue())
+                                <div class="alert alert-warning small mt-3 mb-0" role="status">
+                                    <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>
+                                    <span class="fw-semibold">Batas pembayaran sudah lewat ({{ $purchase->paymentDueAt()->translatedFormat('l, d M Y') }}).</span>
+                                    Hubungi dealer agar unit tetap dipesan untuk Anda; pengajuan yang tidak dibayar dapat dibatalkan.
+                                </div>
+                            @elseif ($purchase->awaitsFirstPayment() && $purchase->approved_at && $purchase->pendingPaymentProofCount() === 0)
+                                <p class="small mt-2 mb-0">
+                                    <i class="bi bi-calendar-check text-accent me-1" aria-hidden="true"></i>Lakukan pembayaran pertama paling lambat
+                                    <span class="fw-semibold">{{ $purchase->paymentDueAt()->translatedFormat('l, d M Y') }}</span>.
+                                </p>
+                            @endif
+
                             @if ($purchase->admin_note)
                                 <div class="admin-note-box small rounded-3 p-2 mt-3">
                                     <span class="fw-semibold"><i class="bi bi-chat-left-text me-1"></i>Catatan dealer:</span>

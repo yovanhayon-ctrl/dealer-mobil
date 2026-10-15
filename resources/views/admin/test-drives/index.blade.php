@@ -29,6 +29,13 @@
             </select>
         </div>
         <div class="col-6 col-md-4 col-lg-auto">
+            <label for="filter_jadwal" class="form-label small mb-1">Jadwal</label>
+            <select id="filter_jadwal" name="jadwal" class="form-select form-select-sm">
+                <option value="">Semua</option>
+                <option value="lewat" @selected($filters['jadwal'] === 'lewat')>Lewat jadwal</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-4 col-lg-auto">
             <label for="filter_dari" class="form-label small mb-1">Jadwal dari</label>
             <input type="date" id="filter_dari" name="dari" value="{{ $filters['dari'] }}" class="form-control form-control-sm">
         </div>
@@ -78,7 +85,12 @@
                                     <div class="small text-muted admin-truncate">{{ $testDrive->user->email }}</div>
                                 </td>
                                 <td><span class="admin-truncate" title="{{ $testDrive->car->brand->name }} {{ $testDrive->car->name }} {{ $testDrive->car->year }}">{{ $testDrive->car->brand->name }} {{ $testDrive->car->name }} {{ $testDrive->car->year }}</span></td>
-                                <td><x-status-badge :status="$testDrive->status" /></td>
+                                <td>
+                                    <x-status-badge :status="$testDrive->status" />
+                                    @if ($testDrive->isOverdue())
+                                        <x-status-badge status="rejected" label="Lewat jadwal" class="ms-1" />
+                                    @endif
+                                </td>
                                 <td class="text-nowrap small d-none d-xxl-table-cell">{{ $testDrive->created_at->translatedFormat('d M Y') }}</td>
                                 <td class="text-end">
                                     <a href="{{ $detailUrl }}" class="btn btn-sm btn-outline-primary btn-icon" title="Detail" aria-label="Detail test drive {{ $testDrive->user->name }}">

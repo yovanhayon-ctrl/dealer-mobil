@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Models\Concerns\HasSchedule;
 use Database\Factories\ServiceBookingFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -21,6 +22,8 @@ class ServiceBooking extends Model
 {
     /** @use HasFactory<ServiceBookingFactory> */
     use HasFactory;
+
+    use HasSchedule;
 
     public const STATUS_PENDING = 'pending';
 

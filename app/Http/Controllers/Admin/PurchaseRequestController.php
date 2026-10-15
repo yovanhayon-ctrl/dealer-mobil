@@ -28,6 +28,9 @@ class PurchaseRequestController extends Controller
         'terlama' => 'asc',
     ];
 
+    /** Nilai filter pembayaran di query string. */
+    public const PAYMENT_FILTER_OVERDUE = 'lewat-tenggat';
+
     /** Nilai filter metode di query string => payment_method. */
     public const METHOD_FILTERS = [
         'cash' => PurchaseRequest::PAYMENT_CASH,
@@ -123,6 +126,7 @@ class PurchaseRequestController extends Controller
             'q' => trim((string) $request->query('q')) ?: null,
             'status' => $pick('status', PurchaseRequest::STATUSES),
             'metode' => $pick('metode', array_keys(self::METHOD_FILTERS)),
+            'pembayaran' => $pick('pembayaran', [self::PAYMENT_FILTER_OVERDUE]),
             'urut' => $pick('urut', array_keys(self::SORTS)) ?? 'terbaru',
         ];
     }
@@ -138,6 +142,7 @@ class PurchaseRequestController extends Controller
                     ->where('name', 'like', "%{$search}%")
                     ->orWhereHas('brand', fn ($brand) => $brand->where('name', 'like', "%{$search}%")))))
             ->when($filters['status'], fn ($q, $status) => $q->where('status', $status))
-            ->when($filters['metode'], fn ($q, $method) => $q->where('payment_method', self::METHOD_FILTERS[$method]));
+            ->when($filters['metode'], fn ($q, $method) => $q->where('payment_method', self::METHOD_FILTERS[$method]))
+            ->when($filters['pembayaran'] === self::PAYMENT_FILTER_OVERDUE, fn ($q) => $q->paymentOverdue());
     }
 }

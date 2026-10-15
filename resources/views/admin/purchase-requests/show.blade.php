@@ -24,6 +24,9 @@
         @if ($purchaseRequest->hasPaymentSection())
             <x-status-badge :status="$purchaseRequest->paymentStatusBadge()" :label="$purchaseRequest->paymentStatusLabel()" />
         @endif
+        @if ($purchaseRequest->isPaymentOverdue())
+            <x-status-badge status="rejected" label="Lewat tenggat" />
+        @endif
         @if (Route::has('admin.purchase-requests.pdf'))
             <a href="{{ route('admin.purchase-requests.pdf', $purchaseRequest) }}" target="_blank" rel="noopener"
                class="btn btn-outline-secondary btn-sm" title="Bukti {{ $purchaseRequest->documentNumber() }}">
@@ -31,6 +34,18 @@
             </a>
         @endif
     </x-admin.detail-header>
+
+    @if ($purchaseRequest->isPaymentOverdue())
+        <div class="alert alert-warning d-flex gap-2 mb-4" role="status">
+            <i class="bi bi-exclamation-triangle"></i>
+            <div>
+                <strong>Lewat batas pembayaran pertama.</strong>
+                Batasnya {{ $purchaseRequest->paymentDueAt()->translatedFormat('l, d M Y') }}
+                ({{ $purchaseRequest->paymentOverdueDays() }} hari lalu) dan belum ada pembayaran maupun bukti yang masuk.
+                Hubungi customer, atau ubah status ke <strong>Dibatalkan</strong> agar unit kembali ke stok.
+            </div>
+        </div>
+    @endif
 
     <div class="row g-4">
         <div class="col-xl-7">
@@ -300,7 +315,7 @@
                             ->all(),
                         'adminNote' => $purchaseRequest->admin_note,
                         'noteHelp' => 'Terisi otomatis sesuai status yang dipilih dan boleh diubah. Saat menolak/membatalkan, ganti tanda … dengan alasan untuk customer. Maksimal 1000 karakter.',
-                        'noteTemplates' => PurchaseRequest::NOTE_TEMPLATES,
+                        'noteTemplates' => $purchaseRequest->noteTemplates(),
                     ])
 
                     <div class="small text-muted mt-3">

@@ -37,6 +37,13 @@
             </select>
         </div>
         <div class="col-6 col-md-4 col-lg-auto">
+            <label for="filter_pembayaran" class="form-label small mb-1">Pembayaran</label>
+            <select id="filter_pembayaran" name="pembayaran" class="form-select form-select-sm">
+                <option value="">Semua</option>
+                <option value="lewat-tenggat" @selected($filters['pembayaran'] === 'lewat-tenggat')>Lewat tenggat bayar</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-4 col-lg-auto">
             <label for="filter_urut" class="form-label small mb-1">Urutkan</label>
             <select id="filter_urut" name="urut" class="form-select form-select-sm">
                 <option value="terbaru" @selected($filters['urut'] === 'terbaru')>Terbaru</option>
@@ -87,6 +94,9 @@
                                     <x-status-badge :status="$purchase->status" />
                                     @if ($purchase->hasPaymentSection())
                                         <x-status-badge :status="$purchase->paymentStatusBadge()" :label="$purchase->paymentStatusLabel()" class="ms-1" />
+                                    @endif
+                                    @if ($purchase->isPaymentOverdue())
+                                        <x-status-badge status="rejected" label="Lewat tenggat" class="ms-1" />
                                     @endif
                                 </td>
                                 <td class="text-end">

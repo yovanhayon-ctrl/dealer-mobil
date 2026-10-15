@@ -4,11 +4,14 @@ namespace App\Models;
 
 use Database\Factories\PurchaseRequestFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
+use Illuminate\Database\Eloquent\Attributes\Scope;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Support\Carbon;
 
 #[Fillable([
     'user_id', 'car_id', 'car_price', 'payment_method', 'down_payment', 'tenor_months',
@@ -85,6 +88,9 @@ class PurchaseRequest extends Model
         self::STATUS_CANCELLED => 'Pengajuan dibatalkan karena '.self::NOTE_PLACEHOLDER,
     ];
 
+    /** Catatan pembatalan bawaan untuk pengajuan yang lewat batas pembayaran pertama. */
+    public const PAYMENT_OVERDUE_NOTE = 'Pengajuan dibatalkan karena melewati batas pembayaran; unit dilepas kembali.';
+
     /** Dihitung "terjual" di laporan: unit sudah dipotong dari stok. */
     public const SOLD_STATUSES = [self::STATUS_APPROVED, self::STATUS_COMPLETED];
 
@@ -113,6 +119,7 @@ class PurchaseRequest extends Model
             'tenor_months' => 'integer',
             'interest_rate' => 'decimal:2',
             'monthly_installment' => 'integer',
+            'approved_at' => 'datetime',
         ];
     }
 
@@ -234,6 +241,76 @@ class PurchaseRequest extends Model
         $this->loadMissing('paymentProofs');
 
         return $this->paymentProofs->where('status', PaymentProof::STATUS_PENDING)->count();
+    }
+
+    public static function paymentDueDays(): int
+    {
+        return max(1, (int) config('dealer.payment_due_days', 3));
+    }
+
+    /**
+     * Batas pembayaran pertama: akhir hari ke-N (DEALER_PAYMENT_DUE_DAYS) setelah disetujui; null bila belum disetujui.
+     */
+    public function paymentDueAt(): ?Carbon
+    {
+        return $this->approved_at?->copy()->startOfDay()->addDays(self::paymentDueDays())->endOfDay();
+    }
+
+    /**
+     * Disetujui, ada tagihan ke dealer, dan belum ada pembayaran yang diterima.
+     */
+    public function awaitsFirstPayment(): bool
+    {
+        return $this->status === self::STATUS_APPROVED
+            && $this->amountPayableToDealer() > 0
+            && $this->verifiedPaymentTotal() === 0;
+    }
+
+    /**
+     * Lewat batas pembayaran pertama tanpa bukti yang sedang diverifikasi. Aturannya sama dengan scope paymentOverdue().
+     */
+    public function isPaymentOverdue(): bool
+    {
+        return $this->awaitsFirstPayment()
+            && $this->approved_at !== null
+            && $this->pendingPaymentProofCount() === 0
+            && now()->greaterThan($this->paymentDueAt());
+    }
+
+    /**
+     * Jumlah hari sejak batas pembayaran terlewati (0 bila belum lewat).
+     */
+    public function paymentOverdueDays(): int
+    {
+        return $this->isPaymentOverdue() ? (int) $this->paymentDueAt()->startOfDay()->diffInDays(today()) : 0;
+    }
+
+    #[Scope]
+    protected function paymentOverdue(Builder $query): void
+    {
+        $query->where('purchase_requests.status', self::STATUS_APPROVED)
+            ->where('purchase_requests.approved_at', '<', today()->subDays(self::paymentDueDays()))
+            ->where(fn (Builder $query) => $query
+                ->where(fn (Builder $cash) => $cash->where('payment_method', self::PAYMENT_CASH)->where('car_price', '>', 0))
+                ->orWhere(fn (Builder $credit) => $credit->where('payment_method', self::PAYMENT_CREDIT)->where('down_payment', '>', 0)))
+            ->whereDoesntHave('paymentProofs', fn (Builder $proofs) => $proofs
+                ->whereIn('status', [PaymentProof::STATUS_APPROVED, PaymentProof::STATUS_PENDING]));
+    }
+
+    /**
+     * Catatan bawaan per status untuk form admin; pengajuan lewat batas bayar memakai alasan pembatalan yang sudah terisi.
+     *
+     * @return array<string, string>
+     */
+    public function noteTemplates(): array
+    {
+        $templates = self::NOTE_TEMPLATES;
+
+        if ($this->isPaymentOverdue()) {
+            $templates[self::STATUS_CANCELLED] = self::PAYMENT_OVERDUE_NOTE;
+        }
+
+        return $templates;
     }
 
     /**

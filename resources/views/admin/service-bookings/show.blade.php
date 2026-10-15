@@ -17,6 +17,9 @@
     <x-admin.detail-header :title="'Booking Servis #'.$booking->id" :subtitle="'Masuk '.$booking->created_at->translatedFormat('d F Y H:i').' WIB'"
                            :back-url="route('admin.service-bookings.index')" back-label="Booking Servis">
         <x-status-badge :status="$booking->status" />
+        @if ($booking->isOverdue())
+            <x-status-badge status="rejected" label="Lewat jadwal" />
+        @endif
     </x-admin.detail-header>
 
     <div class="row g-4">
