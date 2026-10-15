@@ -8,6 +8,8 @@
     $car = $purchaseRequest->car;
     $carLabel = "{$car->brand->name} {$car->name} {$car->year}";
     $awaitingDecision = in_array($purchaseRequest->status, [PurchaseRequest::STATUS_PENDING, PurchaseRequest::STATUS_PROCESSING], true);
+    // Verifikasi bukti, pembayaran showroom, file bukti, dan pengembalian dana: hanya payments.manage (bukan Sales/CS).
+    $canPay = auth()->user()->can('payments.manage');
 @endphp
 
 @section('breadcrumb')
@@ -150,7 +152,7 @@
                             @php($bag = $errors->getBag("rejectProof{$proof->id}"))
                             @php($fileUrl = route('admin.payment-proofs.file', [$purchaseRequest, $proof]))
                             <div class="admin-proof d-flex gap-3">
-                                @if ($proof->hasFile())
+                                @if ($canPay && $proof->hasFile())
                                     <a href="{{ $fileUrl }}" target="_blank" rel="noopener" class="admin-proof-thumb" aria-label="Buka file bukti {{ $proof->typeLabel() }}">
                                         @if ($proof->isImage())
                                             <img src="{{ $fileUrl }}" alt="" loading="lazy">
@@ -173,7 +175,7 @@
                                         @else
                                             Transfer {{ $proof->paid_on->translatedFormat('d M Y') }} · dikirim {{ $proof->created_at->translatedFormat('d M Y H:i') }}
                                         @endif
-                                        @if ($proof->hasFile())
+                                        @if ($canPay && $proof->hasFile())
                                             · <a href="{{ $fileUrl }}" target="_blank" rel="noopener" class="text-break">{{ $proof->file_name }}</a>
                                         @endif
                                     </p>
@@ -184,7 +186,7 @@
                                         <p class="text-danger mb-1"><span class="fw-semibold">Alasan ditolak:</span> {{ $proof->admin_note }}</p>
                                     @endif
 
-                                    @if ($proof->isPending())
+                                    @if ($canPay && $proof->isPending())
                                         <div class="d-flex flex-wrap gap-2 mt-2">
                                             <form method="POST" action="{{ route('admin.payment-proofs.approve', [$purchaseRequest, $proof]) }}"
                                                   data-confirm="Terima bukti {{ $proof->typeLabel() }} Rp {{ number_format($proof->amount, 0, ',', '.') }}? Pastikan dana sudah masuk ke rekening dealer."
@@ -220,7 +222,7 @@
                         @endforelse
 
                         {{-- Pembayaran langsung di showroom: dicatat admin, langsung diterima. --}}
-                        @if ($purchaseRequest->status === PurchaseRequest::STATUS_APPROVED && ! $purchaseRequest->isPaidOff())
+                        @if ($canPay && $purchaseRequest->status === PurchaseRequest::STATUS_APPROVED && ! $purchaseRequest->isPaidOff())
                             @php($showroomErrors = $errors->getBag('showroomPayment'))
                             <div class="mt-3 pt-3 border-top">
                                 <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#showroom-payment"
@@ -313,7 +315,7 @@
                                 @foreach ($purchaseRequest->paymentRefunds as $refund)
                                     @php($refundUrl = route('admin.payment-refunds.file', [$purchaseRequest, $refund]))
                                     <div class="admin-proof d-flex gap-3">
-                                        @if ($refund->hasFile())
+                                        @if ($canPay && $refund->hasFile())
                                             <a href="{{ $refundUrl }}" target="_blank" rel="noopener" class="admin-proof-thumb" aria-label="Buka bukti pengembalian">
                                                 @if ($refund->isImage())
                                                     <img src="{{ $refundUrl }}" alt="" loading="lazy">
@@ -329,7 +331,7 @@
                                             <p class="text-muted mb-1">
                                                 {{ $refund->methodLabel() }} · {{ $refund->refunded_on->translatedFormat('d M Y') }}
                                                 · dicatat {{ $refund->recorder?->name ?? 'admin' }} {{ $refund->created_at->translatedFormat('d M Y H:i') }}
-                                                @if ($refund->hasFile())
+                                                @if ($canPay && $refund->hasFile())
                                                     · <a href="{{ $refundUrl }}" target="_blank" rel="noopener" class="text-break">{{ $refund->file_name }}</a>
                                                 @endif
                                             </p>
@@ -347,7 +349,7 @@
                                     </p>
                                 @endif
 
-                                @if ($purchaseRequest->needsRefundAction())
+                                @if ($canPay && $purchaseRequest->needsRefundAction())
                                     <div class="d-flex flex-wrap gap-2 mt-3">
                                         <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#refund-form"
                                                 aria-expanded="{{ $refundErrors->any() ? 'true' : 'false' }}" aria-controls="refund-form">
@@ -446,16 +448,23 @@
             <div class="card admin-sticky-panel">
                 <div class="card-body p-4">
                     <h3 class="admin-card-title">Status & Catatan Admin</h3>
-                    @include('admin.partials.status-form', [
-                        'action' => route('admin.purchase-requests.update-status', $purchaseRequest),
-                        'currentLabel' => $purchaseRequest->statusLabel(),
-                        'allowed' => collect($purchaseRequest->allowedTransitions())
-                            ->mapWithKeys(fn ($status) => [$status => PurchaseRequest::STATUS_LABELS[$status]])
-                            ->all(),
-                        'adminNote' => $purchaseRequest->admin_note,
-                        'noteHelp' => 'Terisi otomatis sesuai status yang dipilih dan boleh diubah. Saat menolak/membatalkan, ganti tanda … dengan alasan untuk customer. Maksimal 1000 karakter.',
-                        'noteTemplates' => $purchaseRequest->noteTemplates(),
-                    ])
+                    @can('purchases.status')
+                        @include('admin.partials.status-form', [
+                            'action' => route('admin.purchase-requests.update-status', $purchaseRequest),
+                            'currentLabel' => $purchaseRequest->statusLabel(),
+                            'allowed' => collect($purchaseRequest->allowedTransitions())
+                                ->mapWithKeys(fn ($status) => [$status => PurchaseRequest::STATUS_LABELS[$status]])
+                                ->all(),
+                            'adminNote' => $purchaseRequest->admin_note,
+                            'noteHelp' => 'Terisi otomatis sesuai status yang dipilih dan boleh diubah. Saat menolak/membatalkan, ganti tanda … dengan alasan untuk customer. Maksimal 1000 karakter.',
+                            'noteTemplates' => $purchaseRequest->noteTemplates(),
+                        ])
+                    @else
+                        {{-- Customer Service: hanya melihat. --}}
+                        <p class="small mb-2">Status: <x-status-badge :status="$purchaseRequest->status" /></p>
+                        <p class="small text-muted mb-1">Catatan admin</p>
+                        <p class="small mb-0">{{ $purchaseRequest->admin_note ?: '-' }}</p>
+                    @endcan
 
                     @if ($purchaseRequest->status === PurchaseRequest::STATUS_APPROVED && $purchaseRequest->verifiedPaymentTotal() > 0)
                         <div class="alert alert-warning small py-2 mt-3 mb-0">

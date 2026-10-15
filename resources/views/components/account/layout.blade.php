@@ -25,7 +25,7 @@
         $isAdmin ? null : ['account.test-drives.index', 'account.test-drives.*', 'bi-calendar-check', 'Test Drive', $user->test_drives_count],
         $isAdmin ? null : ['account.service-bookings.index', 'account.service-bookings.*', 'bi-wrench-adjustable', 'Servis', $user->service_bookings_count],
         $isAdmin ? null : ['account.favorites.index', 'account.favorites.*', 'bi-heart', 'Favorit', $user->favorite_cars_count],
-        $user->isAdmin() ? null : ['account.notifications.index', 'account.notifications.*', 'bi-bell', 'Notifikasi', null],
+        $user->isStaff() ? null : ['account.notifications.index', 'account.notifications.*', 'bi-bell', 'Notifikasi', null],
     ]);
 @endphp
 

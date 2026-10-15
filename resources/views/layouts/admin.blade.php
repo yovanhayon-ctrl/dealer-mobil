@@ -4,10 +4,11 @@
     @include('partials.head', ['noindex' => true, 'forceLight' => true])
 </head>
 <body class="admin-body">
-    {{-- Layout panel staf: owner & admin (panel admin) dan mekanik (Pekerjaan Saya). --}}
+    {{-- Layout panel staf: panel admin (semua staf kecuali mekanik) dan panel mekanik (Pekerjaan Saya). --}}
     @php($panelUser = auth()->user())
-    {{-- Dihitung sekali; dipakai lonceng topbar & menu sidebar (hanya panel admin). --}}
-    @php($adminUnreadNotifications = $panelUser->isAdmin() && Route::has('admin.notifications.index') ? $panelUser->unreadNotifications()->count() : 0)
+    @php($notificationRoute = $panelUser->isMechanic() ? 'mechanic.notifications' : 'admin.notifications')
+    {{-- Dihitung sekali; dipakai lonceng topbar & menu sidebar. --}}
+    @php($adminUnreadNotifications = Route::has($notificationRoute.'.index') ? $panelUser->unreadNotifications()->count() : 0)
 
     <div class="admin-wrapper">
         @include('partials.admin-sidebar')
@@ -24,9 +25,9 @@
                     <h1 class="h5 mb-0 text-truncate">@yield('title', $panelUser->isAdmin() ? 'Admin' : 'Pekerjaan Saya')</h1>
 
                     <div class="d-flex align-items-center gap-2 gap-sm-3 ms-auto">
-                        @if ($panelUser->isAdmin() && Route::has('admin.notifications.index'))
-                            <a href="{{ route('admin.notifications.index') }}"
-                               @class(['btn btn-sm btn-outline-secondary notification-bell', 'active' => request()->routeIs('admin.notifications.*')])
+                        @if (Route::has($notificationRoute.'.index'))
+                            <a href="{{ route($notificationRoute.'.index') }}"
+                               @class(['btn btn-sm btn-outline-secondary notification-bell', 'active' => request()->routeIs($notificationRoute.'.*')])
                                aria-label="Notifikasi{{ $adminUnreadNotifications ? ", {$adminUnreadNotifications} belum dibaca" : '' }}">
                                 <i class="bi bi-bell{{ $adminUnreadNotifications ? '-fill' : '' }}"></i>
                                 @if ($adminUnreadNotifications)

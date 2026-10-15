@@ -1,38 +1,34 @@
 @php
-    // Menu hanya tampil jika route-nya sudah terdaftar (lihat Route::has di bawah).
-    // Mekanik: panel Pekerjaan Saya. Owner: menu admin + Merek, Kategori, Laporan, Staf.
+    // Menu hanya tampil jika route-nya terdaftar dan user punya hak aksesnya ('can' = User::PERMISSIONS, sama dengan route).
+    // Mekanik: panel sendiri (Pekerjaan Saya).
     $panelUser = auth()->user();
     $mechanicMenu = [
         ['label' => 'Pekerjaan Saya', 'icon' => 'bi-wrench-adjustable', 'route' => 'mechanic.jobs.index', 'active' => 'mechanic.jobs.*'],
+        ['label' => 'Notifikasi', 'icon' => 'bi-bell', 'route' => 'mechanic.notifications.index', 'active' => 'mechanic.notifications.*', 'badge' => $adminUnreadNotifications ?? 0],
+        ['label' => 'Layanan Servis', 'icon' => 'bi-tools', 'route' => 'mechanic.services.index', 'active' => 'mechanic.services.*'],
         ['label' => 'Rating Saya', 'icon' => 'bi-star', 'route' => 'mechanic.ratings.index', 'active' => 'mechanic.ratings.*'],
         ['label' => 'Profil', 'icon' => 'bi-person', 'route' => 'account.profile', 'active' => 'account.profile*'],
     ];
     $menu = [
         ['label' => 'Dashboard', 'icon' => 'bi-speedometer2', 'route' => 'admin.dashboard', 'active' => 'admin.dashboard'],
         ['label' => 'Notifikasi', 'icon' => 'bi-bell', 'route' => 'admin.notifications.index', 'active' => 'admin.notifications.*', 'badge' => $adminUnreadNotifications ?? 0],
-        ['label' => 'Mobil', 'icon' => 'bi-car-front', 'route' => 'admin.cars.index', 'active' => 'admin.cars.*'],
-        ['label' => 'Merek', 'icon' => 'bi-tags', 'route' => 'admin.brands.index', 'active' => 'admin.brands.*', 'owner' => true],
-        ['label' => 'Kategori', 'icon' => 'bi-grid', 'route' => 'admin.categories.index', 'active' => 'admin.categories.*', 'owner' => true],
-        ['label' => 'Promo', 'icon' => 'bi-percent', 'route' => 'admin.promos.index', 'active' => 'admin.promos.*'],
-        ['label' => 'Test Drive', 'icon' => 'bi-calendar-check', 'route' => 'admin.test-drives.index', 'active' => 'admin.test-drives.*'],
-        ['label' => 'Pengajuan', 'icon' => 'bi-file-earmark-text', 'route' => 'admin.purchase-requests.index', 'active' => 'admin.purchase-requests.*'],
-        ['label' => 'Booking Servis', 'icon' => 'bi-wrench-adjustable', 'route' => 'admin.service-bookings.index', 'active' => 'admin.service-bookings.*'],
-        ['label' => 'Layanan Servis', 'icon' => 'bi-tools', 'route' => 'admin.services.index', 'active' => 'admin.services.*'],
-        ['label' => 'Ulasan', 'icon' => 'bi-star', 'route' => 'admin.testimonials.index', 'active' => 'admin.testimonials.*'],
-        ['label' => 'Pengguna', 'icon' => 'bi-people', 'route' => 'admin.users.index', 'active' => 'admin.users.*'],
+        ['label' => 'Mobil', 'icon' => 'bi-car-front', 'route' => 'admin.cars.index', 'active' => 'admin.cars.*', 'can' => 'cars.view'],
+        ['label' => 'Merek', 'icon' => 'bi-tags', 'route' => 'admin.brands.index', 'active' => 'admin.brands.*', 'can' => 'catalog.manage'],
+        ['label' => 'Kategori', 'icon' => 'bi-grid', 'route' => 'admin.categories.index', 'active' => 'admin.categories.*', 'can' => 'catalog.manage'],
+        ['label' => 'Promo', 'icon' => 'bi-percent', 'route' => 'admin.promos.index', 'active' => 'admin.promos.*', 'can' => 'promos.view'],
+        ['label' => 'Test Drive', 'icon' => 'bi-calendar-check', 'route' => 'admin.test-drives.index', 'active' => 'admin.test-drives.*', 'can' => 'test-drives.manage'],
+        ['label' => 'Pengajuan', 'icon' => 'bi-file-earmark-text', 'route' => 'admin.purchase-requests.index', 'active' => 'admin.purchase-requests.*', 'can' => 'purchases.view'],
+        ['label' => 'Booking Servis', 'icon' => 'bi-wrench-adjustable', 'route' => 'admin.service-bookings.index', 'active' => 'admin.service-bookings.*', 'can' => 'service-bookings.manage'],
+        ['label' => 'Layanan Servis', 'icon' => 'bi-tools', 'route' => 'admin.services.index', 'active' => 'admin.services.*', 'can' => 'services.manage'],
+        ['label' => 'Ulasan', 'icon' => 'bi-star', 'route' => 'admin.testimonials.index', 'active' => 'admin.testimonials.*', 'can' => 'testimonials.view'],
+        ['label' => 'Pengguna', 'icon' => 'bi-people', 'route' => 'admin.users.index', 'active' => 'admin.users.*', 'can' => 'users.view'],
+        ['label' => 'Laporan', 'icon' => 'bi-bar-chart', 'route' => 'admin.reports.index', 'active' => 'admin.reports.*', 'can' => 'reports.view'],
+        ['label' => 'Staf', 'icon' => 'bi-person-badge', 'route' => 'admin.staff.index', 'active' => 'admin.staff.*', 'can' => 'staff.manage'],
     ];
 
-    // Merek & Kategori khusus owner (rutenya juga dikunci role:owner).
-    $menu = array_values(array_filter($menu, fn ($item) => ! ($item['owner'] ?? false) || $panelUser->isOwner()));
-
-    if ($panelUser->isOwner()) {
-        $menu[] = ['label' => 'Laporan', 'icon' => 'bi-bar-chart', 'route' => 'admin.reports.index', 'active' => 'admin.reports.*'];
-        $menu[] = ['label' => 'Staf', 'icon' => 'bi-person-badge', 'route' => 'admin.staff.index', 'active' => 'admin.staff.*'];
-    }
-
-    if ($panelUser->isMechanic()) {
-        $menu = $mechanicMenu;
-    }
+    $menu = $panelUser->isMechanic()
+        ? $mechanicMenu
+        : array_values(array_filter($menu, fn ($item) => ! isset($item['can']) || $panelUser->can($item['can'])));
 @endphp
 
 <div class="admin-sidebar">

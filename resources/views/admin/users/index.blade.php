@@ -19,14 +19,16 @@
             <label for="filter_q" class="form-label small mb-1">Kata kunci</label>
             <input type="search" id="filter_q" name="q" value="{{ $filters['q'] }}" class="form-control form-control-sm" placeholder="Nama, email, atau nomor HP…">
         </div>
-        <div class="col-6 col-md-4 col-lg-auto">
-            <label for="filter_role" class="form-label small mb-1">Role</label>
-            <select id="filter_role" name="role" class="form-select form-select-sm">
-                @foreach (\App\Http\Controllers\Admin\UserController::ROLE_FILTERS as $value => $label)
-                    <option value="{{ $value }}" @selected($filters['role'] === $value)>{{ $label }}</option>
-                @endforeach
-            </select>
-        </div>
+        @can('staff-accounts.view')
+            <div class="col-6 col-md-4 col-lg-auto">
+                <label for="filter_role" class="form-label small mb-1">Role</label>
+                <select id="filter_role" name="role" class="form-select form-select-sm">
+                    @foreach (\App\Http\Controllers\Admin\UserController::ROLE_FILTERS as $value => $label)
+                        <option value="{{ $value }}" @selected($filters['role'] === $value)>{{ $label }}</option>
+                    @endforeach
+                </select>
+            </div>
+        @endcan
         <div class="col-6 col-md-4 col-lg-auto">
             <label for="filter_urut" class="form-label small mb-1">Urutkan</label>
             <select id="filter_urut" name="urut" class="form-select form-select-sm">

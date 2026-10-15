@@ -475,6 +475,21 @@ php vendor/bin/phpunit -c phpunit.mysql.xml
 
 Hasil Phase 17: 651 test lulus di SQLite dan MySQL; semua route dirujuk test; crawler 119 halaman publik tanpa error; uji browser alur tamu, customer (test drive, servis, simulasi → pengajuan, profil), dan admin (dashboard, laporan & CSV, status, validasi, galeri) di desktop, tablet, dan HP. `tests/Feature/SeedDataValidationTest.php` memastikan semua data contoh seeder lolos validasi form admin.
 
+## Peran Staf
+
+Enam peran staf (sejak v1.14.0). Aturan aksesnya ada di satu tempat: `User::PERMISSIONS` di `app/Models/User.php`.
+
+| Peran | Fungsi utama | Tidak dapat |
+|---|---|---|
+| **Owner** | Pemilik dealer: semua menu, laporan bisnis, kelola semua akun staf, hapus data master. | - |
+| **Super Admin** | Semua menu operasional & sistem, kelola akun staf, hapus data master. | Mengelola akun Owner & Super Admin. |
+| **Admin Dealer** | Mobil, merek, kategori, promo, test drive, pengajuan, pembayaran & pengembalian dana, servis, ulasan, pengguna, laporan & ekspor. | Kelola staf, hapus data master. |
+| **Sales** | Melayani pembeli: test drive, proses status pengajuan; mobil & promo hanya lihat. | Ubah data mobil/promo, verifikasi pembayaran, pengembalian dana. |
+| **Customer Service** | Konfirmasi jadwal test drive & servis, tugaskan mekanik; pengajuan, ulasan, dan customer hanya lihat. | Ubah transaksi finansial, moderasi ulasan, lihat akun staf. |
+| **Mekanik** | Panel sendiri: pekerjaan servis yang ditugaskan (checklist, temuan, selesai), layanan servis (lihat), rating. | Membuka panel admin. |
+
+Owner pertama: `php artisan user:make-owner email`. Peran lain dibuat di menu **Staf**. Rincian hak per menu: [docs/RELEASE-v1.14.0.md](docs/RELEASE-v1.14.0.md).
+
 ## Keamanan
 
 Sudah diterapkan (Phase 16):
@@ -498,7 +513,7 @@ Wajib saat production (Phase 19):
 
 - **Demo lokal / presentasi:** [docs/DEMO.md](docs/DEMO.md) — persiapan, akun demo, alur demo ±15 menit, dan solusi masalah saat demo.
 - **Shared hosting (cPanel):** [docs/DEPLOY-CPANEL.md](docs/DEPLOY-CPANEL.md) — syarat hosting (**PHP ≥ 8.4**), upload, document root, database, `.env` production, HTTPS, dan pembaruan.
-- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md), [docs/RELEASE-v1.1.0.md](docs/RELEASE-v1.1.0.md), [docs/RELEASE-v1.2.0.md](docs/RELEASE-v1.2.0.md), [docs/RELEASE-v1.3.0.md](docs/RELEASE-v1.3.0.md), [docs/RELEASE-v1.4.0.md](docs/RELEASE-v1.4.0.md), [docs/RELEASE-v1.5.0.md](docs/RELEASE-v1.5.0.md), [docs/RELEASE-v1.6.0.md](docs/RELEASE-v1.6.0.md), [docs/RELEASE-v1.7.0.md](docs/RELEASE-v1.7.0.md), [docs/RELEASE-v1.7.1.md](docs/RELEASE-v1.7.1.md), [docs/RELEASE-v1.7.2.md](docs/RELEASE-v1.7.2.md), [docs/RELEASE-v1.7.3.md](docs/RELEASE-v1.7.3.md), [docs/RELEASE-v1.8.0.md](docs/RELEASE-v1.8.0.md), [docs/RELEASE-v1.9.0.md](docs/RELEASE-v1.9.0.md), [docs/RELEASE-v1.10.0.md](docs/RELEASE-v1.10.0.md), [docs/RELEASE-v1.11.0.md](docs/RELEASE-v1.11.0.md), [docs/RELEASE-v1.11.1.md](docs/RELEASE-v1.11.1.md), [docs/RELEASE-v1.11.2.md](docs/RELEASE-v1.11.2.md), [docs/RELEASE-v1.12.0.md](docs/RELEASE-v1.12.0.md), [docs/RELEASE-v1.12.1.md](docs/RELEASE-v1.12.1.md), [docs/RELEASE-v1.13.0.md](docs/RELEASE-v1.13.0.md).
+- Catatan rilis: [docs/RELEASE-v1.0.0.md](docs/RELEASE-v1.0.0.md), [docs/RELEASE-v1.1.0.md](docs/RELEASE-v1.1.0.md), [docs/RELEASE-v1.2.0.md](docs/RELEASE-v1.2.0.md), [docs/RELEASE-v1.3.0.md](docs/RELEASE-v1.3.0.md), [docs/RELEASE-v1.4.0.md](docs/RELEASE-v1.4.0.md), [docs/RELEASE-v1.5.0.md](docs/RELEASE-v1.5.0.md), [docs/RELEASE-v1.6.0.md](docs/RELEASE-v1.6.0.md), [docs/RELEASE-v1.7.0.md](docs/RELEASE-v1.7.0.md), [docs/RELEASE-v1.7.1.md](docs/RELEASE-v1.7.1.md), [docs/RELEASE-v1.7.2.md](docs/RELEASE-v1.7.2.md), [docs/RELEASE-v1.7.3.md](docs/RELEASE-v1.7.3.md), [docs/RELEASE-v1.8.0.md](docs/RELEASE-v1.8.0.md), [docs/RELEASE-v1.9.0.md](docs/RELEASE-v1.9.0.md), [docs/RELEASE-v1.10.0.md](docs/RELEASE-v1.10.0.md), [docs/RELEASE-v1.11.0.md](docs/RELEASE-v1.11.0.md), [docs/RELEASE-v1.11.1.md](docs/RELEASE-v1.11.1.md), [docs/RELEASE-v1.11.2.md](docs/RELEASE-v1.11.2.md), [docs/RELEASE-v1.12.0.md](docs/RELEASE-v1.12.0.md), [docs/RELEASE-v1.12.1.md](docs/RELEASE-v1.12.1.md), [docs/RELEASE-v1.13.0.md](docs/RELEASE-v1.13.0.md), [docs/RELEASE-v1.14.0.md](docs/RELEASE-v1.14.0.md).
 
 ## Performa
 
@@ -565,6 +580,7 @@ php artisan optimize
 | +     | Rilis v1.12.0                  | ✅ Selesai (notifikasi bukti & pembayaran pengajuan; 966 test) |
 | +     | Rilis v1.12.1                  | ✅ Selesai (Kebijakan Privasi & Syarat Ketentuan, panduan SMTP, cadangan data, log harian; 973 test) |
 | +     | Rilis v1.13.0                  | ✅ Selesai (batas pembayaran pertama, jadwal lewat, pengembalian dana; 997 test) |
+| +     | Rilis v1.14.0                  | ✅ Selesai (6 peran staf: Owner, Super Admin, Admin Dealer, Sales, Customer Service, Mekanik; 1028 test) |
 
 > **Halaman publik:** layout publik (navbar + footer), beranda, dan katalog `/mobil` (filter kata kunci, merek, kategori, kondisi, harga, tahun, transmisi, BBM, kursi, hanya promo; 6 pilihan urutan; 12 per halaman) sudah selesai. Halaman detail mobil `/mobil/{slug}` juga sudah selesai: galeri, harga & promo, spesifikasi, ringkasan cicilan, tombol WhatsApp, dan mobil serupa. Customer bisa booking test drive di `/test-drive` dan melihat/membatalkan riwayatnya di `/akun/test-drive`. Promo berjalan tampil di `/promo` (filter Semua/Khusus Mobil/Promo Umum) dan detailnya di `/promo/{slug}`. Simulasi kredit bunga flat di `/simulasi-kredit` (tanpa login; pilih mobil atau isi harga, DP, tenor). Customer mengajukan pembelian cash/kredit di `/mobil/{slug}/ajukan` (hasil simulasi bisa ikut terbawa) dan memantau/membatalkan di `/akun/pengajuan`. Halaman `/tentang-kami` dan `/kontak` (alamat, telepon, WhatsApp, email, jam operasional, Google Maps) membaca data dealer dari `.env` (`DEALER_*`). Setiap akun bisa mengubah data diri dan kata sandi di `/akun/profil`.
 
@@ -608,6 +624,8 @@ php artisan optimize
 
 > **Rilis v1.13.0:** batas pembayaran pertama setelah pengajuan disetujui (`DEALER_PAYMENT_DUE_DAYS`, bawaan 3 hari; admin diingatkan, tanpa pembatalan otomatis), penanda **Lewat jadwal** untuk test drive & servis, dan pencatatan **pengembalian dana** untuk pengajuan batal yang sempat dibayar. Setelah pull **wajib** `php artisan migrate` (2 migration). Detail: [docs/RELEASE-v1.13.0.md](docs/RELEASE-v1.13.0.md).
 
+> **Rilis v1.14.0:** enam peran staf (**Owner**, **Super Admin**, **Admin Dealer**, **Sales**, **Customer Service**, **Mekanik**) dengan menu, tombol, dashboard, dan notifikasi sesuai hak masing-masing (lihat bagian *Peran Staf*). Setelah pull **wajib** `php artisan migrate` (1 migration). Detail: [docs/RELEASE-v1.14.0.md](docs/RELEASE-v1.14.0.md).
+
 > **Urutan kerja:** semua halaman **admin** dikerjakan dulu (sudah selesai), lalu halaman **publik** (katalog, detail, test drive, pengajuan, simulasi kredit, dan lainnya). Jadi nomor phase di tabel tidak dikerjakan berurutan.
 
 ### Keputusan desain
@@ -623,7 +641,7 @@ php artisan optimize
 
 | Tabel               | Fungsi                                            |
 | ------------------- | ------------------------------------------------- |
-| `users`             | Owner, admin, mekanik & customer (`role`, `phone`, `is_active`) |
+| `users`             | Staf (owner, super admin, admin dealer, sales, customer service, mekanik) & customer (`role`, `phone`, `is_active`) |
 | `brands`            | Merek mobil                                       |
 | `categories`        | Jenis mobil (SUV, MPV, Sport, EV, dan lain-lain) |
 | `cars`              | Data mobil (baru/bekas, harga, spesifikasi, stok) |

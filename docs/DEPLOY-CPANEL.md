@@ -165,7 +165,7 @@ php artisan optimize
 - `db:seed --force` di production membuat: akun admin (dari `ADMIN_EMAIL`/`ADMIN_PASSWORD`), merek Nissan, kategori, 14 mobil Nissan contoh, 5 promo, dan 6 layanan servis. Data dummy customer, transaksi, dan ulasan contoh **tidak** dibuat (hanya local/testing), sehingga bagian *Kata Pelanggan* di beranda baru muncul setelah ada ulasan customer sungguhan yang disetujui admin. Lewati perintah ini bila ingin mengisi data sendiri lewat admin (akun admin tetap dibutuhkan: jalankan `php artisan db:seed --class=AdminUserSeeder --force`).
 - Opsi B (`public_html`): perintah `artisan` di terminal **tidak** membaca `public_html/index.php`, jadi `storage:link` membuat tautan di `dealer-mobil/public/storage` (tidak dipakai). Buat tautan untuk `public_html` secara manual:
   `ln -s ~/dealer-mobil/storage/app/public ~/public_html/storage`
-- `user:make-owner` menjadikan akun admin dari `ADMIN_EMAIL` sebagai **owner** (pemilik dealer). Hanya owner yang bisa membuka Laporan dan menu **Staf** untuk membuat akun admin dan mekanik.
+- `user:make-owner` menjadikan akun admin dari `ADMIN_EMAIL` sebagai **owner** (pemilik dealer). Owner (dan Super Admin) membuat akun staf lain di menu **Staf**: Super Admin, Admin Dealer, Sales, Customer Service, dan Mekanik. Hak tiap peran: README bagian *Peran Staf*.
 - Izin folder (bila muncul error "Permission denied"): `chmod -R 775 storage bootstrap/cache`.
 
 ## 8. HTTPS
@@ -257,7 +257,7 @@ Cadangan berisi data pribadi customer dan bukti pembayaran: simpan di tempat yan
 | **Cetak PDF** error *Class "Dompdf\Dompdf" not found* | Folder `vendor` lama → upload paket baru (bagian 2) atau `composer install --no-dev`. |
 | **Export Excel** error *Class "PhpOffice\PhpSpreadsheet\..." not found* atau file gagal dibuat | Folder `vendor` lama → upload paket baru / `composer install --no-dev`; pastikan ekstensi PHP `zip` dan `xml` aktif. |
 | Isian harga/kilometer tidak otomatis bertitik ribuan, huruf masih bisa diketik | File `public/js/number-input.js` belum terunggah → upload paket terbaru (server tetap menolak isian berhuruf). |
-| Menu **Laporan** / **Staf** tidak ada, semua akun staf mendapat 403 | Belum ada owner → `php artisan user:make-owner email-admin@dealer.com`. |
+| Menu **Staf** tidak ada, semua akun staf mendapat 403 | Belum ada owner → `php artisan user:make-owner email-admin@dealer.com`. |
 | Bukti pembayaran gagal diunggah / tidak bisa dibuka | Folder `storage/app/private` harus bisa ditulis (`chmod -R 775 storage`) dan ikut dicadangkan; batas upload sama dengan foto (≥ 8M). |
 | Upload foto gagal / halaman error saat mengunggah | Batas `upload_max_filesize` / `post_max_size` hosting terlalu kecil → naikkan (lihat bagian 1). Foto lama: jalankan `php artisan cars:optimize-images` sekali. |
 | **Cetak PDF** error terkait `DOMDocument` | Ekstensi PHP `dom` belum aktif → cPanel → *Select PHP Version* → *Extensions* → centang `dom`. |
