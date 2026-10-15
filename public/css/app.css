@@ -421,6 +421,66 @@ main {
     text-underline-offset: 3px;
 }
 
+.footer-legal {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem 1.25rem;
+}
+
+/* ---------- Publik: Kebijakan Privasi & Syarat Ketentuan ---------- */
+
+.legal-page {
+    max-width: 46rem;
+}
+
+.legal-toc {
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--dm-line);
+    border-radius: var(--dm-radius-panel);
+    background: var(--dm-surface);
+}
+
+.legal-toc-title {
+    font-size: .8125rem;
+    font-weight: 600;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+    color: var(--dm-muted);
+    margin-bottom: .5rem;
+}
+
+.legal-toc ol {
+    padding-left: 1.25rem;
+}
+
+.legal-toc li + li {
+    margin-top: .25rem;
+}
+
+.legal-body {
+    line-height: 1.7;
+}
+
+.legal-body h2 {
+    font-size: 1.25rem;
+    margin: 2.25rem 0 .75rem;
+    /* Judul tidak tertutup navbar sticky saat dibuka dari daftar isi. */
+    scroll-margin-top: 6rem;
+}
+
+.legal-body ul {
+    padding-left: 1.25rem;
+}
+
+.legal-body li + li {
+    margin-top: .375rem;
+}
+
+.legal-contact {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--dm-line);
+}
+
 /* ---------- Publik: beranda ---------- */
 
 .home-hero {
