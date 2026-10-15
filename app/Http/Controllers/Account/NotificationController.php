@@ -19,9 +19,13 @@ class NotificationController extends Controller
 
     public function index(Request $request): View|RedirectResponse
     {
-        // Admin punya halaman notifikasi sendiri dengan layout admin.
+        // Staf punya halaman notifikasi sendiri di panelnya (admin / mekanik).
         if ($request->user()->isAdmin()) {
             return redirect()->route('admin.notifications.index');
+        }
+
+        if ($request->user()->isMechanic()) {
+            return redirect()->route('mechanic.notifications.index');
         }
 
         $notifications = $request->user()->notifications()->paginate(self::PER_PAGE);

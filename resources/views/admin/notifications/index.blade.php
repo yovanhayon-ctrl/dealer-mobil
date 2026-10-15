@@ -6,11 +6,14 @@
     @include('partials.breadcrumb', ['items' => [['label' => 'Notifikasi']]])
 @endsection
 
+{{-- Dipakai panel admin & mekanik: $routePrefix menentukan route buka / tandai dibaca. --}}
+@php($routePrefix ??= 'admin.notifications')
+
 @section('content')
     <div class="d-flex flex-wrap align-items-center justify-content-between gap-2 mb-3">
-        <p class="text-muted small mb-0">Test drive, pengajuan, dan booking servis baru atau yang dibatalkan customer.</p>
+        <p class="text-muted small mb-0">{{ $intro ?? 'Test drive, pengajuan, pembayaran, booking servis, dan ulasan dari customer sesuai menu Anda.' }}</p>
         @if ($hasUnread)
-            <form method="POST" action="{{ route('admin.notifications.read-all') }}" data-disable-on-submit>
+            <form method="POST" action="{{ route($routePrefix.'.read-all') }}" data-disable-on-submit>
                 @csrf
                 @method('PATCH')
                 <button type="submit" class="btn btn-outline-secondary btn-sm">
@@ -23,13 +26,13 @@
     @if ($notifications->isEmpty())
         <div class="card">
             <x-empty-state icon="bi-bell" title="Belum ada notifikasi"
-                           message="Notifikasi muncul saat customer membuat atau membatalkan test drive, pengajuan pembelian, atau booking servis." />
+                           :message="$emptyMessage ?? 'Notifikasi muncul saat customer membuat atau membatalkan test drive, pengajuan pembelian, atau booking servis.'" />
         </div>
     @else
         <div class="list-group">
             @foreach ($notifications as $notification)
                 @php($data = $notification->data)
-                <a href="{{ route('admin.notifications.open', $notification->id) }}"
+                <a href="{{ route($routePrefix.'.open', $notification->id) }}"
                    @class(['list-group-item list-group-item-action notification-item p-3', 'is-unread' => $notification->unread()])>
                     <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
                         <span @class(['fw-semibold' => $notification->unread()])>{{ $data['title'] ?? 'Notifikasi' }}</span>

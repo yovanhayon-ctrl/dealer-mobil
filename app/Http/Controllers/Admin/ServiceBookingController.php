@@ -9,6 +9,8 @@ use App\Models\Service;
 use App\Models\ServiceBooking;
 use App\Models\ServiceBookingTask;
 use App\Models\User;
+use App\Notifications\MechanicJobAssigned;
+use App\Notifications\Notifier;
 use DateTime;
 use DomainException;
 use Illuminate\Database\Eloquent\Builder;
@@ -111,12 +113,18 @@ class ServiceBookingController extends Controller
         }
 
         $mechanic = User::findOrFail($validated['mechanic_id']);
+        $reassigned = $serviceBooking->mechanic_id !== $mechanic->id;
         $serviceBooking->update([
             'mechanic_id' => $mechanic->id,
             // Diganti admin: bukan lagi pilihan customer.
             'mechanic_chosen_by_customer' => $serviceBooking->mechanic_chosen_by_customer && $serviceBooking->mechanic_id === $mechanic->id,
         ]);
         $serviceBooking->copyChecklistFromService();
+
+        // Booking yang sudah dikonfirmasi langsung muncul di Pekerjaan Saya; yang masih menunggu dikabarkan saat dikonfirmasi.
+        if ($reassigned && in_array($serviceBooking->status, [ServiceBooking::STATUS_CONFIRMED, ServiceBooking::STATUS_IN_PROGRESS], true)) {
+            Notifier::send($mechanic, new MechanicJobAssigned($serviceBooking));
+        }
 
         return $redirect->with('success', "Booking ditugaskan ke {$mechanic->name}. Checklist pekerjaan siap dikerjakan.");
     }

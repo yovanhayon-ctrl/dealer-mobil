@@ -8,8 +8,8 @@
     </div>
     <div class="col-md-6">
         <x-form.select name="role" label="Role" required :value="old('role', $staff->role)"
-                       :options="collect(User::ASSIGNABLE_STAFF_ROLES)->mapWithKeys(fn ($role) => [$role => User::ROLE_LABELS[$role]])->all()"
-                       help="Admin: menu admin tanpa Laporan, Staf, dan tombol hapus data master. Mekanik: hanya panel Pekerjaan Saya." />
+                       :options="collect(auth()->user()->manageableStaffRoles())->mapWithKeys(fn ($role) => [$role => User::ROLE_LABELS[$role]])->all()"
+                       help="Super Admin: semua menu, kelola staf selain Owner & Super Admin. Admin Dealer: operasional & laporan, tanpa Staf dan hapus data master. Sales: test drive & pengajuan, mobil & promo hanya lihat. Customer Service: jadwal test drive & servis, pengajuan & ulasan hanya lihat. Mekanik: panel Pekerjaan Saya." />
     </div>
     <div class="col-md-6">
         <x-form.input name="email" type="email" label="Email (untuk login)" :value="$staff->email" required maxlength="255" autocomplete="off" />

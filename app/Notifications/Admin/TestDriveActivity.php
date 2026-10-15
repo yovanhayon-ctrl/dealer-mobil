@@ -22,6 +22,11 @@ class TestDriveActivity extends AdminActivityNotification
         return TestDriveStatusChanged::describe($this->record);
     }
 
+    public function permission(): string
+    {
+        return 'test-drives.manage';
+    }
+
     protected function routeName(): string
     {
         return 'admin.test-drives.show';

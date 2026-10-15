@@ -3,7 +3,6 @@
 namespace App\Http\Requests\Admin;
 
 use App\Http\Requests\Concerns\NormalizesPhone;
-use App\Models\User;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Str;
 use Illuminate\Validation\Rule;
@@ -17,7 +16,7 @@ class StaffRequest extends FormRequest
     use NormalizesPhone;
 
     /**
-     * Akses dibatasi middleware role:owner pada grup route.
+     * Akses dibatasi middleware can:staff.manage pada grup route; role yang boleh diberikan dibatasi di rules().
      */
     public function authorize(): bool
     {
@@ -44,7 +43,7 @@ class StaffRequest extends FormRequest
             'name' => ['required', 'string', 'min:3', 'max:100'],
             'email' => ['required', 'string', 'email', 'max:255', Rule::unique('users', 'email')->ignore($staff?->id)],
             'phone' => ['nullable', 'regex:'.self::PHONE_REGEX],
-            'role' => ['required', Rule::in(User::ASSIGNABLE_STAFF_ROLES)],
+            'role' => ['required', Rule::in($this->user()->manageableStaffRoles())],
             // Wajib saat membuat akun; saat mengubah, kosong = kata sandi tetap.
             'password' => [$staff ? 'nullable' : 'required', 'string', 'confirmed', Password::min(8)],
             'is_active' => ['nullable', 'boolean'],

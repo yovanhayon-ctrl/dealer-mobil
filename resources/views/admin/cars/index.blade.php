@@ -11,10 +11,14 @@
 @endphp
 
 @section('content')
+    {{-- Sales hanya melihat (cars.view); tambah/ubah/galeri/status untuk cars.manage. --}}
+    @php($canManage = auth()->user()->can('cars.manage'))
     <x-admin.list-header :summary="number_format($cars->total(), 0, ',', '.').' mobil'.($hasFilters ? ' ditemukan' : '')">
-        <a href="{{ route('admin.cars.create') }}" class="btn btn-accent btn-sm">
-            <i class="bi bi-plus-lg"></i>Tambah Mobil
-        </a>
+        @if ($canManage)
+            <a href="{{ route('admin.cars.create') }}" class="btn btn-accent btn-sm">
+                <i class="bi bi-plus-lg"></i>Tambah Mobil
+            </a>
+        @endif
     </x-admin.list-header>
 
     <x-admin.filters :action="route('admin.cars.index')" :reset-url="route('admin.cars.index')"
@@ -87,7 +91,9 @@
                 <x-empty-state icon="bi-search" title="Mobil tidak ditemukan" message="Tidak ada mobil yang cocok dengan filter." />
             @else
                 <x-empty-state icon="bi-car-front" title="Belum ada mobil" message="Tambahkan mobil pertama agar tampil di katalog.">
-                    <a href="{{ route('admin.cars.create') }}" class="btn btn-accent btn-sm"><i class="bi bi-plus-lg"></i>Tambah Mobil</a>
+                    @if ($canManage)
+                        <a href="{{ route('admin.cars.create') }}" class="btn btn-accent btn-sm"><i class="bi bi-plus-lg"></i>Tambah Mobil</a>
+                    @endif
                 </x-empty-state>
             @endif
         @else
@@ -109,17 +115,21 @@
                             @php($carTitle = "{$car->name} {$car->year}")
                             <tr @class(['table-light text-muted' => ! $car->is_active])>
                                 <td>
-                                    <a href="{{ route('admin.cars.images.index', $car) }}" title="Kelola galeri">
+                                    @if ($canManage)<a href="{{ route('admin.cars.images.index', $car) }}" title="Kelola galeri">@endif
                                         @if ($car->primaryImage)
                                             <img src="{{ $car->primaryImage->thumb_url }}" alt="{{ $carTitle }}" class="car-thumb" loading="lazy">
                                         @else
                                             <span class="car-thumb car-thumb-empty"><i class="bi bi-car-front"></i></span>
                                         @endif
-                                    </a>
+                                    @if ($canManage)</a>@endif
                                 </td>
                                 <td>
                                     <div class="fw-semibold d-flex flex-wrap align-items-center gap-1">
-                                        <a href="{{ route('admin.cars.edit', $car) }}" class="text-reset text-decoration-none">{{ $car->name }}</a>
+                                        @if ($canManage)
+                                            <a href="{{ route('admin.cars.edit', $car) }}" class="text-reset text-decoration-none">{{ $car->name }}</a>
+                                        @else
+                                            {{ $car->name }}
+                                        @endif
                                         @if ($car->is_featured)
                                             <span class="badge rounded-pill badge-status-dark" title="Unggulan di beranda"><i class="bi bi-star-fill me-1"></i>Unggulan</span>
                                         @endif
@@ -153,21 +163,31 @@
                                 </td>
                                 <td class="text-nowrap">
                                     <x-status-badge :status="$car->is_active ? 'active' : 'inactive'" class="me-1" />
-                                    <form method="POST" action="{{ route('admin.cars.toggle-active', $car) }}" class="d-inline">
-                                        @csrf
-                                        @method('PATCH')
-                                        <button type="submit" class="btn btn-link btn-sm p-0 align-baseline">
-                                            {{ $car->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
-                                        </button>
-                                    </form>
+                                    @if ($canManage)
+                                        <form method="POST" action="{{ route('admin.cars.toggle-active', $car) }}" class="d-inline">
+                                            @csrf
+                                            @method('PATCH')
+                                            <button type="submit" class="btn btn-link btn-sm p-0 align-baseline">
+                                                {{ $car->is_active ? 'Nonaktifkan' : 'Aktifkan' }}
+                                            </button>
+                                        </form>
+                                    @endif
                                 </td>
                                 <td class="text-end text-nowrap">
                                     <div class="admin-row-actions">
-                                        <a href="{{ route('admin.cars.images.index', $car) }}" class="btn btn-sm btn-outline-secondary btn-icon"
-                                           title="Galeri" aria-label="Galeri {{ $carTitle }}">
-                                            <i class="bi bi-images"></i>
-                                        </a>
+                                        @if ($canManage)
+                                            <a href="{{ route('admin.cars.images.index', $car) }}" class="btn btn-sm btn-outline-secondary btn-icon"
+                                               title="Galeri" aria-label="Galeri {{ $carTitle }}">
+                                                <i class="bi bi-images"></i>
+                                            </a>
+                                        @elseif ($car->is_active)
+                                            <a href="{{ route('cars.show', $car) }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-secondary btn-icon"
+                                               title="Lihat di website" aria-label="Lihat {{ $carTitle }} di website">
+                                                <i class="bi bi-box-arrow-up-right"></i>
+                                            </a>
+                                        @endif
                                         @include('admin.partials.row-actions', [
+                                            'editAbility' => 'cars.manage',
                                             'editUrl' => route('admin.cars.edit', $car),
                                             'deleteUrl' => route('admin.cars.destroy', $car),
                                             'name' => $carTitle,

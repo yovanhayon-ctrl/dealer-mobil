@@ -3,6 +3,7 @@
 namespace App\Actions;
 
 use App\Models\ServiceBooking;
+use App\Notifications\MechanicJobAssigned;
 use App\Notifications\Notifier;
 use App\Notifications\ServiceBookingStatusChanged;
 use DomainException;
@@ -10,7 +11,8 @@ use Illuminate\Support\Facades\DB;
 
 /**
  * Ubah status booking servis (admin atau mekanik) di dalam transaksi dengan baris terkunci,
- * catat waktu mulai / selesai, lalu kabari customer bila status benar-benar berubah.
+ * catat waktu mulai / selesai, lalu kabari customer bila status benar-benar berubah
+ * (dan mekanik yang ditugaskan saat booking dikonfirmasi: pekerjaan baru di Pekerjaan Saya).
  */
 class ChangeServiceBookingStatus
 {
@@ -51,6 +53,10 @@ class ChangeServiceBookingStatus
         // Hanya perubahan status yang benar-benar tersimpan yang dikabarkan ke customer.
         if ($status !== null && $updated->wasChanged('status')) {
             Notifier::send($updated->user, new ServiceBookingStatusChanged($updated));
+
+            if ($status === ServiceBooking::STATUS_CONFIRMED && $updated->mechanic_id !== null) {
+                Notifier::send($updated->loadMissing('mechanic')->mechanic, new MechanicJobAssigned($updated));
+            }
         }
 
         return $updated;

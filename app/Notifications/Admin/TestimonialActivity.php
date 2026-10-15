@@ -28,6 +28,11 @@ class TestimonialActivity extends AdminActivityNotification
             .'"'.Str::limit($this->record->comment, 80).'"';
     }
 
+    public function permission(): string
+    {
+        return 'testimonials.view';
+    }
+
     protected function routeName(): string
     {
         return 'admin.testimonials.index';

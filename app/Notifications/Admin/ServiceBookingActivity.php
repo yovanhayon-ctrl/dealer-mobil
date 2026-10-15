@@ -30,6 +30,11 @@ class ServiceBookingActivity extends AdminActivityNotification
             : $description;
     }
 
+    public function permission(): string
+    {
+        return 'service-bookings.manage';
+    }
+
     protected function routeName(): string
     {
         return 'admin.service-bookings.show';
