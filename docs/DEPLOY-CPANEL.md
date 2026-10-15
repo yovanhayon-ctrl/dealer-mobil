@@ -81,6 +81,8 @@ APP_ENV=production
 APP_DEBUG=false
 APP_URL=https://domain-anda.com
 LOG_LEVEL=warning
+LOG_STACK=daily
+LOG_DAILY_DAYS=14
 
 DB_CONNECTION=mysql
 DB_HOST=localhost
@@ -117,13 +119,31 @@ ADMIN_EMAIL=admin@domain-anda.com
 ADMIN_PASSWORD=kata-sandi-admin-yang-kuat
 ```
 
-- `MAIL_*`: buat akun email di cPanel → **Email Accounts**. Dipakai fitur *Lupa kata sandi* dan **notifikasi email**: customer menerima email saat status test drive/pengajuan/servis/ulasan berubah, admin menerima email saat ada booking, pengajuan, pembatalan, atau ulasan baru. Pastikan `ADMIN_EMAIL` adalah alamat yang benar-benar dibaca.
-- `DEALER_MAIL_NOTIFICATIONS=false` mematikan email notifikasi (lonceng tetap jalan). Kegagalan SMTP tidak menggagalkan proses, tetapi setting yang salah membuat aksi terasa lambat; cek `storage/logs/laravel.log`.
+- `MAIL_*`: **wajib** diisi SMTP sungguhan, karena fitur *Lupa kata sandi* hanya bisa dipakai bila email benar-benar terkirim (tidak bergantung pada `DEALER_MAIL_NOTIFICATIONS`). Langkahnya ada di bagian *Email* di bawah. Pastikan `ADMIN_EMAIL` adalah alamat yang benar-benar dibaca.
+- `DEALER_MAIL_NOTIFICATIONS` mengatur **email notifikasi** (customer: status test drive/pengajuan/pembayaran/servis/ulasan berubah; admin: booking, pengajuan, bukti pembayaran, pembatalan, atau ulasan baru). `false` = hanya lonceng 🔔. Kegagalan SMTP tidak menggagalkan proses, tetapi setting yang salah membuat aksi terasa lambat; cek log di `storage/logs/`.
+- `LOG_STACK=daily`: log ditulis per hari (`storage/logs/laravel-2026-10-15.log`, dst.) dan file yang lebih tua dari `LOG_DAILY_DAYS` hari dihapus otomatis, sehingga tidak memenuhi kuota hosting.
 - `DEALER_*` diisi **data klien** (nama dealer, alamat, telepon, WhatsApp, email, jam buka, peta): tampil di navbar, footer, Kontak, tombol WhatsApp, email, kop **PDF bukti pengajuan**, dan bagian kontak **Kebijakan Privasi** / **Syarat & Ketentuan**.
 - Isi `/kebijakan-privasi` dan `/syarat-ketentuan` adalah templat yang disesuaikan dengan fitur situs, **bukan nasihat hukum**: minta pemilik dealer (atau penasihat hukumnya) membacanya sebelum online. Teksnya ada di `resources/views/pages/legal/`; bila diubah, perbarui tanggal berlaku di `PageController::LEGAL_EFFECTIVE_DATE`.
 - `SESSION_SECURE_COOKIE=true` hanya bila situs sudah memakai **HTTPS**.
 - `SEED_CUSTOMER_PASSWORD` dibiarkan kosong: customer dummy tidak dibuat di production.
 - Peta Google: Google Maps → *Bagikan* → *Sematkan peta* → salin URL di dalam `src="…"`.
+
+### Email (SMTP dari cPanel)
+
+1. cPanel → **Email Accounts** → *Create*: buat mis. `noreply@domain-anda.com` dengan kata sandi kuat.
+2. Klik **Connect Devices** pada akun itu, catat *Outgoing Server* (biasanya `mail.domain-anda.com`) dan port SMTP.
+3. Isi `.env`:
+   - Port **465** (SSL): `MAIL_PORT=465` dan `MAIL_SCHEME=smtps`.
+   - Port **587** (STARTTLS): `MAIL_PORT=587` dan `MAIL_SCHEME=smtp`.
+   - `MAIL_USERNAME` dan `MAIL_FROM_ADDRESS` = alamat email lengkap tadi (harus sama, banyak hosting menolak pengirim yang berbeda).
+4. cPanel → **Email Deliverability**: pastikan **SPF** dan **DKIM** berstatus *Valid* (klik *Repair* bila belum). Tanpa ini email reset kata sandi mudah masuk folder Spam.
+5. Setelah bagian 7 selesai, uji kirim (ganti alamat tujuan dengan email Anda):
+
+   ```bash
+   php artisan tinker --execute='Mail::raw("Tes email dari JAF Dealer.", fn ($m) => $m->to("email-anda@gmail.com")->subject("Tes email JAF Dealer"));'
+   ```
+
+   Tidak ada pesan error dan email masuk (cek juga folder Spam) = SMTP benar. Bila error, perbaiki `MAIL_*`, jalankan `php artisan optimize`, lalu uji lagi. Tanpa Terminal: uji lewat halaman **Lupa kata sandi** dan lihat log di `storage/logs/`.
 
 ## 7. Perintah di Terminal cPanel
 
@@ -170,7 +190,7 @@ Header keamanan (CSP, HSTS saat HTTPS, dll.) sudah dipasang aplikasi; aturan cac
 - [ ] Beranda, katalog, detail mobil, promo, simulasi, servis, kontak tampil normal (tidak ada halaman debug).
 - [ ] Login admin berhasil; tambah foto mobil dan foto tampil di katalog.
 - [ ] Daftar akun customer baru → booking test drive → muncul di admin.
-- [ ] *Lupa kata sandi* mengirim email.
+- [ ] *Lupa kata sandi* mengirim email (cek juga folder Spam) dan tautan reset bisa dipakai untuk masuk.
 - [ ] Footer memuat **Kebijakan Privasi** dan **Syarat & Ketentuan** dengan kontak dealer yang benar.
 - [ ] Admin mengubah status booking test drive tadi → customer melihat lonceng 🔔 dan menerima email; admin menerima notifikasi booking baru.
 - [ ] **Pengajuan Saya** → **Cetak PDF** membuka bukti pengajuan dengan kop data klien.
@@ -179,17 +199,56 @@ Header keamanan (CSP, HSTS saat HTTPS, dll.) sudah dipasang aplikasi; aturan cac
 
 ## 11. Memperbarui aplikasi (rilis berikutnya)
 
-1. Siapkan paket baru seperti bagian 2 dan upload/ekstrak menimpa folder `dealer-mobil` (**jangan** menimpa `.env`, `storage/app/public`, dan `storage/app/private` yang berisi bukti pembayaran customer). Folder `vendor` ikut diganti, sehingga dependency baru (mis. dompdf di v1.4.0) ikut terpasang. Bila memakai Terminal dengan `composer`, boleh juga `composer install --no-dev --optimize-autoloader` di server.
-2. Di Terminal: `cd ~/dealer-mobil && php artisan down && php artisan migrate --force && php artisan optimize && php artisan up`.
-3. Opsi B: salin ulang isi `dealer-mobil/public` ke `public_html` (kecuali `index.php` yang sudah diedit).
-4. Ikuti langkah khusus di catatan rilis versi tersebut. Contoh v1.11.0: `php artisan user:make-owner email-admin@dealer.com` dan isi `DEALER_BANK_*` di `.env` (lihat [RELEASE-v1.11.0.md](RELEASE-v1.11.0.md)).
+1. **Cadangkan dulu** database dan folder `storage` (bagian 12).
+2. Siapkan paket baru seperti bagian 2 dan upload/ekstrak menimpa folder `dealer-mobil` (**jangan** menimpa `.env`, `storage/app/public`, dan `storage/app/private` yang berisi bukti pembayaran customer). Folder `vendor` ikut diganti, sehingga dependency baru (mis. dompdf di v1.4.0) ikut terpasang. Bila memakai Terminal dengan `composer`, boleh juga `composer install --no-dev --optimize-autoloader` di server.
+3. Di Terminal: `cd ~/dealer-mobil && php artisan down && php artisan migrate --force && php artisan optimize && php artisan up`.
+4. Opsi B: salin ulang isi `dealer-mobil/public` ke `public_html` (kecuali `index.php` yang sudah diedit).
+5. Ikuti langkah khusus di catatan rilis versi tersebut. Contoh v1.11.0: `php artisan user:make-owner email-admin@dealer.com` dan isi `DEALER_BANK_*` di `.env` (lihat [RELEASE-v1.11.0.md](RELEASE-v1.11.0.md)).
 
-## 12. Masalah umum
+## 12. Cadangan data
+
+Yang **wajib** dicadangkan (folder lain bisa dibuat ulang dari paket aplikasi):
+
+| Data | Lokasi | Isi |
+|---|---|---|
+| Database | MySQL `namauser_dealer` | Akun, mobil, pengajuan, pembayaran, servis, notifikasi |
+| Bukti pembayaran | `dealer-mobil/storage/app/private` | Bukti transfer & kwitansi customer (data pribadi) |
+| Foto | `dealer-mobil/storage/app/public` | Foto mobil, banner promo, logo merek |
+| Pengaturan | `dealer-mobil/.env` | Kunci aplikasi (`APP_KEY`), database, email, data dealer |
+
+**Kapan:** minimal **sekali seminggu**, dan **selalu** sebelum memperbarui aplikasi (bagian 11). Banyak hosting juga membuat cadangan otomatis harian; cek di cPanel → **Backup** / **JetBackup**, tetapi tetap simpan salinan sendiri.
+
+**Cara A, lewat cPanel (tanpa Terminal):**
+
+1. cPanel → **Backup** → *Download a MySQL Database Backup* → klik nama database.
+2. cPanel → **File Manager** → klik kanan folder `dealer-mobil/storage/app` → *Compress* (Zip) → unduh file zip-nya, lalu hapus zip dari server.
+3. Unduh juga `dealer-mobil/.env`.
+
+**Cara B, lewat Terminal:**
+
+```bash
+mkdir -p ~/backups
+mysqldump -u namauser_dealer -p namauser_dealer > ~/backups/db-$(date +%F).sql
+tar -czf ~/backups/storage-$(date +%F).tar.gz -C ~/dealer-mobil storage/app/public storage/app/private .env
+find ~/backups -type f -mtime +30 -delete   # hapus cadangan yang lebih tua dari 30 hari
+```
+
+`mysqldump` menanyakan kata sandi database. Folder `~/backups` berada di luar `public_html` sehingga tidak bisa diunduh orang lain; tetap unduh salinannya ke komputer atau penyimpanan cloud milik dealer.
+
+**Memulihkan:**
+
+1. Database: phpMyAdmin → pilih database → *Import* file `.sql` (atau `mysql -u namauser_dealer -p namauser_dealer < db-TANGGAL.sql`).
+2. File: ekstrak cadangan ke `dealer-mobil` sehingga `storage/app/public`, `storage/app/private`, dan `.env` kembali ke tempatnya (`tar -xzf storage-TANGGAL.tar.gz -C ~/dealer-mobil`).
+3. `php artisan storage:link` (opsi B: buat ulang tautan `public_html/storage`, bagian 7) lalu `php artisan optimize`.
+
+Cadangan berisi data pribadi customer dan bukti pembayaran: simpan di tempat yang aman dan jangan dibagikan (lihat Kebijakan Privasi).
+
+## 13. Masalah umum
 
 | Gejala | Penyebab & solusi |
 |---|---|
 | Error *"Your Composer dependencies require a PHP version >= 8.4.1"* | Versi PHP hosting terlalu lama → pilih PHP 8.4/8.5 (web **dan** CLI). |
-| Halaman putih / *500 Server Error* | Lihat `dealer-mobil/storage/logs/laravel.log`. Biasanya `.env` salah (DB), `APP_KEY` kosong, atau izin folder `storage`. |
+| Halaman putih / *500 Server Error* | Lihat log terbaru di `dealer-mobil/storage/logs/` (`laravel-TANGGAL.log`; `laravel.log` bila `LOG_STACK=single`). Biasanya `.env` salah (DB), `APP_KEY` kosong, atau izin folder `storage`. |
 | Perubahan `.env` tidak berlaku | Config ter-cache → `php artisan optimize`. |
 | Foto tidak tampil | `storage:link` belum ada / salah folder (opsi B: tautan harus `public_html/storage` → `~/dealer-mobil/storage/app/public`, dibuat manual dengan `ln -s`). |
 | Peta tidak tampil | `DEALER_MAPS_EMBED_URL` harus URL **embed** Google Maps (https). |
@@ -200,5 +259,5 @@ Header keamanan (CSP, HSTS saat HTTPS, dll.) sudah dipasang aplikasi; aturan cac
 | Bukti pembayaran gagal diunggah / tidak bisa dibuka | Folder `storage/app/private` harus bisa ditulis (`chmod -R 775 storage`) dan ikut dicadangkan; batas upload sama dengan foto (≥ 8M). |
 | Upload foto gagal / halaman error saat mengunggah | Batas `upload_max_filesize` / `post_max_size` hosting terlalu kecil → naikkan (lihat bagian 1). Foto lama: jalankan `php artisan cars:optimize-images` sekali. |
 | **Cetak PDF** error terkait `DOMDocument` | Ekstensi PHP `dom` belum aktif → cPanel → *Select PHP Version* → *Extensions* → centang `dom`. |
-| Email notifikasi tidak terkirim / aksi lambat | `MAIL_*` salah atau port SMTP diblokir hosting → cek `laravel.log`, perbaiki lalu `php artisan optimize`, atau sementara `DEALER_MAIL_NOTIFICATIONS=false`. |
+| Email notifikasi tidak terkirim / aksi lambat | `MAIL_*` salah atau port SMTP diblokir hosting → cek log di `storage/logs/`, perbaiki lalu `php artisan optimize`, atau sementara `DEALER_MAIL_NOTIFICATIONS=false`. |
 | *419 Sesi Berakhir* terus-menerus | `SESSION_SECURE_COOKIE=true` padahal belum HTTPS, atau `APP_URL` tidak sesuai domain. |
