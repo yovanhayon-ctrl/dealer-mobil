@@ -59,6 +59,12 @@
                    class="form-control" autocomplete="new-password" required>
         </div>
 
+        <p class="form-text mb-3">
+            Dengan mendaftar, Anda menyetujui
+            <a href="{{ route('terms') }}" target="_blank" rel="noopener">Syarat &amp; Ketentuan</a> dan
+            <a href="{{ route('privacy') }}" target="_blank" rel="noopener">Kebijakan Privasi</a> {{ config('dealer.name') }}.
+        </p>
+
         <button type="submit" class="btn btn-accent w-100">
             <i class="bi bi-person-plus"></i>Daftar
         </button>

@@ -119,7 +119,8 @@ ADMIN_PASSWORD=kata-sandi-admin-yang-kuat
 
 - `MAIL_*`: buat akun email di cPanel → **Email Accounts**. Dipakai fitur *Lupa kata sandi* dan **notifikasi email**: customer menerima email saat status test drive/pengajuan/servis/ulasan berubah, admin menerima email saat ada booking, pengajuan, pembatalan, atau ulasan baru. Pastikan `ADMIN_EMAIL` adalah alamat yang benar-benar dibaca.
 - `DEALER_MAIL_NOTIFICATIONS=false` mematikan email notifikasi (lonceng tetap jalan). Kegagalan SMTP tidak menggagalkan proses, tetapi setting yang salah membuat aksi terasa lambat; cek `storage/logs/laravel.log`.
-- `DEALER_*` diisi **data klien** (nama dealer, alamat, telepon, WhatsApp, email, jam buka, peta): tampil di navbar, footer, Kontak, tombol WhatsApp, email, dan kop **PDF bukti pengajuan**.
+- `DEALER_*` diisi **data klien** (nama dealer, alamat, telepon, WhatsApp, email, jam buka, peta): tampil di navbar, footer, Kontak, tombol WhatsApp, email, kop **PDF bukti pengajuan**, dan bagian kontak **Kebijakan Privasi** / **Syarat & Ketentuan**.
+- Isi `/kebijakan-privasi` dan `/syarat-ketentuan` adalah templat yang disesuaikan dengan fitur situs, **bukan nasihat hukum**: minta pemilik dealer (atau penasihat hukumnya) membacanya sebelum online. Teksnya ada di `resources/views/pages/legal/`; bila diubah, perbarui tanggal berlaku di `PageController::LEGAL_EFFECTIVE_DATE`.
 - `SESSION_SECURE_COOKIE=true` hanya bila situs sudah memakai **HTTPS**.
 - `SEED_CUSTOMER_PASSWORD` dibiarkan kosong: customer dummy tidak dibuat di production.
 - Peta Google: Google Maps → *Bagikan* → *Sematkan peta* → salin URL di dalam `src="…"`.
@@ -170,6 +171,7 @@ Header keamanan (CSP, HSTS saat HTTPS, dll.) sudah dipasang aplikasi; aturan cac
 - [ ] Login admin berhasil; tambah foto mobil dan foto tampil di katalog.
 - [ ] Daftar akun customer baru → booking test drive → muncul di admin.
 - [ ] *Lupa kata sandi* mengirim email.
+- [ ] Footer memuat **Kebijakan Privasi** dan **Syarat & Ketentuan** dengan kontak dealer yang benar.
 - [ ] Admin mengubah status booking test drive tadi → customer melihat lonceng 🔔 dan menerima email; admin menerima notifikasi booking baru.
 - [ ] **Pengajuan Saya** → **Cetak PDF** membuka bukti pengajuan dengan kop data klien.
 - [ ] Favorit (❤), **Bandingkan**, dan grafik **Tren 6 Bulan** di dashboard admin tampil (grafik butuh akses ke cdn.jsdelivr.net).

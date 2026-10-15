@@ -69,7 +69,11 @@
 
         <div class="footer-bottom">
             <p class="mb-0">&copy; {{ now()->year }} {{ $dealer['name'] }}. Hak cipta dilindungi.</p>
-            <a href="#top" class="footer-bottom-link">Kembali ke atas</a>
+            <nav class="footer-legal" aria-label="Informasi hukum">
+                <a href="{{ route('privacy') }}" class="footer-bottom-link">Kebijakan Privasi</a>
+                <a href="{{ route('terms') }}" class="footer-bottom-link">Syarat &amp; Ketentuan</a>
+                <a href="#top" class="footer-bottom-link">Kembali ke atas</a>
+            </nav>
         </div>
     </div>
 </footer>
