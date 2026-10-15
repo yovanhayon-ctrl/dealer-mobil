@@ -125,6 +125,8 @@ class TestDriveController extends Controller
             'status' => $pick('status', TestDrive::STATUSES),
             'dari' => $date('dari'),
             'sampai' => $date('sampai'),
+            // "lewat": masih Menunggu/Dikonfirmasi padahal tanggalnya sudah lewat.
+            'jadwal' => $pick('jadwal', ['lewat']),
             'urut' => $pick('urut', array_keys(self::SORTS)) ?? 'terbaru',
         ];
     }
@@ -141,6 +143,7 @@ class TestDriveController extends Controller
                     ->orWhereHas('brand', fn ($brand) => $brand->where('name', 'like', "%{$search}%")))))
             ->when($filters['status'], fn ($q, $status) => $q->where('status', $status))
             ->when($filters['dari'], fn ($q, $date) => $q->whereDate('preferred_date', '>=', $date))
-            ->when($filters['sampai'], fn ($q, $date) => $q->whereDate('preferred_date', '<=', $date));
+            ->when($filters['sampai'], fn ($q, $date) => $q->whereDate('preferred_date', '<=', $date))
+            ->when($filters['jadwal'] === 'lewat', fn ($q) => $q->overdue());
     }
 }

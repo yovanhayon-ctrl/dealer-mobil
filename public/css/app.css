@@ -1426,6 +1426,42 @@ img.promo-card-img {
     margin-bottom: .75rem;
 }
 
+/* Strip "Perlu ditindaklanjuti" di dashboard: lewat tenggat bayar / lewat jadwal. */
+.dashboard-attention {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem 1.25rem;
+    padding: .75rem 1rem;
+    border: 1px solid rgba(195, 0, 47, .35);
+    border-left-width: 4px;
+    border-radius: var(--dm-radius-control);
+    background: var(--dm-surface);
+}
+
+.dashboard-attention-title {
+    font-weight: 600;
+    color: var(--dm-accent-text);
+}
+
+.dashboard-attention-title .bi {
+    margin-right: .375rem;
+}
+
+.dashboard-attention-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .25rem 1.25rem;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.dashboard-attention-list a {
+    color: inherit;
+    text-underline-offset: 3px;
+}
+
 .dashboard-section-meta {
     font-weight: 400;
     text-transform: none;

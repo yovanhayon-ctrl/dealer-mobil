@@ -17,7 +17,7 @@ class PurchaseRequestPdf
 {
     public function html(PurchaseRequest $purchaseRequest): string
     {
-        $purchaseRequest->loadMissing(['user:id,name,email', 'car.brand:id,name', 'paymentProofs']);
+        $purchaseRequest->loadMissing(['user:id,name,email', 'car.brand:id,name', 'paymentProofs', 'paymentRefunds']);
 
         return view('pdf.purchase-request', [
             'purchase' => $purchaseRequest,

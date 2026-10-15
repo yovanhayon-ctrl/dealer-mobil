@@ -112,9 +112,27 @@
                 </tr>
             @endforeach
             <tr class="total"><th>Total diterima</th><td class="amount">{{ $rupiah($purchase->verifiedPaymentTotal()) }}</td></tr>
-            @unless ($purchase->isPaidOff())
+            @unless ($purchase->isPaidOff() || $purchase->isClosed())
                 <tr><th>Sisa {{ $purchase->isCredit() ? 'DP' : 'pembayaran' }}</th><td>{{ $rupiah($purchase->remainingPayment()) }}</td></tr>
             @endunless
+        </table>
+    @endif
+
+    @if ($purchase->refundStatus())
+        <div class="section">Pengembalian Dana · {{ $purchase->paymentStatusLabel() }}</div>
+        <table class="data">
+            @foreach ($purchase->paymentRefunds as $refund)
+                <tr>
+                    <th>{{ $refund->refunded_on->translatedFormat('d F Y') }} · {{ $refund->methodLabel() }}</th>
+                    <td>{{ $rupiah($refund->amount) }}</td>
+                </tr>
+            @endforeach
+            <tr class="total"><th>Total dikembalikan</th><td class="amount">{{ $rupiah($purchase->refundedTotal()) }}</td></tr>
+            @if ($purchase->refund_closed_at)
+                <tr><th>Tidak dikembalikan</th><td>{{ $purchase->refund_closed_note }}</td></tr>
+            @elseif ($purchase->refundableAmount() > 0)
+                <tr><th>Belum dikembalikan</th><td>{{ $rupiah($purchase->refundableAmount()) }}</td></tr>
+            @endif
         </table>
     @endif
 

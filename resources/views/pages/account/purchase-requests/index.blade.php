@@ -78,6 +78,20 @@
                                 </p>
                             @endif
 
+                            {{-- Batas pembayaran pertama (DEALER_PAYMENT_DUE_DAYS); tidak tampil bila bukti sedang diverifikasi. --}}
+                            @if ($purchase->isPaymentOverdue())
+                                <div class="alert alert-warning small mt-3 mb-0" role="status">
+                                    <i class="bi bi-exclamation-triangle me-1" aria-hidden="true"></i>
+                                    <span class="fw-semibold">Batas pembayaran sudah lewat ({{ $purchase->paymentDueAt()->translatedFormat('l, d M Y') }}).</span>
+                                    Hubungi dealer agar unit tetap dipesan untuk Anda; pengajuan yang tidak dibayar dapat dibatalkan.
+                                </div>
+                            @elseif ($purchase->awaitsFirstPayment() && $purchase->approved_at && $purchase->pendingPaymentProofCount() === 0)
+                                <p class="small mt-2 mb-0">
+                                    <i class="bi bi-calendar-check text-accent me-1" aria-hidden="true"></i>Lakukan pembayaran pertama paling lambat
+                                    <span class="fw-semibold">{{ $purchase->paymentDueAt()->translatedFormat('l, d M Y') }}</span>.
+                                </p>
+                            @endif
+
                             @if ($purchase->admin_note)
                                 <div class="admin-note-box small rounded-3 p-2 mt-3">
                                     <span class="fw-semibold"><i class="bi bi-chat-left-text me-1"></i>Catatan dealer:</span>
@@ -127,6 +141,33 @@
                                                 </li>
                                             @endforeach
                                         </ul>
+                                    @endif
+
+                                    {{-- Pengajuan batal yang sempat menerima pembayaran: rincian pengembalian dana. --}}
+                                    @if ($purchase->refundStatus())
+                                        <div class="border-top pt-2 mb-2">
+                                            <p class="fw-semibold mb-1">Pengembalian dana</p>
+                                            @foreach ($purchase->paymentRefunds as $refund)
+                                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                                    <x-price :amount="$refund->amount" />
+                                                    <span class="text-muted">· {{ $refund->refunded_on->translatedFormat('d M Y') }} · {{ $refund->methodLabel() }}</span>
+                                                    @if ($refund->hasFile())
+                                                        <a href="{{ route('account.payment-refunds.file', [$purchase, $refund]) }}" target="_blank" rel="noopener" class="ms-auto">Lihat file</a>
+                                                    @endif
+                                                </div>
+                                                @if ($refund->note)
+                                                    <p class="text-muted mb-1">{{ $refund->note }}</p>
+                                                @endif
+                                            @endforeach
+                                            @if ($purchase->refund_closed_at)
+                                                <p class="mb-0"><span class="fw-semibold">Dana {{ $purchase->refundedTotal() > 0 ? 'sisanya ' : '' }}tidak dikembalikan:</span> {{ $purchase->refund_closed_note }}</p>
+                                            @elseif ($purchase->needsRefundAction())
+                                                <p class="text-muted mb-0">
+                                                    Dealer akan menghubungi Anda terkait dana <span class="fw-semibold text-body"><x-price :amount="$purchase->refundableAmount()" /></span>
+                                                    yang sudah dibayarkan.
+                                                </p>
+                                            @endif
+                                        </div>
                                     @endif
 
                                     @if ($purchase->canReceivePaymentProofs())

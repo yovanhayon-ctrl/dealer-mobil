@@ -16,6 +16,7 @@ use App\Http\Controllers\Admin\CategoryController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\NotificationController as AdminNotificationController;
 use App\Http\Controllers\Admin\PaymentProofController as AdminPaymentProofController;
+use App\Http\Controllers\Admin\PaymentRefundController;
 use App\Http\Controllers\Admin\PromoController as AdminPromoController;
 use App\Http\Controllers\Admin\PurchaseRequestController as AdminPurchaseRequestController;
 use App\Http\Controllers\Admin\ReportController;
@@ -160,6 +161,9 @@ Route::middleware('auth')->group(function () {
         Route::get('pengajuan/{purchaseRequest}/bukti-pembayaran/{paymentProof}', [AccountPaymentProofController::class, 'file'])
             ->scopeBindings()
             ->name('payment-proofs.file');
+        Route::get('pengajuan/{purchaseRequest}/pengembalian-dana/{paymentRefund}', [AccountPaymentProofController::class, 'refundFile'])
+            ->scopeBindings()
+            ->name('payment-refunds.file');
 
         Route::get('servis', [AccountServiceBookingController::class, 'index'])->name('service-bookings.index');
         Route::patch('servis/{serviceBooking}/batal', [AccountServiceBookingController::class, 'cancel'])->name('service-bookings.cancel');
@@ -253,6 +257,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
             Route::get('{paymentProof}', 'file')->name('file');
             Route::patch('{paymentProof}/terima', 'approve')->name('approve');
             Route::patch('{paymentProof}/tolak', 'reject')->name('reject');
+        });
+
+    // Pengembalian dana pengajuan Dibatalkan/Ditolak yang sempat menerima pembayaran.
+    Route::controller(PaymentRefundController::class)->prefix('pengajuan/{purchaseRequest}/pengembalian-dana')
+        ->name('payment-refunds.')->scopeBindings()->group(function () {
+            Route::post('/', 'store')->name('store');
+            Route::patch('tutup', 'close')->name('close');
+            Route::get('{paymentRefund}', 'file')->name('file');
         });
 
     // JAF Service: master layanan (CRUD) + booking servis dari customer (lihat & ubah status).

@@ -113,6 +113,8 @@ DEALER_HOURS="Senin-Sabtu 08.00-17.00 WIB"
 DEALER_BANK_NAME="BCA"
 DEALER_BANK_ACCOUNT="…"
 DEALER_BANK_HOLDER="PT …"
+# Batas pembayaran pertama (hari) setelah pengajuan disetujui
+DEALER_PAYMENT_DUE_DAYS=3
 DEALER_MAPS_EMBED_URL="https://www.google.com/maps/embed?pb=…"
 
 ADMIN_EMAIL=admin@domain-anda.com

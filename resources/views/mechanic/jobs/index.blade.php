@@ -28,7 +28,12 @@
                         <div class="d-flex flex-wrap align-items-center gap-2 mb-1">
                             <span class="fw-semibold">{{ $job->plate_number }}</span>
                             <span>{{ $job->vehicle_model }}</span>
-                            <x-status-badge :status="$job->status" class="ms-auto" />
+                            <span class="ms-auto d-inline-flex gap-1">
+                                @if ($job->isOverdue())
+                                    <x-status-badge status="rejected" label="Lewat jadwal" />
+                                @endif
+                                <x-status-badge :status="$job->status" />
+                            </span>
                         </div>
                         <div class="small text-muted">
                             {{ $job->service->name }}, {{ $job->preferred_date->translatedFormat('l, d M Y') }} pukul {{ $job->timeLabel() }}

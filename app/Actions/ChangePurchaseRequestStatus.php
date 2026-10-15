@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\DB;
 /**
  * Ubah status pengajuan beserta efek stok mobil (RANCANGAN §5):
  * → approved: stok −1 (ditolak jika stok 0); approved → rejected/cancelled: stok +1;
- * approved → completed: stok tetap.
+ * approved → completed: stok tetap. Saat disetujui, approved_at dicatat (batas pembayaran pertama).
  *
  * Baris pengajuan & mobil dikunci (lockForUpdate) di dalam transaksi, lalu status diperiksa ulang,
  * sehingga dua admin yang menyetujui bersamaan tidak mengurangi stok dua kali.
@@ -65,6 +65,8 @@ class ChangePurchaseRequestStatus
             }
 
             $car->decrement('stock');
+            // Dasar batas pembayaran pertama (PurchaseRequest::paymentDueAt).
+            $purchaseRequest->approved_at = now();
         } elseif ($purchaseRequest->status === PurchaseRequest::STATUS_APPROVED
             && in_array($status, [PurchaseRequest::STATUS_REJECTED, PurchaseRequest::STATUS_CANCELLED], true)) {
             // Unit yang sudah dipesan dikembalikan ke stok.
