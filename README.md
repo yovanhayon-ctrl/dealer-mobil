@@ -490,7 +490,8 @@ Sudah diterapkan (Phase 16):
 
 Wajib saat production (Phase 19):
 
-- `.env`: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `LOG_LEVEL=warning`, `SESSION_SECURE_COOKIE=true`, dan `MAIL_MAILER` ke SMTP sungguhan.
+- `.env`: `APP_ENV=production`, `APP_DEBUG=false`, `APP_URL=https://…`, `LOG_LEVEL=warning`, `LOG_STACK=daily` (log per hari, dihapus otomatis setelah `LOG_DAILY_DAYS` hari), `SESSION_SECURE_COOKIE=true`, dan `MAIL_MAILER` ke SMTP sungguhan (wajib untuk *Lupa kata sandi*).
+- Cadangan rutin database, `storage/app/private` (bukti pembayaran), dan `storage/app/public` (foto): lihat [docs/DEPLOY-CPANEL.md](docs/DEPLOY-CPANEL.md) bagian *Cadangan data*.
 - Server: `expose_php = Off` di `php.ini`, `ServerTokens Prod` dan `ServerSignature Off` di Apache (menyembunyikan versi PHP/Apache), serta HTTPS.
 
 ## Deployment
