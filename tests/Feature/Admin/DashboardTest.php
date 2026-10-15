@@ -60,6 +60,7 @@ class DashboardTest extends TestCase
                 'overdue_test_drives' => 0,
                 'overdue_service_bookings' => 0,
                 'pending_refunds' => 0,
+                'awaiting_response' => 0,
             ])
             ->assertDontSee('class="dashboard-attention', false)
             ->assertSeeInOrder(['Mobil Aktif', 'Stok Habis', 'Test Drive Pending', 'Pengajuan Pending', 'Servis Pending', 'Customer']);

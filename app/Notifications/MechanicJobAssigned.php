@@ -8,13 +8,13 @@ use Illuminate\Notifications\Notification;
 
 /**
  * Pemberitahuan ke mekanik saat ada pekerjaan baru di Pekerjaan Saya: booking yang ditugaskan kepadanya dikonfirmasi,
- * atau booking yang sudah dikonfirmasi dialihkan kepadanya.
+ * atau booking yang sudah dikonfirmasi dialihkan kepadanya; juga saat jadwalnya diubah (judul "Jadwal Servis Diubah").
  */
 class MechanicJobAssigned extends Notification
 {
     use BuildsNotificationMail;
 
-    public function __construct(private ServiceBooking $booking)
+    public function __construct(private ServiceBooking $booking, private string $title = 'Pekerjaan Servis Baru')
     {
         $this->booking->loadMissing('service');
     }
@@ -43,7 +43,7 @@ class MechanicJobAssigned extends Notification
     public function toArray(object $notifiable): array
     {
         return [
-            'title' => 'Pekerjaan Servis Baru',
+            'title' => $this->title,
             'message' => ServiceBookingStatusChanged::describe($this->booking),
             'status' => $this->booking->status,
             'admin_note' => null,
