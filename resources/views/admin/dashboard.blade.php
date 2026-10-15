@@ -13,6 +13,7 @@
         [$stats['overdue_payments'], 'pengajuan lewat tenggat bayar', 'admin.purchase-requests.index', ['pembayaran' => 'lewat-tenggat']],
         [$stats['overdue_test_drives'], 'test drive lewat jadwal', 'admin.test-drives.index', ['jadwal' => 'lewat']],
         [$stats['overdue_service_bookings'], 'booking servis lewat jadwal', 'admin.service-bookings.index', ['jadwal' => 'lewat']],
+        [$stats['pending_refunds'], 'pengajuan batal, dana belum dikembalikan', 'admin.purchase-requests.index', ['pembayaran' => 'dana-belum-dikembalikan']],
     ], fn (array $item) => $item[0] > 0);
 @endphp
 

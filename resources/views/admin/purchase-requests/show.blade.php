@@ -142,7 +142,7 @@
                                 <i class="bi bi-check-circle me-1"></i>Pembayaran {{ mb_strtolower($purchaseRequest->paymentStatusLabel()) }}.
                                 Ubah status ke <span class="fw-semibold">Selesai</span> setelah mobil diserahkan.
                             </div>
-                        @elseif ($purchaseRequest->verifiedPaymentTotal() > 0)
+                        @elseif ($purchaseRequest->verifiedPaymentTotal() > 0 && ! $purchaseRequest->isClosed())
                             <p class="small text-muted mb-3">Sisa <span class="fw-semibold text-body"><x-price :amount="$purchaseRequest->remainingPayment()" /></span></p>
                         @endif
 
@@ -289,6 +289,145 @@
                             </div>
                         @endif
 
+                        {{-- Pengembalian dana: pengajuan batal yang sempat menerima pembayaran. --}}
+                        @if ($purchaseRequest->refundStatus())
+                            @php($refundErrors = $errors->getBag('refund'))
+                            @php($closeErrors = $errors->getBag('refundClose'))
+                            <div class="mt-3 pt-3 border-top" id="pengembalian-dana">
+                                <div class="d-flex flex-wrap justify-content-between align-items-baseline gap-2 mb-2">
+                                    <h4 class="h6 mb-0">Pengembalian Dana</h4>
+                                    <span class="small text-muted">
+                                        Dikembalikan <span class="fw-semibold text-body"><x-price :amount="$purchaseRequest->refundedTotal()" /></span>
+                                        dari <x-price :amount="$purchaseRequest->verifiedPaymentTotal()" /> diterima
+                                    </span>
+                                </div>
+
+                                @if ($purchaseRequest->needsRefundAction())
+                                    <div class="alert alert-warning small py-2">
+                                        <i class="bi bi-exclamation-triangle me-1"></i>Pengajuan sudah {{ mb_strtolower($purchaseRequest->statusLabel()) }}, tetapi dana
+                                        <span class="fw-semibold"><x-price :amount="$purchaseRequest->refundableAmount()" /></span> belum dikembalikan ke customer.
+                                        Catat pengembaliannya, atau tutup tanpa pengembalian bila sesuai kesepakatan (mis. tanda jadi hangus).
+                                    </div>
+                                @endif
+
+                                @foreach ($purchaseRequest->paymentRefunds as $refund)
+                                    @php($refundUrl = route('admin.payment-refunds.file', [$purchaseRequest, $refund]))
+                                    <div class="admin-proof d-flex gap-3">
+                                        @if ($refund->hasFile())
+                                            <a href="{{ $refundUrl }}" target="_blank" rel="noopener" class="admin-proof-thumb" aria-label="Buka bukti pengembalian">
+                                                @if ($refund->isImage())
+                                                    <img src="{{ $refundUrl }}" alt="" loading="lazy">
+                                                @else
+                                                    <i class="bi bi-file-earmark-pdf" aria-hidden="true"></i>
+                                                @endif
+                                            </a>
+                                        @else
+                                            <span class="admin-proof-thumb" aria-hidden="true"><i class="bi bi-arrow-return-left"></i></span>
+                                        @endif
+                                        <div class="min-w-0 flex-grow-1 small">
+                                            <span class="fw-semibold">Dikembalikan <x-price :amount="$refund->amount" /></span>
+                                            <p class="text-muted mb-1">
+                                                {{ $refund->methodLabel() }} · {{ $refund->refunded_on->translatedFormat('d M Y') }}
+                                                · dicatat {{ $refund->recorder?->name ?? 'admin' }} {{ $refund->created_at->translatedFormat('d M Y H:i') }}
+                                                @if ($refund->hasFile())
+                                                    · <a href="{{ $refundUrl }}" target="_blank" rel="noopener" class="text-break">{{ $refund->file_name }}</a>
+                                                @endif
+                                            </p>
+                                            @if ($refund->note)
+                                                <p class="mb-1"><span class="fw-semibold">Catatan:</span> {{ $refund->note }}</p>
+                                            @endif
+                                        </div>
+                                    </div>
+                                @endforeach
+
+                                @if ($purchaseRequest->refund_closed_at)
+                                    <p class="small mb-0">
+                                        <span class="fw-semibold">Ditutup tanpa {{ $purchaseRequest->refundedTotal() > 0 ? 'sisa ' : '' }}pengembalian</span>
+                                        {{ $purchaseRequest->refund_closed_at->translatedFormat('d M Y H:i') }}: {{ $purchaseRequest->refund_closed_note }}
+                                    </p>
+                                @endif
+
+                                @if ($purchaseRequest->needsRefundAction())
+                                    <div class="d-flex flex-wrap gap-2 mt-3">
+                                        <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#refund-form"
+                                                aria-expanded="{{ $refundErrors->any() ? 'true' : 'false' }}" aria-controls="refund-form">
+                                            <i class="bi bi-arrow-return-left"></i>Catat Pengembalian Dana
+                                        </button>
+                                        <button class="btn btn-outline-secondary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#refund-close"
+                                                aria-expanded="{{ $closeErrors->any() ? 'true' : 'false' }}" aria-controls="refund-close">
+                                            Tutup tanpa pengembalian
+                                        </button>
+                                    </div>
+
+                                    <form method="POST" action="{{ route('admin.payment-refunds.store', $purchaseRequest) }}" enctype="multipart/form-data"
+                                          @class(['collapse mt-3', 'show' => $refundErrors->any()]) id="refund-form" novalidate
+                                          data-confirm="Catat pengembalian dana ini? Pastikan uang sudah dikembalikan ke customer.">
+                                        @csrf
+                                        @php($refundError = fn (string $field) => $refundErrors->first($field))
+                                        <div class="row g-2">
+                                            <div class="col-sm-6">
+                                                <label for="rf-amount" class="form-label small">Nominal dikembalikan (Rp)</label>
+                                                <input type="text" id="rf-amount" name="amount" data-number="thousands" inputmode="numeric" required
+                                                       value="{{ old('amount', number_format($purchaseRequest->refundableAmount(), 0, ',', '.')) }}"
+                                                       @class(['form-control form-control-sm', 'is-invalid' => $refundError('amount')])>
+                                                @if ($refundError('amount'))
+                                                    <div class="invalid-feedback">{{ $refundError('amount') }}</div>
+                                                @else
+                                                    <div class="form-text">Belum dikembalikan <x-price :amount="$purchaseRequest->refundableAmount()" /></div>
+                                                @endif
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label for="rf-method" class="form-label small">Cara pengembalian</label>
+                                                <select id="rf-method" name="method" @class(['form-select form-select-sm', 'is-invalid' => $refundError('method')]) required>
+                                                    @foreach (\App\Models\PaymentRefund::METHOD_LABELS as $value => $label)
+                                                        <option value="{{ $value }}" @selected(old('method') === $value)>{{ $label }}</option>
+                                                    @endforeach
+                                                </select>
+                                                @if ($refundError('method'))<div class="invalid-feedback">{{ $refundError('method') }}</div>@endif
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label for="rf-date" class="form-label small">Tanggal pengembalian</label>
+                                                <input type="date" id="rf-date" name="refunded_on" required value="{{ old('refunded_on', today()->toDateString()) }}"
+                                                       min="{{ $purchaseRequest->created_at->toDateString() }}" max="{{ today()->toDateString() }}"
+                                                       @class(['form-control form-control-sm', 'is-invalid' => $refundError('refunded_on')])>
+                                                @if ($refundError('refunded_on'))<div class="invalid-feedback">{{ $refundError('refunded_on') }}</div>@endif
+                                            </div>
+                                            <div class="col-sm-6">
+                                                <label for="rf-file" class="form-label small">Bukti transfer / kwitansi (opsional)</label>
+                                                <input type="file" id="rf-file" name="file" accept=".jpg,.jpeg,.png,.webp,.pdf"
+                                                       @class(['form-control form-control-sm', 'is-invalid' => $refundError('file')])>
+                                                @if ($refundError('file'))<div class="invalid-feedback">{{ $refundError('file') }}</div>@endif
+                                            </div>
+                                            <div class="col-12">
+                                                <label for="rf-note" class="form-label small">Catatan untuk customer (opsional)</label>
+                                                <input type="text" id="rf-note" name="note" maxlength="500" value="{{ old('note') }}" placeholder="Contoh: Ditransfer ke BCA a.n. customer"
+                                                       @class(['form-control form-control-sm', 'is-invalid' => $refundError('note')])>
+                                                @if ($refundError('note'))<div class="invalid-feedback">{{ $refundError('note') }}</div>@endif
+                                            </div>
+                                        </div>
+                                        <button type="submit" class="btn btn-primary btn-sm mt-3">
+                                            <i class="bi bi-check-lg"></i>Simpan Pengembalian
+                                        </button>
+                                    </form>
+
+                                    <form method="POST" action="{{ route('admin.payment-refunds.close', $purchaseRequest) }}"
+                                          @class(['collapse mt-3', 'show' => $closeErrors->any()]) id="refund-close"
+                                          data-confirm="Tutup tanpa mengembalikan dana Rp {{ number_format($purchaseRequest->refundableAmount(), 0, ',', '.') }}? Customer akan melihat alasannya.">
+                                        @csrf
+                                        @method('PATCH')
+                                        <label for="rf-close-note" class="form-label small">Alasan dana tidak dikembalikan (dilihat customer)</label>
+                                        <textarea id="rf-close-note" name="refund_closed_note" rows="2" maxlength="500" required
+                                                  @class(['form-control form-control-sm', 'is-invalid' => $closeErrors->has('refund_closed_note')])
+                                                  placeholder="Contoh: Tanda jadi hangus sesuai kesepakatan pada saat pemesanan.">{{ $closeErrors->any() ? old('refund_closed_note') : '' }}</textarea>
+                                        @if ($closeErrors->has('refund_closed_note'))
+                                            <div class="invalid-feedback">{{ $closeErrors->first('refund_closed_note') }}</div>
+                                        @endif
+                                        <button type="submit" class="btn btn-outline-danger btn-sm mt-2">Tutup tanpa Pengembalian</button>
+                                    </form>
+                                @endif
+                            </div>
+                        @endif
+
                         <p class="small text-muted mt-3 mb-0">
                             <i class="bi bi-info-circle me-1"></i>Cocokkan dengan mutasi rekening sebelum menerima. Status pengajuan tetap diubah manual.
                         </p>
@@ -317,6 +456,14 @@
                         'noteHelp' => 'Terisi otomatis sesuai status yang dipilih dan boleh diubah. Saat menolak/membatalkan, ganti tanda … dengan alasan untuk customer. Maksimal 1000 karakter.',
                         'noteTemplates' => $purchaseRequest->noteTemplates(),
                     ])
+
+                    @if ($purchaseRequest->status === PurchaseRequest::STATUS_APPROVED && $purchaseRequest->verifiedPaymentTotal() > 0)
+                        <div class="alert alert-warning small py-2 mt-3 mb-0">
+                            <i class="bi bi-exclamation-triangle me-1"></i>Pengajuan ini sudah menerima
+                            <span class="fw-semibold"><x-price :amount="$purchaseRequest->verifiedPaymentTotal()" /></span>.
+                            Bila dibatalkan atau ditolak, kembalikan dananya lalu catat di bagian Bukti Pembayaran.
+                        </div>
+                    @endif
 
                     <div class="small text-muted mt-3">
                         <i class="bi bi-info-circle me-1"></i>Disetujui: stok −1 · Disetujui → Ditolak/Dibatalkan: stok +1 · Disetujui → Selesai: stok tetap.
