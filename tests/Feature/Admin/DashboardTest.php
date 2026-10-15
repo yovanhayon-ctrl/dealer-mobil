@@ -135,12 +135,11 @@ class DashboardTest extends TestCase
             ->assertSee('href="'.route('admin.users.index').'"', false)
             ->assertSee('href="'.route('admin.test-drives.index').'"', false)
             ->assertSee('href="'.route('admin.purchase-requests.index').'"', false)
-            ->assertDontSee('href="'.route('admin.reports.index').'"', false)
-            ->assertDontSee('href="'.route('admin.brands.index').'"', false)
-            ->assertDontSee('href="'.route('admin.categories.index').'"', false)
-            ->assertSeeInOrder(['Dashboard', 'Mobil', 'Promo', 'Test Drive', 'Pengajuan', 'Pengguna']);
+            ->assertSee('href="'.route('admin.reports.index').'"', false)
+            ->assertDontSee('href="'.route('admin.staff.index').'"', false)
+            ->assertSeeInOrder(['Dashboard', 'Mobil', 'Merek', 'Kategori', 'Promo', 'Test Drive', 'Pengajuan', 'Pengguna', 'Laporan']);
 
-        // Merek, Kategori, Laporan & Staf khusus owner.
+        // Staf hanya untuk owner & super admin.
         $this->actingAs(User::factory()->owner()->create())->get('/admin/dashboard')
             ->assertSeeInOrder(['Dashboard', 'Mobil', 'Merek', 'Kategori', 'Promo', 'Pengguna', 'Laporan', 'Staf']);
     }

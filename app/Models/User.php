@@ -20,30 +20,89 @@ class User extends Authenticatable
     /** @use HasFactory<UserFactory> */
     use HasFactory, Notifiable;
 
-    /** Pemilik dealer: semua akses admin + kelola akun staf. */
+    /** Pemilik dealer: semua menu + kelola semua akun staf. */
     public const ROLE_OWNER = 'owner';
 
+    /** Semua menu; kelola akun staf kecuali Owner & Super Admin. */
+    public const ROLE_SUPER_ADMIN = 'super_admin';
+
+    /** Admin Dealer: operasional (mobil, katalog, promo, transaksi, servis, ulasan, laporan). */
     public const ROLE_ADMIN = 'admin';
 
-    /** Mekanik bengkel: hanya panel Pekerjaan Saya. */
+    /** Melayani pembeli: test drive & pengajuan; mobil & promo hanya lihat. */
+    public const ROLE_SALES = 'sales';
+
+    /** Konfirmasi jadwal test drive & servis; pengajuan, ulasan, dan customer hanya lihat. */
+    public const ROLE_CUSTOMER_SERVICE = 'customer_service';
+
+    /** Mekanik bengkel: panel Pekerjaan Saya. */
     public const ROLE_MECHANIC = 'mechanic';
 
     public const ROLE_CUSTOMER = 'customer';
 
     public const ROLE_LABELS = [
         self::ROLE_OWNER => 'Owner',
-        self::ROLE_ADMIN => 'Admin',
+        self::ROLE_SUPER_ADMIN => 'Super Admin',
+        self::ROLE_ADMIN => 'Admin Dealer',
+        self::ROLE_SALES => 'Sales',
+        self::ROLE_CUSTOMER_SERVICE => 'Customer Service',
         self::ROLE_MECHANIC => 'Mekanik',
         self::ROLE_CUSTOMER => 'Customer',
     ];
 
-    /** Role yang bisa diberikan owner lewat menu Staf (owner baru lewat perintah user:make-owner). */
-    public const ASSIGNABLE_STAFF_ROLES = [self::ROLE_ADMIN, self::ROLE_MECHANIC];
+    /** Role yang bisa diberikan lewat menu Staf (owner baru lewat perintah user:make-owner). */
+    public const ASSIGNABLE_STAFF_ROLES = [
+        self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES, self::ROLE_CUSTOMER_SERVICE, self::ROLE_MECHANIC,
+    ];
 
-    public const STAFF_ROLES = [self::ROLE_OWNER, self::ROLE_ADMIN, self::ROLE_MECHANIC];
+    public const STAFF_ROLES = [
+        self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES, self::ROLE_CUSTOMER_SERVICE, self::ROLE_MECHANIC,
+    ];
 
-    /** Bisa membuka panel admin (owner & admin). */
-    public const PANEL_ROLES = [self::ROLE_OWNER, self::ROLE_ADMIN];
+    /** Bisa membuka panel admin (semua staf kecuali mekanik, yang punya panel sendiri). */
+    public const PANEL_ROLES = [
+        self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES, self::ROLE_CUSTOMER_SERVICE,
+    ];
+
+    /**
+     * Hak akses per kemampuan => role yang memilikinya. Satu-satunya sumber aturan akses staf:
+     * didaftarkan sebagai Gate (AppServiceProvider), dipakai route (can:...), sidebar, tombol, notifikasi, dan dashboard.
+     *
+     * @var array<string, list<string>>
+     */
+    public const PERMISSIONS = [
+        'cars.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES],
+        'cars.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
+        'catalog.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
+        'promos.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES],
+        'promos.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
+        // Hapus data master (mobil, merek, kategori, promo, layanan).
+        'master.delete' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN],
+        'test-drives.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES, self::ROLE_CUSTOMER_SERVICE],
+        'purchases.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES, self::ROLE_CUSTOMER_SERVICE],
+        'purchases.status' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES],
+        // Verifikasi bukti bayar, pembayaran di showroom, file bukti, dan pengembalian dana.
+        'payments.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
+        'service-bookings.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_CUSTOMER_SERVICE],
+        'services.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
+        'testimonials.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_CUSTOMER_SERVICE],
+        'testimonials.moderate' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
+        // Daftar & detail customer; staff-accounts.view juga melihat akun staf.
+        'users.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_CUSTOMER_SERVICE],
+        'staff-accounts.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
+        'reports.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
+        'staff.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN],
+    ];
+
+    /**
+     * Role yang boleh dibuat/diubah lewat menu Staf oleh role tertentu. Super Admin tidak bisa mengelola Owner & Super Admin.
+     *
+     * @var array<string, list<string>>
+     */
+    public const MANAGEABLE_STAFF_ROLES = [
+        self::ROLE_OWNER => self::ASSIGNABLE_STAFF_ROLES,
+        self::ROLE_SUPER_ADMIN => [self::ROLE_ADMIN, self::ROLE_SALES, self::ROLE_CUSTOMER_SERVICE, self::ROLE_MECHANIC],
+    ];
 
     /** @var array<int, true>|null */
     private ?array $favoriteCarIdsCache = null;
@@ -63,7 +122,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Boleh membuka panel admin: owner atau admin.
+     * Boleh membuka panel admin (semua staf kecuali mekanik). Hak per menu: hasPermission().
      */
     public function isAdmin(): bool
     {
@@ -75,13 +134,36 @@ class User extends Authenticatable
         return $this->role === self::ROLE_OWNER;
     }
 
+    /**
+     * Lihat User::PERMISSIONS; di Blade/route pakai @can / can:... (Gate yang sama).
+     */
+    public function hasPermission(string $ability): bool
+    {
+        return in_array($this->role, self::PERMISSIONS[$ability] ?? [], true);
+    }
+
+    /**
+     * Role yang boleh diberikan user ini lewat menu Staf.
+     *
+     * @return list<string>
+     */
+    public function manageableStaffRoles(): array
+    {
+        return self::MANAGEABLE_STAFF_ROLES[$this->role] ?? [];
+    }
+
+    public function canManageStaffAccount(User $staff): bool
+    {
+        return $staff->id !== $this->id && in_array($staff->role, $this->manageableStaffRoles(), true);
+    }
+
     public function isMechanic(): bool
     {
         return $this->role === self::ROLE_MECHANIC;
     }
 
     /**
-     * Akun staf dealer (owner, admin, mekanik): tidak memakai fitur customer (booking, pengajuan, favorit).
+     * Akun staf dealer (semua role selain customer): tidak memakai fitur customer (booking, pengajuan, favorit).
      */
     public function isStaff(): bool
     {

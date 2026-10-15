@@ -56,38 +56,41 @@
                             <p class="small text-danger mb-2"><span class="fw-semibold">Alasan ditolak:</span> {{ $testimonial->admin_note }}</p>
                         @endif
 
-                        <div class="d-flex flex-wrap gap-2">
-                            @unless ($testimonial->isApproved())
-                                <form method="POST" action="{{ route('admin.testimonials.approve', $testimonial) }}" data-disable-on-submit>
+                        {{-- Customer Service hanya melihat; moderasi untuk testimonials.moderate. --}}
+                        @can('testimonials.moderate')
+                            <div class="d-flex flex-wrap gap-2">
+                                @unless ($testimonial->isApproved())
+                                    <form method="POST" action="{{ route('admin.testimonials.approve', $testimonial) }}" data-disable-on-submit>
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-lg"></i>Setujui</button>
+                                    </form>
+                                @endunless
+                                @if ($testimonial->status !== \App\Models\Testimonial::STATUS_REJECTED)
+                                    <button class="btn btn-outline-danger btn-sm" type="button" data-bs-toggle="collapse"
+                                            data-bs-target="#reject-{{ $testimonial->id }}" aria-expanded="{{ $bag->any() ? 'true' : 'false' }}"
+                                            aria-controls="reject-{{ $testimonial->id }}">
+                                        <i class="bi bi-x-lg"></i>{{ $testimonial->isApproved() ? 'Sembunyikan (Tolak)' : 'Tolak' }}
+                                    </button>
+                                @endif
+                            </div>
+
+                            @if ($testimonial->status !== \App\Models\Testimonial::STATUS_REJECTED)
+                                <form method="POST" action="{{ route('admin.testimonials.reject', $testimonial) }}"
+                                      @class(['collapse mt-2', 'show' => $bag->any()]) id="reject-{{ $testimonial->id }}" data-disable-on-submit>
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="btn btn-success btn-sm"><i class="bi bi-check-lg"></i>Setujui</button>
+                                    <label for="admin_note-{{ $testimonial->id }}" class="form-label small">Alasan penolakan (dikirim ke customer)</label>
+                                    <textarea id="admin_note-{{ $testimonial->id }}" name="admin_note" rows="2" maxlength="500" required
+                                              @class(['form-control form-control-sm', 'is-invalid' => $bag->has('admin_note')])
+                                              placeholder="Contoh: Ulasan berisi nomor HP. Mohon hapus data pribadi.">{{ $bag->any() ? old('admin_note') : '' }}</textarea>
+                                    @if ($bag->has('admin_note'))
+                                        <div class="invalid-feedback">{{ $bag->first('admin_note') }}</div>
+                                    @endif
+                                    <button type="submit" class="btn btn-danger btn-sm mt-2">Tolak Ulasan</button>
                                 </form>
-                            @endunless
-                            @if ($testimonial->status !== \App\Models\Testimonial::STATUS_REJECTED)
-                                <button class="btn btn-outline-danger btn-sm" type="button" data-bs-toggle="collapse"
-                                        data-bs-target="#reject-{{ $testimonial->id }}" aria-expanded="{{ $bag->any() ? 'true' : 'false' }}"
-                                        aria-controls="reject-{{ $testimonial->id }}">
-                                    <i class="bi bi-x-lg"></i>{{ $testimonial->isApproved() ? 'Sembunyikan (Tolak)' : 'Tolak' }}
-                                </button>
                             @endif
-                        </div>
-
-                        @if ($testimonial->status !== \App\Models\Testimonial::STATUS_REJECTED)
-                            <form method="POST" action="{{ route('admin.testimonials.reject', $testimonial) }}"
-                                  @class(['collapse mt-2', 'show' => $bag->any()]) id="reject-{{ $testimonial->id }}" data-disable-on-submit>
-                                @csrf
-                                @method('PATCH')
-                                <label for="admin_note-{{ $testimonial->id }}" class="form-label small">Alasan penolakan (dikirim ke customer)</label>
-                                <textarea id="admin_note-{{ $testimonial->id }}" name="admin_note" rows="2" maxlength="500" required
-                                          @class(['form-control form-control-sm', 'is-invalid' => $bag->has('admin_note')])
-                                          placeholder="Contoh: Ulasan berisi nomor HP. Mohon hapus data pribadi.">{{ $bag->any() ? old('admin_note') : '' }}</textarea>
-                                @if ($bag->has('admin_note'))
-                                    <div class="invalid-feedback">{{ $bag->first('admin_note') }}</div>
-                                @endif
-                                <button type="submit" class="btn btn-danger btn-sm mt-2">Tolak Ulasan</button>
-                            </form>
-                        @endif
+                        @endcan
                     </div>
                 </article>
             @endforeach

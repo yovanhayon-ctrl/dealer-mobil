@@ -1,15 +1,18 @@
 {{--
     Tombol aksi baris tabel (ikon + tooltip; label lengkap untuk pembaca layar).
-    Tombol Hapus hanya untuk owner (route destroy dibatasi role:owner).
+    $editAbility (opsional, mis. "cars.manage"): tombol Ubah hanya untuk yang punya hak itu (Sales hanya melihat).
+    Tombol Hapus hanya untuk yang punya hak master.delete (owner & super admin; route destroy dibatasi can:master.delete).
     Jika $disabledReason diisi (mis. "Masih dipakai 3 mobil"), tombol Hapus dinonaktifkan
     dan alasannya tampil sebagai tooltip. Server tetap memeriksa ulang saat menghapus.
 --}}
-<a href="{{ $editUrl }}" class="btn btn-sm btn-outline-primary btn-icon" title="Edit" aria-label="Edit {{ $name }}">
-    <i class="bi bi-pencil-square"></i>
-</a>
+@if (empty($editAbility) || auth()->user()->can($editAbility))
+    <a href="{{ $editUrl }}" class="btn btn-sm btn-outline-primary btn-icon" title="Edit" aria-label="Edit {{ $name }}">
+        <i class="bi bi-pencil-square"></i>
+    </a>
+@endif
 
-@if (! auth()->user()->isOwner())
-    {{-- Admin: tidak ada tombol hapus. --}}
+@if (! auth()->user()->can('master.delete'))
+    {{-- Tanpa hak hapus: tidak ada tombol hapus. --}}
 @elseif (! empty($disabledReason))
     <span class="d-inline-block" tabindex="0" title="{{ $disabledReason }}">
         <button type="button" class="btn btn-sm btn-outline-danger btn-icon" disabled aria-label="Hapus {{ $name }} (tidak bisa: {{ $disabledReason }})">

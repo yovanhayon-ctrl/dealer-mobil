@@ -34,12 +34,19 @@ abstract class AdminActivityNotification extends Notification
     /** Route detail di admin, menerima id data. */
     abstract protected function routeName(): string;
 
+    /** Hak akses (User::PERMISSIONS) yang diperlukan penerima, mis. Sales tidak menerima booking servis. */
+    abstract public function permission(): string;
+
     /**
-     * Kirim ke semua akun admin.
+     * Kirim ke semua staf panel aktif yang punya hak akses atas data ini.
      */
     public static function notifyAdmins(self $notification): void
     {
-        Notifier::send(User::whereIn('role', User::PANEL_ROLES)->where('is_active', true)->get(), $notification);
+        $recipients = User::whereIn('role', User::PANEL_ROLES)->where('is_active', true)->get()
+            ->filter(fn (User $user) => $user->hasPermission($notification->permission()))
+            ->values();
+
+        Notifier::send($recipients, $notification);
     }
 
     /**

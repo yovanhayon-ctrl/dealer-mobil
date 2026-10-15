@@ -28,6 +28,11 @@ class PaymentProofActivity extends AdminActivityNotification
             ." · {$this->proof->typeLabel()} Rp ".number_format($this->proof->amount, 0, ',', '.')." ({$this->proof->methodLabel()})";
     }
 
+    public function permission(): string
+    {
+        return 'payments.manage';
+    }
+
     protected function routeName(): string
     {
         return 'admin.purchase-requests.show';

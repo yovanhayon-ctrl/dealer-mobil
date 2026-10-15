@@ -12,7 +12,9 @@
 
 @section('content')
     <x-admin.list-header :summary="number_format($promos->total(), 0, ',', '.').' promo'.($hasFilters ? ' ditemukan' : '')">
-        <a href="{{ route('admin.promos.create') }}" class="btn btn-accent btn-sm"><i class="bi bi-plus-lg"></i>Tambah Promo</a>
+        @can('promos.manage')
+            <a href="{{ route('admin.promos.create') }}" class="btn btn-accent btn-sm"><i class="bi bi-plus-lg"></i>Tambah Promo</a>
+        @endcan
     </x-admin.list-header>
 
     <x-admin.filters :action="route('admin.promos.index')" :reset-url="route('admin.promos.index')"
@@ -46,7 +48,9 @@
                 <x-empty-state icon="bi-search" title="Promo tidak ditemukan" message="Tidak ada promo yang cocok dengan filter." />
             @else
                 <x-empty-state icon="bi-percent" title="Belum ada promo" message="Tambahkan promo untuk menarik minat pembeli.">
-                    <a href="{{ route('admin.promos.create') }}" class="btn btn-accent btn-sm"><i class="bi bi-plus-lg"></i>Tambah Promo</a>
+                    @can('promos.manage')
+                        <a href="{{ route('admin.promos.create') }}" class="btn btn-accent btn-sm"><i class="bi bi-plus-lg"></i>Tambah Promo</a>
+                    @endcan
                 </x-empty-state>
             @endif
         @else
@@ -97,6 +101,7 @@
                                 <td><x-status-badge :status="$promo->status" /></td>
                                 <td class="text-end text-nowrap">
                                     @include('admin.partials.row-actions', [
+                                        'editAbility' => 'promos.manage',
                                         'editUrl' => route('admin.promos.edit', $promo),
                                         'deleteUrl' => route('admin.promos.destroy', $promo),
                                         'name' => $promo->title,

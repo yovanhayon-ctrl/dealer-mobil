@@ -35,7 +35,9 @@ use App\Http\Controllers\CompareController;
 use App\Http\Controllers\CreditSimulationController;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\Mechanic\JobController as MechanicJobController;
+use App\Http\Controllers\Mechanic\NotificationController as MechanicNotificationController;
 use App\Http\Controllers\Mechanic\RatingController as MechanicRatingController;
+use App\Http\Controllers\Mechanic\ServiceController as MechanicServiceController;
 use App\Http\Controllers\PageController;
 use App\Http\Controllers\PromoController;
 use App\Http\Controllers\PurchaseRequestController;
@@ -195,10 +197,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         Route::get('{notification}', 'open')->whereUuid('notification')->name('open');
     });
 
-    Route::patch('mobil/{car}/status', [AdminCarController::class, 'toggleActive'])->name('cars.toggle-active');
+    // Hak akses per menu: User::PERMISSIONS (Gate), dicek lewat middleware can:... di bawah.
+    Route::patch('mobil/{car}/status', [AdminCarController::class, 'toggleActive'])->middleware('can:cars.manage')->name('cars.toggle-active');
 
     // Galeri gambar mobil; scopeBindings: {image} harus milik {car}, selain itu 404.
     Route::prefix('mobil/{car}/gambar')->name('cars.images.')->controller(CarImageController::class)
+        ->middleware('can:cars.manage')
         ->scopeBindings()
         ->group(function () {
             Route::get('/', 'index')->name('index');
@@ -212,47 +216,50 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->except('show')
         ->parameters(['mobil' => 'car'])
         ->names('cars')
-        // Menghapus data master khusus owner; admin cukup menambah & mengubah.
-        ->middlewareFor('destroy', 'role:owner');
+        // Sales hanya melihat; menghapus data master khusus owner & super admin.
+        ->middleware('can:cars.view')
+        ->middlewareFor(['create', 'store', 'edit', 'update'], 'can:cars.manage')
+        ->middlewareFor('destroy', 'can:master.delete');
 
     Route::resource('merek', BrandController::class)
         ->except('show')
         ->parameters(['merek' => 'brand'])
         ->names('brands')
-        // Merek jarang berubah tapi memengaruhi filter katalog: seluruhnya khusus owner.
-        ->middleware('role:owner');
+        ->middleware('can:catalog.manage')
+        ->middlewareFor('destroy', 'can:master.delete');
 
     Route::resource('kategori', CategoryController::class)
         ->except('show')
         ->parameters(['kategori' => 'category'])
         ->names('categories')
-        // Kategori jarang berubah tapi memengaruhi filter katalog: seluruhnya khusus owner.
-        ->middleware('role:owner');
+        ->middleware('can:catalog.manage')
+        ->middlewareFor('destroy', 'can:master.delete');
 
     Route::resource('promo', AdminPromoController::class)
         ->except('show')
         ->parameters(['promo' => 'promo'])
         ->names('promos')
-        // Menghapus data master khusus owner; admin cukup menambah & mengubah.
-        ->middlewareFor('destroy', 'role:owner');
+        ->middleware('can:promos.view')
+        ->middlewareFor(['create', 'store', 'edit', 'update'], 'can:promos.manage')
+        ->middlewareFor('destroy', 'can:master.delete');
 
     // Test drive & pengajuan dibuat customer (halaman publik); admin hanya melihat & mengubah status.
-    Route::controller(AdminTestDriveController::class)->prefix('test-drive')->name('test-drives.')->group(function () {
+    Route::controller(AdminTestDriveController::class)->prefix('test-drive')->name('test-drives.')->middleware('can:test-drives.manage')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('{testDrive}', 'show')->name('show');
         Route::patch('{testDrive}/status', 'updateStatus')->name('update-status');
     });
 
-    Route::controller(AdminPurchaseRequestController::class)->prefix('pengajuan')->name('purchase-requests.')->group(function () {
+    Route::controller(AdminPurchaseRequestController::class)->prefix('pengajuan')->name('purchase-requests.')->middleware('can:purchases.view')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('{purchaseRequest}', 'show')->name('show');
         Route::get('{purchaseRequest}/pdf', 'pdf')->middleware('throttle:20,1')->name('pdf');
-        Route::patch('{purchaseRequest}/status', 'updateStatus')->name('update-status');
+        Route::patch('{purchaseRequest}/status', 'updateStatus')->middleware('can:purchases.status')->name('update-status');
     });
 
     // Verifikasi bukti pembayaran customer (bukti harus milik pengajuan di URL).
     Route::controller(AdminPaymentProofController::class)->prefix('pengajuan/{purchaseRequest}/bukti-pembayaran')
-        ->name('payment-proofs.')->scopeBindings()->group(function () {
+        ->name('payment-proofs.')->middleware('can:payments.manage')->scopeBindings()->group(function () {
             Route::post('/', 'store')->name('store');
             Route::get('{paymentProof}', 'file')->name('file');
             Route::patch('{paymentProof}/terima', 'approve')->name('approve');
@@ -261,7 +268,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Pengembalian dana pengajuan Dibatalkan/Ditolak yang sempat menerima pembayaran.
     Route::controller(PaymentRefundController::class)->prefix('pengajuan/{purchaseRequest}/pengembalian-dana')
-        ->name('payment-refunds.')->scopeBindings()->group(function () {
+        ->name('payment-refunds.')->middleware('can:payments.manage')->scopeBindings()->group(function () {
             Route::post('/', 'store')->name('store');
             Route::patch('tutup', 'close')->name('close');
             Route::get('{paymentRefund}', 'file')->name('file');
@@ -272,10 +279,10 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->except('show')
         ->parameters(['layanan' => 'service'])
         ->names('services')
-        // Menghapus data master khusus owner; admin cukup menambah & mengubah.
-        ->middlewareFor('destroy', 'role:owner');
+        ->middleware('can:services.manage')
+        ->middlewareFor('destroy', 'can:master.delete');
 
-    Route::controller(AdminServiceBookingController::class)->prefix('servis')->name('service-bookings.')->group(function () {
+    Route::controller(AdminServiceBookingController::class)->prefix('servis')->name('service-bookings.')->middleware('can:service-bookings.manage')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('{serviceBooking}', 'show')->name('show');
         Route::patch('{serviceBooking}/status', 'updateStatus')->name('update-status');
@@ -285,15 +292,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     });
 
     // Moderasi ulasan customer (tampil di beranda setelah disetujui).
-    Route::controller(AdminTestimonialController::class)->prefix('ulasan')->name('testimonials.')->group(function () {
+    Route::controller(AdminTestimonialController::class)->prefix('ulasan')->name('testimonials.')->middleware('can:testimonials.view')->group(function () {
         Route::get('/', 'index')->name('index');
-        Route::patch('{testimonial}/setujui', 'approve')->name('approve');
-        Route::patch('{testimonial}/tolak', 'reject')->name('reject');
+        Route::patch('{testimonial}/setujui', 'approve')->middleware('can:testimonials.moderate')->name('approve');
+        Route::patch('{testimonial}/tolak', 'reject')->middleware('can:testimonials.moderate')->name('reject');
     });
 
     // Laporan (hanya baca) + export Excel (rapi) / CSV (data mentah) dengan periode yang sama.
-    // Khusus owner: data keuangan & penjualan.
-    Route::middleware('role:owner')->group(function () {
+    Route::middleware('can:reports.view')->group(function () {
         Route::get('laporan', [ReportController::class, 'index'])->name('reports.index');
         Route::get('laporan/export', [ReportController::class, 'export'])->name('reports.export');
         Route::get('laporan/export/excel', [ReportController::class, 'exportExcel'])->name('reports.export-excel');
@@ -303,14 +309,15 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::resource('pengguna', UserController::class)
         ->only(['index', 'show'])
         ->parameters(['pengguna' => 'user'])
-        ->names('users');
+        ->names('users')
+        ->middleware('can:users.view');
 
-    // Kelola akun staf (admin & mekanik): khusus owner.
+    // Kelola akun staf: owner (semua) & super admin (kecuali Owner/Super Admin), lihat User::MANAGEABLE_STAFF_ROLES.
     Route::resource('staf', StaffController::class)
         ->only(['index', 'create', 'store', 'edit', 'update'])
         ->parameters(['staf' => 'user'])
         ->names('staff')
-        ->middleware('role:owner');
+        ->middleware('can:staff.manage');
 });
 
 /*
@@ -330,4 +337,10 @@ Route::middleware(['auth', 'role:mechanic'])->prefix('mekanik')->name('mechanic.
         Route::patch('{serviceBooking}/tugas/{task}', 'updateTask')->scopeBindings()->name('tasks.update');
     });
     Route::get('rating', [MechanicRatingController::class, 'index'])->name('ratings.index');
+    Route::get('layanan', [MechanicServiceController::class, 'index'])->name('services.index');
+    Route::controller(MechanicNotificationController::class)->prefix('notifikasi')->name('notifications.')->group(function () {
+        Route::get('/', 'index')->name('index');
+        Route::patch('baca-semua', 'markAllAsRead')->name('read-all');
+        Route::get('{notification}', 'open')->whereUuid('notification')->name('open');
+    });
 });

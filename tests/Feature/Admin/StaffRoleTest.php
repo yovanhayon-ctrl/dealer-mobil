@@ -53,10 +53,12 @@ class StaffRoleTest extends TestCase
             'dashboard admin' => ['admin.dashboard', 200, 200, 403, 403],
             'kelola staf' => ['admin.staff.index', 200, 403, 403, 403],
             'tambah staf' => ['admin.staff.create', 200, 403, 403, 403],
-            'daftar merek' => ['admin.brands.index', 200, 403, 403, 403],
-            'tambah merek' => ['admin.brands.create', 200, 403, 403, 403],
-            'daftar kategori' => ['admin.categories.index', 200, 403, 403, 403],
-            'tambah kategori' => ['admin.categories.create', 200, 403, 403, 403],
+            // v1.14.0: Admin Dealer kembali mengelola merek & kategori (hapus tetap owner/super admin).
+            'daftar merek' => ['admin.brands.index', 200, 200, 403, 403],
+            'tambah merek' => ['admin.brands.create', 200, 200, 403, 403],
+            'daftar kategori' => ['admin.categories.index', 200, 200, 403, 403],
+            'tambah kategori' => ['admin.categories.create', 200, 200, 403, 403],
+            'laporan' => ['admin.reports.index', 200, 200, 403, 403],
             'pekerjaan mekanik' => ['mechanic.jobs.index', 403, 403, 200, 403],
         ];
     }
@@ -72,7 +74,7 @@ class StaffRoleTest extends TestCase
         $this->get(route($route))->assertRedirect(route('login'));
     }
 
-    public function test_admin_tidak_bisa_menghapus_data_master_dan_membuka_laporan(): void
+    public function test_admin_dealer_tidak_bisa_menghapus_data_master(): void
     {
         $car = Car::factory()->create();
         $brand = Brand::factory()->create();
@@ -91,48 +93,28 @@ class StaffRoleTest extends TestCase
             $this->assertModelExists($model);
         }
 
-        foreach (['admin.reports.index', 'admin.reports.export', 'admin.reports.export-excel'] as $route) {
-            $this->get(route($route))->assertForbidden();
-        }
-
-        // Admin tetap bisa membuka daftar & form ubah, tanpa tombol hapus.
+        // Admin Dealer tetap bisa membuka daftar & form ubah serta laporan, tanpa tombol hapus.
         $this->get(route('admin.services.index'))->assertOk()->assertDontSee('data-delete-url', false);
         $this->get(route('admin.services.edit', $service))->assertOk();
-        $this->get(route('admin.dashboard'))->assertDontSee(route('admin.reports.index'), false);
+        $this->get(route('admin.dashboard'))->assertSee(route('admin.reports.index'), false);
 
         // Owner melihat tombol hapus.
         $this->actingAs($this->owner)->get(route('admin.services.index'))->assertSee('data-delete-url', false);
     }
 
-    public function test_merek_dan_kategori_hanya_dikelola_owner(): void
+    public function test_admin_dealer_mengelola_merek_dan_kategori(): void
     {
         $brand = Brand::factory()->create(['name' => 'Nissan']);
         $category = Category::factory()->create(['name' => 'SUV']);
 
         $this->actingAs($this->admin);
-        $this->get(route('admin.brands.edit', $brand))->assertForbidden();
-        $this->get(route('admin.categories.edit', $category))->assertForbidden();
-        $this->post(route('admin.brands.store'), ['name' => 'Toyota'])->assertForbidden();
-        $this->post(route('admin.categories.store'), ['name' => 'Sedan'])->assertForbidden();
-        $this->put(route('admin.brands.update', $brand), ['name' => 'Datsun'])->assertForbidden();
-        $this->put(route('admin.categories.update', $category), ['name' => 'Crossover'])->assertForbidden();
-
-        $this->assertDatabaseCount('brands', 1);
-        $this->assertDatabaseCount('categories', 1);
-        $this->assertDatabaseHas('brands', ['id' => $brand->id, 'name' => 'Nissan']);
-        $this->assertDatabaseHas('categories', ['id' => $category->id, 'name' => 'SUV']);
-
-        // Menu disembunyikan untuk admin; form mobil tetap bisa memilih merek & kategori yang ada.
         $this->get(route('admin.dashboard'))
-            ->assertDontSee(route('admin.brands.index'), false)
-            ->assertDontSee(route('admin.categories.index'), false);
-        $this->get(route('admin.cars.create'))->assertOk()->assertSee('Nissan')->assertSee('SUV');
-
-        $this->actingAs($this->owner)->get(route('admin.dashboard'))
             ->assertSee(route('admin.brands.index'), false)
             ->assertSee(route('admin.categories.index'), false);
         $this->put(route('admin.brands.update', $brand), ['name' => 'Nissan Motor'])->assertRedirect(route('admin.brands.index'));
+        $this->put(route('admin.categories.update', $category), ['name' => 'Crossover'])->assertRedirect(route('admin.categories.index'));
         $this->assertDatabaseHas('brands', ['id' => $brand->id, 'name' => 'Nissan Motor']);
+        $this->assertDatabaseHas('categories', ['id' => $category->id, 'name' => 'Crossover']);
     }
 
     public function test_login_diarahkan_sesuai_role(): void

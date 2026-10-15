@@ -5,10 +5,12 @@ namespace App\Providers;
 use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\ServiceBookingController;
 use App\Http\Controllers\TestDriveController;
+use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -44,6 +46,11 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Paginator::useBootstrapFive();
+
+        // Hak akses staf per kemampuan (User::PERMISSIONS): @can di Blade, can:... di route.
+        foreach (array_keys(User::PERMISSIONS) as $ability) {
+            Gate::define($ability, fn (User $user) => $user->isActive() && $user->hasPermission($ability));
+        }
 
         // Registrasi: batasi per IP agar tidak dipakai membuat banyak akun otomatis.
         RateLimiter::for('register', fn (Request $request) => Limit::perMinute(self::MAX_REGISTRATIONS_PER_MINUTE)

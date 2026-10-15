@@ -23,6 +23,11 @@ class PurchaseRequestActivity extends AdminActivityNotification
             .' · Rp '.number_format($this->record->car_price, 0, ',', '.');
     }
 
+    public function permission(): string
+    {
+        return 'purchases.view';
+    }
+
     protected function routeName(): string
     {
         return 'admin.purchase-requests.show';

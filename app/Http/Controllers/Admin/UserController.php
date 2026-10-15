@@ -20,11 +20,14 @@ class UserController extends Controller
         'nama' => ['name', 'asc'],
     ];
 
-    /** Nilai filter role => label. Default customer. */
+    /** Nilai filter role => label. Default customer; role staf hanya untuk yang boleh melihat akun staf. */
     public const ROLE_FILTERS = [
         User::ROLE_CUSTOMER => 'Customer',
         User::ROLE_OWNER => 'Owner',
-        User::ROLE_ADMIN => 'Admin',
+        User::ROLE_SUPER_ADMIN => 'Super Admin',
+        User::ROLE_ADMIN => 'Admin Dealer',
+        User::ROLE_SALES => 'Sales',
+        User::ROLE_CUSTOMER_SERVICE => 'Customer Service',
         User::ROLE_MECHANIC => 'Mekanik',
         'semua' => 'Semua',
     ];
@@ -51,8 +54,11 @@ class UserController extends Controller
         ]);
     }
 
-    public function show(User $user): View
+    public function show(Request $request, User $user): View
     {
+        // Customer Service hanya melihat customer; akun staf disembunyikan.
+        abort_if($user->isStaff() && ! $request->user()->hasPermission('staff-accounts.view'), 404);
+
         $car = fn ($query) => $query->select(['id', 'brand_id', 'name', 'year'])->with('brand:id,name');
 
         $user->load([
@@ -78,7 +84,9 @@ class UserController extends Controller
 
         return [
             'q' => trim((string) $request->query('q')) ?: null,
-            'role' => $pick('role', array_keys(self::ROLE_FILTERS)) ?? User::ROLE_CUSTOMER,
+            'role' => $request->user()->hasPermission('staff-accounts.view')
+                ? ($pick('role', array_keys(self::ROLE_FILTERS)) ?? User::ROLE_CUSTOMER)
+                : User::ROLE_CUSTOMER,
             'urut' => $pick('urut', array_keys(self::SORTS)) ?? 'terbaru',
         ];
     }
