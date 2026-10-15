@@ -41,6 +41,7 @@
             <select id="filter_pembayaran" name="pembayaran" class="form-select form-select-sm">
                 <option value="">Semua</option>
                 <option value="lewat-tenggat" @selected($filters['pembayaran'] === 'lewat-tenggat')>Lewat tenggat bayar</option>
+                <option value="dana-belum-dikembalikan" @selected($filters['pembayaran'] === 'dana-belum-dikembalikan')>Dana belum dikembalikan</option>
             </select>
         </div>
         <div class="col-6 col-md-4 col-lg-auto">

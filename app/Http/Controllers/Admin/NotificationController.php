@@ -87,7 +87,7 @@ class NotificationController extends Controller
             $query = self::RECORDS[$type]::query()->whereKey($items->pluck('id')->unique()->all());
 
             if ($type === 'PurchaseRequest') {
-                $query->with('paymentProofs:id,purchase_request_id,amount,status,created_at');
+                $query->with(['paymentProofs:id,purchase_request_id,amount,status,created_at', 'paymentRefunds:id,purchase_request_id,amount']);
             }
 
             return $query->get()->keyBy(fn (Model $record) => $record->getKey());

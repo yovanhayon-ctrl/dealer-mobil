@@ -143,6 +143,33 @@
                                         </ul>
                                     @endif
 
+                                    {{-- Pengajuan batal yang sempat menerima pembayaran: rincian pengembalian dana. --}}
+                                    @if ($purchase->refundStatus())
+                                        <div class="border-top pt-2 mb-2">
+                                            <p class="fw-semibold mb-1">Pengembalian dana</p>
+                                            @foreach ($purchase->paymentRefunds as $refund)
+                                                <div class="d-flex flex-wrap align-items-center gap-2">
+                                                    <x-price :amount="$refund->amount" />
+                                                    <span class="text-muted">· {{ $refund->refunded_on->translatedFormat('d M Y') }} · {{ $refund->methodLabel() }}</span>
+                                                    @if ($refund->hasFile())
+                                                        <a href="{{ route('account.payment-refunds.file', [$purchase, $refund]) }}" target="_blank" rel="noopener" class="ms-auto">Lihat file</a>
+                                                    @endif
+                                                </div>
+                                                @if ($refund->note)
+                                                    <p class="text-muted mb-1">{{ $refund->note }}</p>
+                                                @endif
+                                            @endforeach
+                                            @if ($purchase->refund_closed_at)
+                                                <p class="mb-0"><span class="fw-semibold">Dana {{ $purchase->refundedTotal() > 0 ? 'sisanya ' : '' }}tidak dikembalikan:</span> {{ $purchase->refund_closed_note }}</p>
+                                            @elseif ($purchase->needsRefundAction())
+                                                <p class="text-muted mb-0">
+                                                    Dealer akan menghubungi Anda terkait dana <span class="fw-semibold text-body"><x-price :amount="$purchase->refundableAmount()" /></span>
+                                                    yang sudah dibayarkan.
+                                                </p>
+                                            @endif
+                                        </div>
+                                    @endif
+
                                     @if ($purchase->canReceivePaymentProofs())
                                         <a href="{{ route('account.payment-proofs.create', $purchase) }}" class="btn btn-outline-primary btn-sm">
                                             <i class="bi bi-upload"></i>Kirim Bukti Pembayaran

@@ -31,6 +31,8 @@ class PurchaseRequestController extends Controller
     /** Nilai filter pembayaran di query string. */
     public const PAYMENT_FILTER_OVERDUE = 'lewat-tenggat';
 
+    public const PAYMENT_FILTER_REFUND = 'dana-belum-dikembalikan';
+
     /** Nilai filter metode di query string => payment_method. */
     public const METHOD_FILTERS = [
         'cash' => PurchaseRequest::PAYMENT_CASH,
@@ -45,6 +47,7 @@ class PurchaseRequestController extends Controller
             ->with([
                 'user:id,name,email', 'car:id,brand_id,name,year', 'car.brand:id,name',
                 'paymentProofs:id,purchase_request_id,amount,status,created_at',
+                'paymentRefunds:id,purchase_request_id,amount',
             ])
             ->tap(fn (Builder $query) => $this->applyFilters($query, $filters))
             ->orderBy('created_at', self::SORTS[$filters['urut']])
@@ -66,6 +69,7 @@ class PurchaseRequestController extends Controller
             'car:id,brand_id,name,slug,year,vehicle_condition,price,stock,is_active',
             'car.brand:id,name',
             'paymentProofs.recorder:id,name',
+            'paymentRefunds.recorder:id,name',
         ]);
 
         return view('admin.purchase-requests.show', ['purchaseRequest' => $purchaseRequest]);
@@ -126,7 +130,7 @@ class PurchaseRequestController extends Controller
             'q' => trim((string) $request->query('q')) ?: null,
             'status' => $pick('status', PurchaseRequest::STATUSES),
             'metode' => $pick('metode', array_keys(self::METHOD_FILTERS)),
-            'pembayaran' => $pick('pembayaran', [self::PAYMENT_FILTER_OVERDUE]),
+            'pembayaran' => $pick('pembayaran', [self::PAYMENT_FILTER_OVERDUE, self::PAYMENT_FILTER_REFUND]),
             'urut' => $pick('urut', array_keys(self::SORTS)) ?? 'terbaru',
         ];
     }
@@ -143,6 +147,7 @@ class PurchaseRequestController extends Controller
                     ->orWhereHas('brand', fn ($brand) => $brand->where('name', 'like', "%{$search}%")))))
             ->when($filters['status'], fn ($q, $status) => $q->where('status', $status))
             ->when($filters['metode'], fn ($q, $method) => $q->where('payment_method', self::METHOD_FILTERS[$method]))
-            ->when($filters['pembayaran'] === self::PAYMENT_FILTER_OVERDUE, fn ($q) => $q->paymentOverdue());
+            ->when($filters['pembayaran'] === self::PAYMENT_FILTER_OVERDUE, fn ($q) => $q->paymentOverdue())
+            ->when($filters['pembayaran'] === self::PAYMENT_FILTER_REFUND, fn ($q) => $q->refundPending());
     }
 }
