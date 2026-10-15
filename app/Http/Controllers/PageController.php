@@ -6,14 +6,18 @@ use App\Models\Brand;
 use App\Models\Car;
 use App\Models\Service;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 use Illuminate\View\View;
 
 /**
- * Halaman informasi statis: Tentang Kami & Kontak (tanpa form/tabel, RANCANGAN §3).
+ * Halaman informasi statis: Tentang Kami, Kontak, Kebijakan Privasi, dan Syarat & Ketentuan.
  * Data dealer dibaca dari config/dealer.php (.env).
  */
 class PageController extends Controller
 {
+    /** Tanggal berlaku Kebijakan Privasi & Syarat Ketentuan; ubah bila isinya diubah. */
+    public const LEGAL_EFFECTIVE_DATE = '2026-10-15';
+
     public function about(): View
     {
         return view('pages.about', [
@@ -37,6 +41,33 @@ class PageController extends Controller
                 : null,
             'mapsUrl' => self::mapsEmbedUrl($dealer['maps_embed_url']),
         ]);
+    }
+
+    public function privacy(): View
+    {
+        return view('pages.legal.privacy', $this->legalData());
+    }
+
+    public function terms(): View
+    {
+        return view('pages.legal.terms', $this->legalData());
+    }
+
+    /**
+     * Kontak dealer (dari .env) & tanggal berlaku untuk halaman kebijakan.
+     *
+     * @return array<string, mixed>
+     */
+    private function legalData(): array
+    {
+        $dealer = config('dealer');
+        $whatsapp = preg_replace('/\D/', '', (string) $dealer['whatsapp']);
+
+        return [
+            'dealer' => $dealer,
+            'whatsappUrl' => $whatsapp !== '' ? "https://wa.me/{$whatsapp}" : null,
+            'effectiveDate' => Carbon::parse(self::LEGAL_EFFECTIVE_DATE)->translatedFormat('j F Y'),
+        ];
     }
 
     /**
