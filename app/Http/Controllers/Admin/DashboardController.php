@@ -66,6 +66,7 @@ class DashboardController extends Controller
             'overdue_test_drives' => TestDrive::query()->overdue()->count(),
             'overdue_service_bookings' => ServiceBooking::query()->overdue()->count(),
             'pending_refunds' => PurchaseRequest::query()->refundPending()->count(),
+            'awaiting_response' => PurchaseRequest::query()->awaitingResponse()->count(),
         ];
     }
 }

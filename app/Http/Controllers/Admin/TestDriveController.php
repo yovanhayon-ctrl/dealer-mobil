@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\RescheduleBooking;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\RescheduleRequest;
 use App\Http\Requests\Admin\TestDriveStatusRequest;
 use App\Models\TestDrive;
 use App\Notifications\Notifier;
@@ -103,6 +105,22 @@ class TestDriveController extends Controller
         Notifier::send($updated->user, new TestDriveStatusChanged($updated));
 
         return $redirect->with('success', "Status test drive diubah dari {$oldLabel} menjadi {$updated->statusLabel()}.");
+    }
+
+    /**
+     * Jadwal ulang (status menjadi Dikonfirmasi, customer diberi tahu). Lihat RescheduleBooking.
+     */
+    public function reschedule(RescheduleRequest $request, TestDrive $testDrive, RescheduleBooking $reschedule): RedirectResponse
+    {
+        $redirect = redirect()->route('admin.test-drives.show', $testDrive);
+
+        try {
+            $updated = $reschedule->handle($testDrive, $request->validated('preferred_date'), $request->validated('preferred_time'));
+        } catch (DomainException $e) {
+            return $redirect->with('error', $e->getMessage());
+        }
+
+        return $redirect->with('success', 'Jadwal diubah ke '.$updated->preferred_date->translatedFormat('d M Y')." {$updated->timeLabel()} WIB. Customer sudah diberi tahu.");
     }
 
     /**

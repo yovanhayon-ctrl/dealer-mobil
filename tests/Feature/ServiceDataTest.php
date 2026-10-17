@@ -118,7 +118,7 @@ class ServiceDataTest extends TestCase
         $this->seed(ServiceBookingSeeder::class);
 
         $seeded = ServiceBooking::with('user:id,email')->get();
-        $this->assertCount(8, $seeded);
+        $this->assertCount(9, $seeded);
         $this->assertEqualsCanonicalizing(ServiceBooking::STATUSES, $seeded->pluck('status')->unique()->values()->all());
         $this->assertTrue($seeded->every(fn (ServiceBooking $booking) => str_ends_with($booking->user->email, '@example.test')));
 

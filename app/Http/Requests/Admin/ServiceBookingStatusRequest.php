@@ -28,6 +28,10 @@ class ServiceBookingStatusRequest extends FormRequest
         $this->merge([
             'status' => blank($status) || $status === $this->serviceBooking()->status ? null : $status,
         ]);
+
+        if ($status === ServiceBooking::STATUS_NO_SHOW && blank($this->input('admin_note'))) {
+            $this->merge(['admin_note' => $this->serviceBooking()->noShowNote()]);
+        }
     }
 
     /**

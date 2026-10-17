@@ -35,9 +35,12 @@ class ServiceBooking extends Model
 
     public const STATUS_CANCELLED = 'cancelled';
 
+    /** Customer tidak hadir pada jadwal yang sudah dikonfirmasi (lihat HasSchedule). */
+    public const STATUS_NO_SHOW = 'no_show';
+
     public const STATUSES = [
         self::STATUS_PENDING, self::STATUS_CONFIRMED, self::STATUS_IN_PROGRESS,
-        self::STATUS_COMPLETED, self::STATUS_CANCELLED,
+        self::STATUS_COMPLETED, self::STATUS_CANCELLED, self::STATUS_NO_SHOW,
     ];
 
     public const STATUS_LABELS = [
@@ -46,12 +49,13 @@ class ServiceBooking extends Model
         self::STATUS_IN_PROGRESS => 'Dikerjakan',
         self::STATUS_COMPLETED => 'Selesai',
         self::STATUS_CANCELLED => 'Dibatalkan',
+        self::STATUS_NO_SHOW => 'Tidak datang',
     ];
 
-    /** Transisi status yang diizinkan. Status lain adalah status akhir. */
+    /** Transisi status yang diizinkan. Status lain adalah status akhir. Tidak datang: lihat allowedTransitions(). */
     public const TRANSITIONS = [
         self::STATUS_PENDING => [self::STATUS_CONFIRMED, self::STATUS_CANCELLED],
-        self::STATUS_CONFIRMED => [self::STATUS_IN_PROGRESS, self::STATUS_CANCELLED],
+        self::STATUS_CONFIRMED => [self::STATUS_IN_PROGRESS, self::STATUS_NO_SHOW, self::STATUS_CANCELLED],
         self::STATUS_IN_PROGRESS => [self::STATUS_COMPLETED],
     ];
 
@@ -224,7 +228,7 @@ class ServiceBooking extends Model
      */
     public function allowedTransitions(): array
     {
-        return self::TRANSITIONS[$this->status] ?? [];
+        return $this->withoutEarlyNoShow(self::TRANSITIONS[$this->status] ?? []);
     }
 
     public function canTransitionTo(string $status): bool

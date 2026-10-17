@@ -29,6 +29,9 @@
         @if ($purchaseRequest->isPaymentOverdue())
             <x-status-badge status="rejected" label="Lewat tenggat" />
         @endif
+        @if ($purchaseRequest->isAwaitingResponse())
+            <x-status-badge status="rejected" label="Belum ditanggapi" />
+        @endif
         @if (Route::has('admin.purchase-requests.pdf'))
             <a href="{{ route('admin.purchase-requests.pdf', $purchaseRequest) }}" target="_blank" rel="noopener"
                class="btn btn-outline-secondary btn-sm" title="Bukti {{ $purchaseRequest->documentNumber() }}">

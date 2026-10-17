@@ -30,7 +30,10 @@ class TestDrive extends Model
 
     public const STATUS_CANCELLED = 'cancelled';
 
-    public const STATUSES = [self::STATUS_PENDING, self::STATUS_CONFIRMED, self::STATUS_COMPLETED, self::STATUS_CANCELLED];
+    /** Customer tidak hadir pada jadwal yang sudah dikonfirmasi (lihat HasSchedule). */
+    public const STATUS_NO_SHOW = 'no_show';
+
+    public const STATUSES = [self::STATUS_PENDING, self::STATUS_CONFIRMED, self::STATUS_COMPLETED, self::STATUS_CANCELLED, self::STATUS_NO_SHOW];
 
     /** Label bahasa Indonesia (sama dengan x-status-badge). */
     public const STATUS_LABELS = [
@@ -38,12 +41,13 @@ class TestDrive extends Model
         self::STATUS_CONFIRMED => 'Dikonfirmasi',
         self::STATUS_COMPLETED => 'Selesai',
         self::STATUS_CANCELLED => 'Dibatalkan',
+        self::STATUS_NO_SHOW => 'Tidak datang',
     ];
 
-    /** Transisi status yang diizinkan (RANCANGAN §5). Status lain adalah status akhir. */
+    /** Transisi status yang diizinkan (RANCANGAN §5). Status lain adalah status akhir. Tidak datang: lihat allowedTransitions(). */
     public const TRANSITIONS = [
         self::STATUS_PENDING => [self::STATUS_CONFIRMED, self::STATUS_CANCELLED],
-        self::STATUS_CONFIRMED => [self::STATUS_COMPLETED, self::STATUS_CANCELLED],
+        self::STATUS_CONFIRMED => [self::STATUS_COMPLETED, self::STATUS_NO_SHOW, self::STATUS_CANCELLED],
     ];
 
     /** Status yang wajib disertai catatan admin (alasan untuk customer). */
@@ -99,7 +103,7 @@ class TestDrive extends Model
      */
     public function allowedTransitions(): array
     {
-        return self::TRANSITIONS[$this->status] ?? [];
+        return $this->withoutEarlyNoShow(self::TRANSITIONS[$this->status] ?? []);
     }
 
     public function canTransitionTo(string $status): bool

@@ -12,6 +12,7 @@
         ['admin.reports.index', 'bi-bar-chart', 'Laporan', 'btn-outline-primary', 'reports.view'],
     ], fn (array $action) => Route::has($action[0]) && $panelUser->can($action[4]));
     $attention = array_filter([
+        [$stats['awaiting_response'], 'pengajuan belum ditanggapi', 'admin.purchase-requests.index', ['tindak' => 'belum-ditanggapi'], 'purchases.status'],
         [$stats['overdue_payments'], 'pengajuan lewat tenggat bayar', 'admin.purchase-requests.index', ['pembayaran' => 'lewat-tenggat'], 'purchases.status'],
         [$stats['overdue_test_drives'], 'test drive lewat jadwal', 'admin.test-drives.index', ['jadwal' => 'lewat'], 'test-drives.manage'],
         [$stats['overdue_service_bookings'], 'booking servis lewat jadwal', 'admin.service-bookings.index', ['jadwal' => 'lewat'], 'service-bookings.manage'],
