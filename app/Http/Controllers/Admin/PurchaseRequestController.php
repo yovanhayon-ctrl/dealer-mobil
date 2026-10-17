@@ -33,6 +33,9 @@ class PurchaseRequestController extends Controller
 
     public const PAYMENT_FILTER_REFUND = 'dana-belum-dikembalikan';
 
+    /** Nilai filter tindak lanjut: pengajuan Menunggu yang belum ditanggapi (lihat PurchaseRequest::RESPONSE_DUE_DAYS). */
+    public const FOLLOW_UP_FILTER = 'belum-ditanggapi';
+
     /** Nilai filter metode di query string => payment_method. */
     public const METHOD_FILTERS = [
         'cash' => PurchaseRequest::PAYMENT_CASH,
@@ -131,6 +134,7 @@ class PurchaseRequestController extends Controller
             'status' => $pick('status', PurchaseRequest::STATUSES),
             'metode' => $pick('metode', array_keys(self::METHOD_FILTERS)),
             'pembayaran' => $pick('pembayaran', [self::PAYMENT_FILTER_OVERDUE, self::PAYMENT_FILTER_REFUND]),
+            'tindak' => $pick('tindak', [self::FOLLOW_UP_FILTER]),
             'urut' => $pick('urut', array_keys(self::SORTS)) ?? 'terbaru',
         ];
     }
@@ -148,6 +152,7 @@ class PurchaseRequestController extends Controller
             ->when($filters['status'], fn ($q, $status) => $q->where('status', $status))
             ->when($filters['metode'], fn ($q, $method) => $q->where('payment_method', self::METHOD_FILTERS[$method]))
             ->when($filters['pembayaran'] === self::PAYMENT_FILTER_OVERDUE, fn ($q) => $q->paymentOverdue())
-            ->when($filters['pembayaran'] === self::PAYMENT_FILTER_REFUND, fn ($q) => $q->refundPending());
+            ->when($filters['pembayaran'] === self::PAYMENT_FILTER_REFUND, fn ($q) => $q->refundPending())
+            ->when($filters['tindak'] === self::FOLLOW_UP_FILTER, fn ($q) => $q->awaitingResponse());
     }
 }

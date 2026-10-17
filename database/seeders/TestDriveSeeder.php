@@ -81,7 +81,7 @@ class TestDriveSeeder extends Seeder
             ['email' => 'agus.setiawan@example.test', 'car' => 'nissan-navara-vl-4x4-at-2024', 'day' => -10, 'hour' => 15,
                 'status' => TestDrive::STATUS_COMPLETED],
             ['email' => 'maya.putri@example.test', 'car' => 'nissan-gt-r-premium-edition-2024', 'day' => -2, 'hour' => 9,
-                'status' => TestDrive::STATUS_CANCELLED, 'admin_note' => 'Customer meminta pembatalan lewat telepon.'],
+                'status' => TestDrive::STATUS_NO_SHOW, 'admin_note' => 'Customer tidak hadir dan tidak bisa dihubungi.'],
             ['email' => 'budi.santoso@example.test', 'car' => 'nissan-silvia-spec-r-s15-2001', 'day' => 6, 'hour' => 10,
                 'status' => TestDrive::STATUS_CANCELLED, 'admin_note' => 'Unit sudah terjual, customer ditawari mobil lain.'],
         ];

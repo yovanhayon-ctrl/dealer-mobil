@@ -37,6 +37,13 @@
             </select>
         </div>
         <div class="col-6 col-md-4 col-lg-auto">
+            <label for="filter_tindak" class="form-label small mb-1">Tindak lanjut</label>
+            <select id="filter_tindak" name="tindak" class="form-select form-select-sm">
+                <option value="">Semua</option>
+                <option value="belum-ditanggapi" @selected($filters['tindak'] === 'belum-ditanggapi')>Belum ditanggapi</option>
+            </select>
+        </div>
+        <div class="col-6 col-md-4 col-lg-auto">
             <label for="filter_pembayaran" class="form-label small mb-1">Pembayaran</label>
             <select id="filter_pembayaran" name="pembayaran" class="form-select form-select-sm">
                 <option value="">Semua</option>
@@ -95,6 +102,9 @@
                                     <x-status-badge :status="$purchase->status" />
                                     @if ($purchase->hasPaymentSection())
                                         <x-status-badge :status="$purchase->paymentStatusBadge()" :label="$purchase->paymentStatusLabel()" class="ms-1" />
+                                    @endif
+                                    @if ($purchase->isAwaitingResponse())
+                                        <x-status-badge status="rejected" label="Belum ditanggapi" class="ms-1" />
                                     @endif
                                     @if ($purchase->isPaymentOverdue())
                                         <x-status-badge status="rejected" label="Lewat tenggat" class="ms-1" />

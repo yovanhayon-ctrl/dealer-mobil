@@ -77,10 +77,44 @@
                             ->mapWithKeys(fn ($status) => [$status => \App\Models\TestDrive::STATUS_LABELS[$status]])
                             ->all(),
                         'adminNote' => $testDrive->admin_note,
+                        // Tidak datang: catatan untuk customer terisi otomatis.
+                        'noteTemplates' => [\App\Models\TestDrive::STATUS_NO_SHOW => $testDrive->noShowNote()],
                         'noteHelp' => 'Wajib diisi saat membatalkan (alasan untuk customer). Maksimal 1000 karakter.',
                     ])
                 </div>
             </div>
+            @if ($testDrive->canBeRescheduled())
+                @php($rescheduleErrors = $errors->getBag('reschedule'))
+                <div class="card mt-4" id="jadwal-ulang">
+                    <div class="card-body p-4">
+                        <h3 class="admin-card-title">Jadwalkan Ulang</h3>
+                        <p class="small text-muted">Untuk jadwal yang disepakati ulang dengan customer. Status menjadi <span class="fw-semibold">Dikonfirmasi</span> dan customer diberi tahu.</p>
+                        <form method="POST" action="{{ route('admin.test-drives.reschedule', $testDrive) }}" novalidate data-disable-on-submit>
+                            @csrf
+                            @method('PATCH')
+                            <div class="row g-2">
+                                <div class="col-sm-6">
+                                    <label for="rs-date" class="form-label small">Tanggal baru</label>
+                                    <input type="date" id="rs-date" name="preferred_date" required min="{{ \App\Http\Requests\TestDriveRequest::firstDate() }}" max="{{ \App\Http\Requests\TestDriveRequest::lastDate() }}"
+                                           value="{{ $rescheduleErrors->any() ? old('preferred_date') : '' }}"
+                                           @class(['form-control form-control-sm', 'is-invalid' => $rescheduleErrors->has('preferred_date')])>
+                                    @if ($rescheduleErrors->has('preferred_date'))<div class="invalid-feedback">{{ $rescheduleErrors->first('preferred_date') }}</div>@endif
+                                </div>
+                                <div class="col-sm-6">
+                                    <label for="rs-time" class="form-label small">Jam baru (WIB)</label>
+                                    <select id="rs-time" name="preferred_time" required @class(['form-select form-select-sm', 'is-invalid' => $rescheduleErrors->has('preferred_time')])>
+                                        @foreach (\App\Models\TestDrive::TIME_SLOTS as $slot)
+                                            <option value="{{ $slot }}" @selected(old('preferred_time', $testDrive->timeLabel()) === $slot)>{{ $slot }}</option>
+                                        @endforeach
+                                    </select>
+                                    @if ($rescheduleErrors->has('preferred_time'))<div class="invalid-feedback">{{ $rescheduleErrors->first('preferred_time') }}</div>@endif
+                                </div>
+                            </div>
+                            <button type="submit" class="btn btn-outline-primary btn-sm mt-3"><i class="bi bi-calendar2-week"></i>Simpan Jadwal Baru</button>
+                        </form>
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
 @endsection

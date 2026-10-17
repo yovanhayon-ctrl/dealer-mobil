@@ -289,7 +289,7 @@ class ReportTest extends TestCase
         $summary = $this->report()->testDriveSummary();
 
         $this->assertSame(4, $summary['total']);
-        $this->assertSame(['pending' => 0, 'confirmed' => 1, 'completed' => 2, 'cancelled' => 1], $summary['statuses']);
+        $this->assertSame(['pending' => 0, 'confirmed' => 1, 'completed' => 2, 'cancelled' => 1, 'no_show' => 0], $summary['statuses']);
         $this->assertSame(50.0, $summary['completion_rate']);
 
         $this->actingAs($this->admin)->get(route('admin.reports.index'))
