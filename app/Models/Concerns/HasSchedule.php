@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Builder;
  * Aturan jadwal bersama test drive & booking servis (kolom preferred_date/preferred_time):
  * - lewat jadwal: masih Menunggu/Dikonfirmasi padahal tanggalnya sudah lewat (hari ini belum);
  * - Tidak datang: hanya dari Dikonfirmasi dan pada/sesudah tanggal jadwal;
- * - jadwal ulang: selama masih Menunggu/Dikonfirmasi.
+ * - jadwal ulang: selama masih Menunggu/Dikonfirmasi, atau Tidak datang (customer minta jadwal baru).
  */
 trait HasSchedule
 {
@@ -54,7 +54,7 @@ trait HasSchedule
 
     public function canBeRescheduled(): bool
     {
-        return in_array($this->status, static::openScheduleStatuses(), true);
+        return in_array($this->status, [...static::openScheduleStatuses(), static::STATUS_NO_SHOW], true);
     }
 
     /**
