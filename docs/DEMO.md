@@ -17,7 +17,7 @@ php artisan test
 ```
 
 - `php artisan test` harus **lulus semua** sebelum demo.
-- `php artisan migrate` juga membuat tabel fitur v1.1.0 (`notifications`, `favorites`) bila laptop masih memakai database versi v1.0.0.
+- `php artisan migrate` juga menyusulkan tabel/kolom dari rilis yang lebih baru (mis. pembayaran, pengembalian dana, peran staf) bila database laptop masih versi lama.
 - Laptop harus **terhubung internet**: Bootstrap, ikon, font, dan grafik dashboard (Chart.js) dimuat dari CDN.
 - **Email notifikasi (v1.2.0):** dengan `MAIL_MAILER=log` email hanya tercatat di `storage/logs/laravel.log`. Agar bisa ditunjukkan, pakai **Mailtrap** (lihat [RELEASE-v1.2.0.md](RELEASE-v1.2.0.md#pengaturan-email-env)) dan buka inbox Mailtrap di tab browser terpisah. Tanpa internet/Mailtrap, set `DEALER_MAIL_NOTIFICATIONS=false` agar tidak menunggu koneksi SMTP.
 - Pastikan `.env` berisi: `DEALER_NAME="JAF Dealer"`, `DEALER_TAGLINE`, kontak dealer (`DEALER_*`), `ADMIN_EMAIL`, `ADMIN_PASSWORD`, dan `SEED_CUSTOMER_PASSWORD` (lihat `.env.example`).
@@ -31,9 +31,10 @@ Jika data lokal sudah berantakan setelah uji coba, database bisa diisi ulang den
 
 ```bash
 php artisan migrate:fresh --seed
+php artisan user:make-owner email-admin@dealer.test
 ```
 
-Hasilnya: 1 admin, 8 customer dummy (`…@example.test`), 14 mobil Nissan (baru & heritage), 5 promo, 6 layanan servis, serta contoh test drive, pengajuan, dan booking servis dengan berbagai status. Seeder **tidak** membuat notifikasi dan favorit; keduanya muncul saat demo (langkah 4 dan 13 di bawah). Seeder membuat 3 ulasan contoh yang sudah disetujui sehingga bagian **Kata Pelanggan** di beranda langsung terisi (v1.3.0). Karena semua data contoh dibuat hari ini, grafik dashboard hanya berisi bulan berjalan. Foto mobil diunggah manual lewat **Admin → Mobil → Galeri** (siapkan 5–10 foto sebelum demo agar katalog terlihat menarik).
+Hasilnya: 1 akun admin (dijadikan **Owner** oleh perintah kedua; ganti dengan nilai `ADMIN_EMAIL`), 8 customer dummy (`…@example.test`), 14 mobil Nissan (baru & heritage), 5 promo, 6 layanan servis, serta contoh test drive (10), pengajuan, dan booking servis (9) dengan berbagai status, termasuk contoh *Tidak datang*. Seeder **tidak** membuat notifikasi dan favorit; keduanya muncul saat demo (langkah 4 dan 13 di bawah). Seeder membuat 3 ulasan contoh yang sudah disetujui sehingga bagian **Kata Pelanggan** di beranda langsung terisi (v1.3.0). Karena semua data contoh dibuat hari ini, grafik dashboard hanya berisi bulan berjalan. Foto mobil diunggah manual lewat **Admin → Mobil → Galeri** (siapkan 5–10 foto sebelum demo agar katalog terlihat menarik).
 
 ### Mode "seperti production" saat demo (opsional)
 
@@ -48,10 +49,11 @@ Setelah demo, kembalikan untuk development: `APP_DEBUG=true` lalu `php artisan o
 
 | Peran | Email | Kata sandi |
 |---|---|---|
-| Admin | nilai `ADMIN_EMAIL` di `.env` | nilai `ADMIN_PASSWORD` di `.env` |
+| Owner | nilai `ADMIN_EMAIL` di `.env` (setelah `user:make-owner`) | nilai `ADMIN_PASSWORD` di `.env` |
+| Super Admin, Admin Dealer, Sales, Customer Service, Mekanik | dibuat Owner di **Admin → Staf** sebelum demo | ditentukan saat membuat akun |
 | Customer | `budi.santoso@example.test` (atau 7 customer dummy lain) | nilai `SEED_CUSTOMER_PASSWORD` di `.env` |
 
-Kata sandi tidak ditulis di repo. Login admin dan customer di **dua browser berbeda** (atau satu jendela biasa + satu jendela penyamaran) agar bisa berpindah peran dengan cepat.
+Kata sandi tidak ditulis di repo. Login staf dan customer di **dua browser berbeda** (atau satu jendela biasa + satu jendela penyamaran) agar bisa berpindah peran dengan cepat. Hak tiap peran: README bagian *Peran Staf*.
 
 ## 3. Alur demo (±20 menit)
 
@@ -76,12 +78,18 @@ Mengikuti *customer journey* di proposal: Temukan → Kenali → Pertimbangkan �
 | 13b | Admin → Customer → Admin | **(v1.3.0)** Admin: **Pengajuan** → pengajuan *Disetujui* milik `andi.pratama@example.test` (Magnite) → *Selesai*. Login sebagai Andi → **Pengajuan Saya** → **Beri Ulasan** (5 bintang + komentar) → kirim. Admin: lonceng bertambah → menu **Ulasan** → **Setujui** → buka **Beranda** | Ulasan hanya untuk pembelian selesai, moderasi admin, ulasan tampil di *Kata Pelanggan* dengan nama "Andi P." |
 | 13c | Customer → Admin | **(v1.4.0)** Customer: **Pengajuan Saya** → **Cetak PDF** pada pengajuan langkah 7. Admin: detail pengajuan yang sama → **Cetak PDF** | Bukti pengajuan A4 terbuka di tab baru: nomor `PB-…`, data customer & mobil, rincian kredit, catatan dealer |
 | 14 | Admin | **Booking Servis** → konfirmasi → (pada tanggalnya) *Dikerjakan* → *Selesai* + catatan | Alur status servis (customer juga mendapat notifikasi) |
-| 15 | Admin | **Laporan** → *Export CSV* | Rekap penjualan, test drive, servis, stok menipis |
+| 15 | Admin | **Laporan** → *Export Excel* / *CSV* | Rekap penjualan, test drive (termasuk *Tidak datang*), servis, stok menipis |
 | 16 | Semua | Tampilkan di HP (F12 → mode perangkat) | Responsif, menu ☰, tabel bandingkan bisa digeser |
+| 17 | Customer → Admin | **(v1.11–v1.12)** Pengajuan *Disetujui* → customer **Kirim Bukti Pembayaran** (tanda jadi). Admin: lonceng *Bukti Pembayaran Baru* → **Terima**. Lalu **Catat Pembayaran di Showroom** untuk pelunasan | Status *Dibayar sebagian* → *Lunas*, notifikasi *Pembayaran Diterima*, rekening dealer di Pengajuan Saya |
+| 18 | Admin | **(v1.13)** Dashboard: strip **Perlu ditindaklanjuti** → *pengajuan lewat tenggat bayar* → batalkan (catatan terisi otomatis). Pada pengajuan batal yang sempat dibayar → **Catat Pengembalian Dana** atau **Tutup tanpa pengembalian** | Batas bayar 3 hari, stok kembali, status dana *Dikembalikan* / *Tidak dikembalikan* |
+| 19 | Sales / Customer Service | **(v1.14)** Login sebagai Sales lalu Customer Service | Menu & dashboard berbeda per peran; Sales hanya melihat Mobil & Promo, CS hanya melihat Pengajuan & Ulasan |
+| 20 | Admin → Mekanik → Customer | **(v1.11)** Booking servis → tugaskan mekanik → konfirmasi. Login mekanik: **Pekerjaan Saya** → *Mulai Kerjakan* → centang checklist → temuan → *Selesai*. Customer memberi rating | Notifikasi pekerjaan baru ke mekanik, checklist per layanan, rating mekanik |
+| 21 | Admin | **(v1.15)** Test drive *Dikonfirmasi* yang lewat jadwal → status **Tidak datang**, atau kartu **Jadwalkan Ulang** → tanggal & jam baru | Badge *Lewat jadwal*, catatan otomatis, notifikasi *Jadwal Test Drive Diubah* |
+| 22 | Admin / Sales | **(v1.15)** Dashboard: *pengajuan belum ditanggapi* → proses pengajuan | Pengajuan *Menunggu* > 2 hari ditandai, tanda hilang setelah diproses |
 
 Tips (v1.5.0): banner beranda memutar **video latar** di laptop. Untuk menunjukkan **kartu mobil unggulan**, kosongkan `DEALER_HERO_VIDEOS=` di `.env` lalu `php artisan optimize:clear`, dan di **Admin → Mobil → Edit** centang **Jadikan unggulan di beranda** pada mobil yang punya foto (mis. Skyline R34). Di HP, *Mobil Terbaru* bisa digeser ke samping.
 
-Tips: booking test drive/servis hanya bisa untuk **besok s/d 30 hari ke depan**; status *Dikerjakan* (servis) hanya bisa dipilih pada tanggal jadwalnya. Kosongkan daftar bandingkan sebelum demo (tombol **Kosongkan** di bar bawah) agar mulai dari nol.
+Tips: booking test drive/servis hanya bisa untuk **besok s/d 30 hari ke depan**; status *Dikerjakan* (servis) dan *Tidak datang* hanya bisa dipilih pada atau sesudah tanggal jadwalnya. Strip *Perlu ditindaklanjuti* hanya muncul bila ada yang lewat jadwal/tenggat; data contoh dibuat relatif terhadap hari seeder dijalankan. Kosongkan daftar bandingkan sebelum demo (tombol **Kosongkan** di bar bawah) agar mulai dari nol.
 
 ## 4. Jika terjadi masalah saat demo
 
@@ -92,10 +100,13 @@ Tips: booking test drive/servis hanya bisa untuk **besok s/d 30 hari ke depan**;
 | Perubahan kode/`.env` tidak terlihat | Cache aktif → `php artisan optimize:clear`. |
 | "Terlalu banyak percobaan…" | Rate limit (keamanan). Tunggu 1 menit. |
 | Grafik dashboard kosong, hanya ada tabel *Lihat angka* | Chart.js gagal dimuat dari CDN (tidak ada internet). Angkanya tetap ada di tabel *Lihat angka*. |
-| Lonceng notifikasi tidak muncul / tidak bertambah | Customer: notifikasi dikirim hanya bila admin benar-benar **mengubah status** (menyimpan catatan saja tidak). Admin: hanya untuk booking/pengajuan **baru** atau yang **dibatalkan customer**. Muat ulang halaman. |
+| Lonceng notifikasi tidak muncul / tidak bertambah | Customer: notifikasi dikirim bila staf **mengubah status**, memproses pembayaran, atau menjadwalkan ulang (menyimpan catatan saja tidak). Staf: hanya untuk data **baru** atau yang **dibatalkan customer**, dan hanya untuk menu yang boleh dibuka perannya (mis. Sales tidak menerima booking servis). Muat ulang halaman. |
+| Menu **Staf** tidak ada | Akun belum Owner/Super Admin → `php artisan user:make-owner email`. |
+| Kartu **Jadwalkan Ulang** tidak muncul | Hanya untuk status *Menunggu*, *Dikonfirmasi*, atau *Tidak datang*. |
+| Pilihan **Tidak datang** tidak ada | Hanya untuk test drive/servis *Dikonfirmasi* yang tanggalnya hari ini atau sudah lewat. |
 | Email tidak masuk ke Mailtrap | Cek `MAIL_*` di `.env` lalu `php artisan optimize:clear`. Proses tetap berhasil walau email gagal; penyebabnya tercatat di `storage/logs/laravel.log`. |
 | Aksi terasa lambat beberapa detik | SMTP tidak bisa dihubungi (internet/Mailtrap). Perbaiki `MAIL_*` atau set `DEALER_MAIL_NOTIFICATIONS=false`. |
-| Tabel `notifications` / `favorites` / `testimonials` atau kolom `is_featured` tidak ditemukan | Database masih versi lama → `php artisan migrate`. |
+| Tabel atau kolom tidak ditemukan (mis. `payment_refunds`, `approved_at`, status `no_show`) | Database masih versi lama → `php artisan migrate`. |
 | Video beranda tidak berputar | Hanya di layar ≥ 992 px; tidak diputar bila *reduce motion* / hemat data aktif atau file di `DEALER_HERO_VIDEOS` tidak ada di `public/`. Cek `.env` lalu `php artisan optimize:clear`. |
 | Tombol **Beri Ulasan** tidak muncul | Hanya untuk pengajuan berstatus **Selesai**; ubah statusnya di admin (*Disetujui* → *Selesai*). Ulasan yang sudah disetujui tidak bisa diubah lagi. |
 | Klik **Cetak PDF** muncul error *Class "Dompdf\Dompdf" not found* | Dependency belum terpasang → `composer install` lalu `php artisan optimize:clear`. |
