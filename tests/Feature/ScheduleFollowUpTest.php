@@ -137,6 +137,33 @@ class ScheduleFollowUpTest extends TestCase
             ->assertSessionHas('error', 'Jadwal tidak bisa diubah karena statusnya sudah Selesai.');
     }
 
+    public function test_jadwal_ulang_dari_tidak_datang(): void
+    {
+        $noShow = $this->makeTestDrive('no_show', '2026-10-14');
+
+        $this->actingAs($this->admin)->get(route('admin.test-drives.show', $noShow))->assertSee('Jadwalkan Ulang');
+        $this->patch(route('admin.test-drives.reschedule', $noShow), ['preferred_date' => '2026-10-19', 'preferred_time' => '11:00'])
+            ->assertSessionHasNoErrors();
+
+        $noShow->refresh();
+        $this->assertSame('confirmed', $noShow->status);
+        $this->assertSame('Customer tidak hadir pada jadwal 14 Okt 2026 10:00; dijadwalkan ulang ke 19 Okt 2026 11:00 WIB.', $noShow->admin_note);
+        $this->assertSame('Jadwal Test Drive Diubah', $this->customer->notifications()->sole()->data['title']);
+
+        // Customer sudah booking ulang sendiri untuk mobil yang sama: booking Tidak datang lama tidak dibuka lagi.
+        $old = $this->makeTestDrive('no_show', '2026-10-13');
+        $this->makeTestDrive('pending', '2026-10-21', ['car_id' => $old->car_id]);
+        $this->patch(route('admin.test-drives.reschedule', $old), ['preferred_date' => '2026-10-20', 'preferred_time' => '10:00'])
+            ->assertSessionHasErrorsIn('reschedule', ['preferred_time' => 'Customer sudah punya jadwal test drive lain untuk mobil ini. Ubah jadwal itu saja.']);
+        $this->assertSame('no_show', $old->fresh()->status);
+
+        $booking = $this->serviceBooking('no_show', '2026-10-14');
+        $this->serviceBooking('pending', '2026-10-22', ['plate_number' => $booking->plate_number]);
+        $this->patch(route('admin.service-bookings.reschedule', $booking), ['preferred_date' => '2026-10-20', 'preferred_time' => '10:00'])
+            ->assertSessionHasErrorsIn('reschedule', 'preferred_time');
+        $this->assertSame('no_show', $booking->fresh()->status);
+    }
+
     public function test_jadwal_ulang_servis_mengikuti_kapasitas_dan_memberi_tahu_mekanik(): void
     {
         config(['dealer.service_slot_capacity' => 1]);

@@ -11,7 +11,8 @@ use DomainException;
 use Illuminate\Support\Facades\DB;
 
 /**
- * Staf menjadwalkan ulang test drive / booking servis yang masih Menunggu atau Dikonfirmasi (termasuk yang lewat jadwal).
+ * Staf menjadwalkan ulang test drive / booking servis yang masih Menunggu atau Dikonfirmasi (termasuk yang lewat jadwal),
+ * atau yang ditandai Tidak datang lalu customer meminta jadwal baru (riwayatnya tetap tercatat di catatan admin).
  * Jadwal baru dianggap sudah disepakati dengan customer: status menjadi Dikonfirmasi, catatan berisi jadwal lama → baru,
  * customer (dan mekanik yang ditugaskan) diberi tahu. Bentrok slot dicek ulang dengan baris terkunci.
  */
@@ -34,10 +35,14 @@ class RescheduleBooking
             }
 
             $before = $locked->preferred_date->translatedFormat('d M Y')." {$locked->timeLabel()}";
+            $wasNoShow = $locked->status === $locked::STATUS_NO_SHOW;
             $locked->preferred_date = $date;
             $locked->preferred_time = $time;
             $locked->status = $locked::STATUS_CONFIRMED;
-            $locked->admin_note = "Jadwal diubah dari {$before} ke ".$locked->preferred_date->translatedFormat('d M Y')." {$time} WIB.";
+            $after = $locked->preferred_date->translatedFormat('d M Y')." {$time} WIB";
+            $locked->admin_note = $wasNoShow
+                ? "Customer tidak hadir pada jadwal {$before}; dijadwalkan ulang ke {$after}."
+                : "Jadwal diubah dari {$before} ke {$after}.";
             $locked->save();
 
             return $locked;
@@ -68,6 +73,13 @@ class RescheduleBooking
             ->whereTime('preferred_time', '=', "{$time}:00")
             ->when($lock, fn ($query) => $query->lockForUpdate());
 
+        // Booking Tidak datang dibuka kembali: customer mungkin sudah membuat booking baru untuk mobil / kendaraan yang sama.
+        if ($booking->status === $booking::STATUS_NO_SHOW && $this->hasNewerActiveBooking($booking, $lock)) {
+            return $booking instanceof TestDrive
+                ? 'Customer sudah punya jadwal test drive lain untuk mobil ini. Ubah jadwal itu saja.'
+                : 'Kendaraan ini sudah punya booking servis aktif. Ubah jadwal booking itu saja.';
+        }
+
         if ($booking instanceof TestDrive) {
             // Query terpisah: relasi car pada model tidak ditimpa kolom terbatas (notifikasi butuh nama & merek).
             $car = $booking->car()->first(['id', 'vehicle_condition', 'stock']);
@@ -90,5 +102,17 @@ class RescheduleBooking
         }
 
         return null;
+    }
+
+    private function hasNewerActiveBooking(TestDrive|ServiceBooking $booking, bool $lock): bool
+    {
+        return $booking::query()
+            ->active()
+            ->whereKeyNot($booking->id)
+            ->when($booking instanceof TestDrive,
+                fn ($query) => $query->where('user_id', $booking->user_id)->where('car_id', $booking->car_id),
+                fn ($query) => $query->where('plate_number', $booking->plate_number))
+            ->when($lock, fn ($query) => $query->lockForUpdate())
+            ->exists();
     }
 }
