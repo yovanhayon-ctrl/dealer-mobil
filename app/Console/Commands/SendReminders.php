@@ -8,11 +8,12 @@ use Illuminate\Console\Attributes\Signature;
 use Illuminate\Console\Command;
 
 /**
+ * Pengingat H-1 jadwal (test drive, servis, mekanik) & batas pembayaran pertama.
  * Dijalankan scheduler setiap hari (routes/console.php, DEALER_REMINDER_TIME); juga lewat tombol dashboard atau manual.
  * Contoh: php artisan reminders:send --dry-run
  */
 #[Signature('reminders:send {--dry-run : Hanya tampilkan jadwal yang akan diingatkan, tanpa mengirim}')]
-#[Description('Kirim pengingat H-1 untuk test drive & booking servis yang dikonfirmasi besok')]
+#[Description('Kirim pengingat H-1: test drive & servis yang dikonfirmasi besok, dan batas pembayaran pertama yang jatuh besok')]
 class SendReminders extends Command
 {
     public function handle(SendScheduleReminders $reminders): int
@@ -27,13 +28,16 @@ class SendReminders extends Command
                 $mechanic = $booking->mechanic ? " · mekanik {$booking->mechanic->name}" : '';
                 $this->line("Servis #{$booking->id} {$booking->timeLabel()} · {$booking->user->name} · {$booking->plate_number}{$mechanic}");
             }
-            $this->info("Akan diingatkan: {$due['test_drives']->count()} test drive, {$due['service_bookings']->count()} servis (belum dikirim).");
+            foreach ($due['purchase_requests'] as $purchaseRequest) {
+                $this->line("Pembayaran pengajuan #{$purchaseRequest->id} · {$purchaseRequest->user->name} · batas ".$purchaseRequest->paymentDueAt()->translatedFormat('d M Y'));
+            }
+            $this->info("Akan diingatkan: {$due['test_drives']->count()} test drive, {$due['service_bookings']->count()} servis, {$due['purchase_requests']->count()} pembayaran (belum dikirim).");
 
             return self::SUCCESS;
         }
 
         $sent = $reminders->handle();
-        $this->info("Pengingat terkirim: {$sent['test_drives']} test drive, {$sent['service_bookings']} servis, {$sent['mechanics']} ke mekanik.");
+        $this->info("Pengingat terkirim: {$sent['test_drives']} test drive, {$sent['service_bookings']} servis, {$sent['mechanics']} ke mekanik, {$sent['payments']} pembayaran.");
 
         return self::SUCCESS;
     }

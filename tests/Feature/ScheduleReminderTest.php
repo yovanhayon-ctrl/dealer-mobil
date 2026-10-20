@@ -53,7 +53,7 @@ class ScheduleReminderTest extends TestCase
         $already = $this->makeTestDrive('confirmed', '2026-10-21', ['preferred_time' => '13:00', 'reminded_at' => now()->subHour()]);
 
         $this->artisan('reminders:send')
-            ->expectsOutput('Pengingat terkirim: 1 test drive, 0 servis, 0 ke mekanik.')
+            ->expectsOutput('Pengingat terkirim: 1 test drive, 0 servis, 0 ke mekanik, 0 pembayaran.')
             ->assertSuccessful();
 
         $notification = $this->customer->notifications()->sole();
@@ -71,7 +71,7 @@ class ScheduleReminderTest extends TestCase
         $this->assertTrue($already->fresh()->reminded_at->equalTo(now()->subHour()));
 
         // Dijalankan lagi (cron & tombol): tidak ada pengingat ganda.
-        $this->artisan('reminders:send')->expectsOutput('Pengingat terkirim: 0 test drive, 0 servis, 0 ke mekanik.');
+        $this->artisan('reminders:send')->expectsOutput('Pengingat terkirim: 0 test drive, 0 servis, 0 ke mekanik, 0 pembayaran.');
         $this->assertSame(1, $this->customer->notifications()->count());
     }
 
@@ -83,7 +83,7 @@ class ScheduleReminderTest extends TestCase
             'preferred_date' => '2026-10-21', 'preferred_time' => '09:00', 'mechanic_id' => $mechanic->id,
         ]);
 
-        $this->artisan('reminders:send')->expectsOutput('Pengingat terkirim: 0 test drive, 1 servis, 1 ke mekanik.');
+        $this->artisan('reminders:send')->expectsOutput('Pengingat terkirim: 0 test drive, 1 servis, 1 ke mekanik, 0 pembayaran.');
 
         $customerNotification = $this->customer->notifications()->sole();
         $this->assertSame('Pengingat: Servis Besok', $customerNotification->data['title']);
@@ -101,7 +101,7 @@ class ScheduleReminderTest extends TestCase
 
         $this->artisan('reminders:send --dry-run')
             ->expectsOutput("Test drive #{$testDrive->id} 10:00 · Fadlan · Kicks e-Power VL")
-            ->expectsOutput('Akan diingatkan: 1 test drive, 0 servis (belum dikirim).')
+            ->expectsOutput('Akan diingatkan: 1 test drive, 0 servis, 0 pembayaran (belum dikirim).')
             ->assertSuccessful();
 
         $this->assertSame(0, $this->customer->notifications()->count());
@@ -131,9 +131,9 @@ class ScheduleReminderTest extends TestCase
 
         $this->post(route('admin.reminders.send'))
             ->assertRedirect(route('admin.dashboard'))
-            ->assertSessionHas('success', 'Pengingat terkirim: 1 test drive dan 0 servis.');
+            ->assertSessionHas('success', 'Pengingat terkirim: 1 test drive, 0 servis, dan 0 pembayaran.');
         $this->post(route('admin.reminders.send'))
-            ->assertSessionHas('status', 'Tidak ada jadwal besok yang perlu diingatkan (belum dikonfirmasi atau sudah diingatkan).');
+            ->assertSessionHas('status', 'Tidak ada jadwal atau batas pembayaran besok yang perlu diingatkan (belum dikonfirmasi atau sudah diingatkan).');
 
         $sales = User::factory()->sales()->create();
         $this->actingAs($sales)->get(route('admin.dashboard'))->assertDontSee(route('admin.reminders.send'), false);

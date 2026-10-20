@@ -147,6 +147,18 @@
                                 <i class="bi bi-check-circle me-1"></i>Pembayaran {{ mb_strtolower($purchaseRequest->paymentStatusLabel()) }}.
                                 Ubah status ke <span class="fw-semibold">Selesai</span> setelah mobil diserahkan.
                             </div>
+                        @elseif ($purchaseRequest->awaitsFirstPayment() && $purchaseRequest->paymentDueAt())
+                            <div class="small mb-3">
+                                Batas pembayaran pertama <span class="fw-semibold">{{ $purchaseRequest->paymentDueAt()->translatedFormat('l, d M Y') }}</span>
+                                @if ($purchaseRequest->payment_reminded_at)
+                                    <span class="text-muted">· pengingat terkirim {{ $purchaseRequest->payment_reminded_at->translatedFormat('d M Y H:i') }}</span>
+                                @endif
+                                @if (auth()->user()->can('purchases.status') && ($waUrl = $purchaseRequest->whatsappPaymentReminderUrl()))
+                                    <a href="{{ $waUrl }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success py-0 ms-1">
+                                        <i class="bi bi-whatsapp"></i>Ingatkan via WhatsApp
+                                    </a>
+                                @endif
+                            </div>
                         @elseif ($purchaseRequest->verifiedPaymentTotal() > 0 && ! $purchaseRequest->isClosed())
                             <p class="small text-muted mb-3">Sisa <span class="fw-semibold text-body"><x-price :amount="$purchaseRequest->remainingPayment()" /></span></p>
                         @endif

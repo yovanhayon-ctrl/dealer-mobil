@@ -172,7 +172,7 @@ php artisan optimize
 
 ### Cron untuk pengingat H-1 (disarankan)
 
-Pengingat H-1 dikirim otomatis setiap hari pukul `DEALER_REMINDER_TIME` (bawaan 16:00 WIB) ke customer yang jadwal test drive/servisnya **dikonfirmasi** untuk besok, dan ke mekanik yang ditugaskan.
+Pengingat H-1 dikirim otomatis setiap hari pukul `DEALER_REMINDER_TIME` (bawaan 16:00 WIB) ke customer yang jadwal test drive/servisnya **dikonfirmasi** untuk besok (dan ke mekanik yang ditugaskan), serta ke customer yang **batas pembayaran pertamanya** jatuh besok.
 
 1. cPanel → **Cron Jobs** → *Add New Cron Job* → *Common Settings*: **Once Per Minute** (`* * * * *`).
 2. Command (sesuaikan path PHP bila hosting memakai `ea-php85`):

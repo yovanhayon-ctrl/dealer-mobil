@@ -37,14 +37,16 @@ class DashboardTest extends TestCase
         Car::factory()->inactive()->outOfStock()->create();
         $cars = Car::all();
 
-        TestDrive::factory()->count(2)->recycle($customers)->recycle($cars)->create();
-        TestDrive::factory()->status('confirmed')->recycle($customers)->recycle($cars)->create();
+        // Jadwal tetap (bukan besok): kartu "besok belum dikonfirmasi" tidak boleh ikut terhitung secara acak.
+        $later = ['preferred_date' => today()->addDays(5)->toDateString()];
+        TestDrive::factory()->count(2)->recycle($customers)->recycle($cars)->create($later);
+        TestDrive::factory()->status('confirmed')->recycle($customers)->recycle($cars)->create($later);
 
         PurchaseRequest::factory()->count(3)->recycle($customers)->recycle($cars)->create();
         PurchaseRequest::factory()->status('approved')->recycle($customers)->recycle($cars)->create();
 
-        ServiceBooking::factory()->recycle($customers)->create();
-        ServiceBooking::factory()->status('confirmed')->recycle($customers)->create();
+        ServiceBooking::factory()->recycle($customers)->create($later);
+        ServiceBooking::factory()->status('confirmed')->recycle($customers)->create($later);
 
         $this->actingAs($admin)->get('/admin/dashboard')
             ->assertOk()

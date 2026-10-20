@@ -37,7 +37,7 @@
                 {{-- Cadangan bila hosting tanpa cron; aman ditekan berulang (yang sudah diingatkan dilewati). --}}
                 @can('reminders.send')
                     <form method="POST" action="{{ route('admin.reminders.send') }}" data-disable-on-submit
-                          data-confirm="Kirim pengingat ke customer & mekanik untuk jadwal besok yang sudah dikonfirmasi?">
+                          data-confirm="Kirim pengingat ke customer & mekanik untuk jadwal besok yang sudah dikonfirmasi dan batas pembayaran yang jatuh besok?">
                         @csrf
                         <button type="submit" class="btn btn-outline-primary btn-sm"><i class="bi bi-alarm"></i>Kirim Pengingat Besok</button>
                     </form>
