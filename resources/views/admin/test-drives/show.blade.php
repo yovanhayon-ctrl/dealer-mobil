@@ -29,7 +29,17 @@
                 <div class="card-body p-4">
                     <dl class="admin-detail-list">
                         <dt>Jadwal</dt>
-                        <dd>{{ $testDrive->preferred_date->translatedFormat('l, d F Y') }} · {{ $testDrive->timeLabel() }} WIB</dd>
+                        <dd>
+                            {{ $testDrive->preferred_date->translatedFormat('l, d F Y') }} · {{ $testDrive->timeLabel() }} WIB
+                            @if ($testDrive->reminded_at)
+                                <div class="small text-muted">Pengingat H-1 terkirim {{ $testDrive->reminded_at->translatedFormat('d M Y H:i') }}</div>
+                            @endif
+                            @if (in_array($testDrive->status, $testDrive::openScheduleStatuses(), true) && ! $testDrive->preferred_date->isPast() && ($waUrl = $testDrive->whatsappReminderUrl()))
+                                <a href="{{ $waUrl }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success py-0 mt-1">
+                                    <i class="bi bi-whatsapp"></i>Ingatkan via WhatsApp
+                                </a>
+                            @endif
+                        </dd>
 
                         <dt>Mobil</dt>
                         <dd>

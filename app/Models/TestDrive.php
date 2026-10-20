@@ -71,6 +71,7 @@ class TestDrive extends Model
     {
         return [
             'preferred_date' => 'date',
+            'reminded_at' => 'datetime',
         ];
     }
 

@@ -19,6 +19,7 @@ use App\Http\Controllers\Admin\PaymentProofController as AdminPaymentProofContro
 use App\Http\Controllers\Admin\PaymentRefundController;
 use App\Http\Controllers\Admin\PromoController as AdminPromoController;
 use App\Http\Controllers\Admin\PurchaseRequestController as AdminPurchaseRequestController;
+use App\Http\Controllers\Admin\ReminderController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ServiceBookingController as AdminServiceBookingController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
@@ -190,6 +191,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(function () {
     Route::redirect('/', '/admin/dashboard')->name('home');
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
+    Route::post('/pengingat', ReminderController::class)->middleware(['can:reminders.send', 'throttle:6,1'])->name('reminders.send');
 
     Route::controller(AdminNotificationController::class)->prefix('notifikasi')->name('notifications.')->group(function () {
         Route::get('/', 'index')->name('index');

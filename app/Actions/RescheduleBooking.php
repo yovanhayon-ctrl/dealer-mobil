@@ -39,6 +39,8 @@ class RescheduleBooking
             $locked->preferred_date = $date;
             $locked->preferred_time = $time;
             $locked->status = $locked::STATUS_CONFIRMED;
+            // Jadwal baru mendapat pengingat H-1 sendiri.
+            $locked->reminded_at = null;
             $after = $locked->preferred_date->translatedFormat('d M Y')." {$time} WIB";
             $locked->admin_note = $wasNoShow
                 ? "Customer tidak hadir pada jadwal {$before}; dijadwalkan ulang ke {$after}."
