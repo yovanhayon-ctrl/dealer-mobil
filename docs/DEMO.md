@@ -86,6 +86,7 @@ Mengikuti *customer journey* di proposal: Temukan → Kenali → Pertimbangkan �
 | 20 | Admin → Mekanik → Customer | **(v1.11)** Booking servis → tugaskan mekanik → konfirmasi. Login mekanik: **Pekerjaan Saya** → *Mulai Kerjakan* → centang checklist → temuan → *Selesai*. Customer memberi rating | Notifikasi pekerjaan baru ke mekanik, checklist per layanan, rating mekanik |
 | 21 | Admin | **(v1.15)** Test drive *Dikonfirmasi* yang lewat jadwal → status **Tidak datang**, atau kartu **Jadwalkan Ulang** → tanggal & jam baru | Badge *Lewat jadwal*, catatan otomatis, notifikasi *Jadwal Test Drive Diubah* |
 | 22 | Admin / Sales | **(v1.15)** Dashboard: *pengajuan belum ditanggapi* → proses pengajuan | Pengajuan *Menunggu* > 2 hari ditandai, tanda hilang setelah diproses |
+| 23 | Admin → Customer | **(v1.16)** Konfirmasi test drive untuk **besok** → Dashboard: **Kirim Pengingat Besok** → login customer, buka lonceng. Di detail test drive: **Ingatkan via WhatsApp** | Pengingat H-1 (lonceng/email), tidak terkirim dua kali, pesan WhatsApp siap kirim |
 
 Tips (v1.5.0): banner beranda memutar **video latar** di laptop. Untuk menunjukkan **kartu mobil unggulan**, kosongkan `DEALER_HERO_VIDEOS=` di `.env` lalu `php artisan optimize:clear`, dan di **Admin → Mobil → Edit** centang **Jadikan unggulan di beranda** pada mobil yang punya foto (mis. Skyline R34). Di HP, *Mobil Terbaru* bisa digeser ke samping.
 
@@ -103,6 +104,7 @@ Tips: booking test drive/servis hanya bisa untuk **besok s/d 30 hari ke depan**;
 | Lonceng notifikasi tidak muncul / tidak bertambah | Customer: notifikasi dikirim bila staf **mengubah status**, memproses pembayaran, atau menjadwalkan ulang (menyimpan catatan saja tidak). Staf: hanya untuk data **baru** atau yang **dibatalkan customer**, dan hanya untuk menu yang boleh dibuka perannya (mis. Sales tidak menerima booking servis). Muat ulang halaman. |
 | Menu **Staf** tidak ada | Akun belum Owner/Super Admin → `php artisan user:make-owner email`. |
 | Kartu **Jadwalkan Ulang** tidak muncul | Hanya untuk status *Menunggu*, *Dikonfirmasi*, atau *Tidak datang*. |
+| **Kirim Pengingat Besok** tidak mengirim apa-apa | Hanya jadwal **Dikonfirmasi** untuk besok yang belum diingatkan. Cek dengan `php artisan reminders:send --dry-run`. Di laptop tidak ada cron, jadi pengingat otomatis 16:00 tidak berjalan; pakai tombol ini. |
 | Pilihan **Tidak datang** tidak ada | Hanya untuk test drive/servis *Dikonfirmasi* yang tanggalnya hari ini atau sudah lewat. |
 | Email tidak masuk ke Mailtrap | Cek `MAIL_*` di `.env` lalu `php artisan optimize:clear`. Proses tetap berhasil walau email gagal; penyebabnya tercatat di `storage/logs/laravel.log`. |
 | Aksi terasa lambat beberapa detik | SMTP tidak bisa dihubungi (internet/Mailtrap). Perbaiki `MAIL_*` atau set `DEALER_MAIL_NOTIFICATIONS=false`. |
