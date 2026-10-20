@@ -23,6 +23,7 @@ use App\Http\Controllers\Admin\ReminderController;
 use App\Http\Controllers\Admin\ReportController;
 use App\Http\Controllers\Admin\ServiceBookingController as AdminServiceBookingController;
 use App\Http\Controllers\Admin\ServiceController as AdminServiceController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\StaffController;
 use App\Http\Controllers\Admin\TestDriveController as AdminTestDriveController;
 use App\Http\Controllers\Admin\TestimonialController as AdminTestimonialController;
@@ -322,6 +323,12 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->parameters(['staf' => 'user'])
         ->names('staff')
         ->middleware('can:staff.manage');
+
+    // Profil dealer, rekening pembayaran, hero beranda (menggantikan nilai .env, lihat App\Models\Setting).
+    Route::controller(SettingController::class)->prefix('pengaturan')->name('settings.')->middleware('can:settings.manage')->group(function () {
+        Route::get('/', 'edit')->name('edit');
+        Route::put('/', 'update')->name('update');
+    });
 });
 
 /*

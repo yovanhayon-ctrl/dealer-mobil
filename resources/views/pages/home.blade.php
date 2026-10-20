@@ -10,8 +10,13 @@
     // Hero memakai mobil pertama; bagian "Mobil Unggulan" menampilkan semuanya bergantian.
     $featuredCars = $chosenFeaturedCars->isNotEmpty() ? $chosenFeaturedCars : collect([$autoFeaturedCar])->filter();
     $featuredCar = $featuredCars->first();
+    // Latar hero (Admin > Pengaturan): video, gambar banner unggahan, atau foto mobil unggulan.
+    $heroBackground = $dealer['hero']['background'];
+    $heroBanner = $heroBackground === 'image' && filled($dealer['hero']['image'])
+        ? Storage::disk('public')->url($dealer['hero']['image'])
+        : null;
     // Video latar hero (DEALER_HERO_VIDEOS): hanya file .mp4 yang benar-benar ada di folder public.
-    $heroVideos = collect(config('dealer.hero_videos', []))
+    $heroVideos = collect($heroBackground === 'video' ? config('dealer.hero_videos', []) : [])
         ->filter(fn ($path) => is_string($path) && str_ends_with(strtolower($path), '.mp4')
             && ! str_contains($path, '..') && is_file(public_path($path)))
         ->map(fn ($path) => \App\Support\Asset::url(ltrim($path, '/')))
@@ -19,12 +24,13 @@
 @endphp
 
 @section('content')
-    @php($heroPhoto = $featuredCar?->primaryImage?->url)
+    @php($heroPhoto = $heroBanner ?? $featuredCar?->primaryImage?->url)
     {{--
         Hero: judul nilai jual + 2 tombol, rata kiri di bagian bawah.
-        Latar: video (layar lebar), foto mobil unggulan (HP / tanpa video), atau gradien + garis livery.
+        Latar: gambar banner unggahan (semua layar), video (layar lebar), foto mobil unggulan (HP / tanpa video),
+        atau gradien + garis livery.
     --}}
-    <section @class(['home-hero', 'has-video' => $heroVideos->isNotEmpty(), 'has-photo' => $heroPhoto]) aria-labelledby="hero-title"
+    <section @class(['home-hero', 'has-video' => $heroVideos->isNotEmpty(), 'has-photo' => $heroPhoto, 'has-banner' => $heroBanner]) aria-labelledby="hero-title"
              @if ($heroPhoto) style="--hero-photo: url('{{ $heroPhoto }}')" @endif>
         @if ($heroVideos->isNotEmpty())
             {{-- Dekoratif: diputar app.js hanya di layar lebar & tanpa "reduce motion"; di HP tidak diunduh. --}}
@@ -34,9 +40,11 @@
         <div class="container home-hero-inner">
             <div class="row align-items-end g-4 w-100 mx-0">
                 <div class="col-lg-7 px-0">
-                    <p class="hero-kicker">{{ $dealer['tagline'] ?: 'Nissan Heritage & Performance' }}</p>
-                    <h1 id="hero-title" class="hero-title">Nissan pilihan, dari klasik sampai terbaru.</h1>
-                    <p class="hero-lead">Lihat stok, hitung cicilan, dan jadwalkan test drive langsung dari sini.</p>
+                    <p class="hero-kicker">{{ $dealer['hero']['kicker'] ?: ($dealer['tagline'] ?: 'Nissan Heritage & Performance') }}</p>
+                    <h1 id="hero-title" class="hero-title">{{ $dealer['hero']['title'] }}</h1>
+                    @if (filled($dealer['hero']['lead']))
+                        <p class="hero-lead">{{ $dealer['hero']['lead'] }}</p>
+                    @endif
                     <div class="d-flex flex-wrap gap-2">
                         <a href="{{ route('cars.index') }}" class="btn btn-accent btn-lg">
                             <i class="bi bi-car-front"></i>Lihat Mobil
@@ -49,7 +57,7 @@
                     </div>
                 </div>
 
-                @if ($featuredCar && $heroVideos->isEmpty())
+                @if ($featuredCar && $heroVideos->isEmpty() && ! $heroBanner)
                     @php($featuredTitle = "{$featuredCar->brand->name} {$featuredCar->name} {$featuredCar->year}")
                     {{-- Hanya layar lebar: di HP foto mobil unggulan sudah menjadi latar hero. --}}
                     <div class="col-lg-5 d-none d-lg-block pe-0">

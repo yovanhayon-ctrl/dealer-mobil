@@ -572,6 +572,15 @@ main {
     display: none;
 }
 
+/* Gambar banner dari Admin > Pengaturan: latar di semua ukuran layar, digelapkan di sisi teks agar tetap terbaca. */
+.home-hero.has-banner {
+    background: linear-gradient(90deg, rgba(11, 11, 12, .9) 0%, rgba(11, 11, 12, .6) 45%, rgba(11, 11, 12, .25) 100%), var(--hero-photo) center / cover no-repeat;
+}
+
+.home-hero.has-banner::before {
+    display: none;
+}
+
 @media (max-width: 991.98px) {
     .hero-video {
         display: none;

@@ -24,6 +24,7 @@
         ['label' => 'Pengguna', 'icon' => 'bi-people', 'route' => 'admin.users.index', 'active' => 'admin.users.*', 'can' => 'users.view'],
         ['label' => 'Laporan', 'icon' => 'bi-bar-chart', 'route' => 'admin.reports.index', 'active' => 'admin.reports.*', 'can' => 'reports.view'],
         ['label' => 'Staf', 'icon' => 'bi-person-badge', 'route' => 'admin.staff.index', 'active' => 'admin.staff.*', 'can' => 'staff.manage'],
+        ['label' => 'Pengaturan', 'icon' => 'bi-gear', 'route' => 'admin.settings.edit', 'active' => 'admin.settings.*', 'can' => 'settings.manage'],
     ];
 
     $menu = $panelUser->isMechanic()

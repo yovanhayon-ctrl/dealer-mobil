@@ -37,14 +37,21 @@
         <div class="row g-4 g-lg-5 align-items-center mb-5">
             <div class="col-lg-7">
                 <h2 class="h4 mb-3">Siapa Kami</h2>
-                <p>
-                    {{ $dealer['name'] }} adalah dealer mobil berbasis web yang menjadikan katalog kendaraan Nissan sebagai titik awal
-                    interaksi dengan calon pembeli, dari generasi terdahulu seperti Skyline GT-R dan Silvia sampai model yang tersedia saat ini.
-                </p>
-                <p class="mb-0">
-                    Website ini bukan sekadar etalase. Anda dapat menemukan kendaraan, membandingkan informasi, menghitung simulasi kredit,
-                    lalu melanjutkan ke test drive atau pengajuan pembelian, tanpa harus datang ke showroom hanya untuk informasi dasar.
-                </p>
+                @if (filled($dealer['about_text']))
+                    {{-- Teks dari Admin > Pengaturan: paragraf dipisah baris kosong. --}}
+                    @foreach (preg_split('/\n\s*\n/', trim($dealer['about_text'])) as $paragraph)
+                        <p @class(['mb-0' => $loop->last])>{!! nl2br(e($paragraph)) !!}</p>
+                    @endforeach
+                @else
+                    <p>
+                        {{ $dealer['name'] }} adalah dealer mobil berbasis web yang menjadikan katalog kendaraan Nissan sebagai titik awal
+                        interaksi dengan calon pembeli, dari generasi terdahulu seperti Skyline GT-R dan Silvia sampai model yang tersedia saat ini.
+                    </p>
+                    <p class="mb-0">
+                        Website ini bukan sekadar etalase. Anda dapat menemukan kendaraan, membandingkan informasi, menghitung simulasi kredit,
+                        lalu melanjutkan ke test drive atau pengajuan pembelian, tanpa harus datang ke showroom hanya untuk informasi dasar.
+                    </p>
+                @endif
             </div>
             <div class="col-lg-5">
                 {{-- Angka dari database (mobil aktif, merek yang punya mobil aktif, layanan aktif). --}}

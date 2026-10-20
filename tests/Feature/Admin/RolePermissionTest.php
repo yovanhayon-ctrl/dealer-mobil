@@ -74,6 +74,7 @@ class RolePermissionTest extends TestCase
             'pengguna' => ['admin.users.index', [...$managers, 'customer_service']],
             'laporan' => ['admin.reports.index', $managers],
             'staf' => ['admin.staff.index', ['owner', 'super_admin']],
+            'pengaturan' => ['admin.settings.edit', ['owner', 'super_admin']],
             'pekerjaan mekanik' => ['mechanic.jobs.index', ['mechanic']],
             'layanan mekanik' => ['mechanic.services.index', ['mechanic']],
             'notifikasi mekanik' => ['mechanic.notifications.index', ['mechanic']],
