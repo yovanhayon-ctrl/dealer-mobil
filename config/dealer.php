@@ -52,6 +52,19 @@ return [
     // Kosongkan untuk memakai banner tanpa video (garis diagonal + kartu mobil unggulan).
     'hero_videos' => array_values(array_filter(array_map('trim', explode(',', (string) env('DEALER_HERO_VIDEOS', 'videos/video2.mp4'))))),
 
+    // Hero beranda & teks "Siapa Kami": bawaan di bawah, bisa diubah owner/super admin di Admin > Pengaturan
+    // (tabel settings menggantikan nilai di file ini & .env, lihat App\Models\Setting).
+    // background: video (hero_videos) | image (hero.image, unggahan admin) | car (foto mobil unggulan).
+    'hero' => [
+        'kicker' => null,
+        'title' => 'Nissan pilihan, dari klasik sampai terbaru.',
+        'lead' => 'Lihat stok, hitung cicilan, dan jadwalkan test drive langsung dari sini.',
+        'background' => 'video',
+        'image' => null,
+    ],
+
+    'about_text' => null,
+
     /*
     |--------------------------------------------------------------------------
     | JAF Service (Bengkel)

@@ -5,6 +5,7 @@ namespace App\Providers;
 use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\ServiceBookingController;
 use App\Http\Controllers\TestDriveController;
+use App\Models\Setting;
 use App\Models\User;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
@@ -46,6 +47,9 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         Paginator::useBootstrapFive();
+
+        // Pengaturan dealer dari admin (profil, rekening, hero) menggantikan config dealer.* dari .env.
+        Setting::apply();
 
         // Hak akses staf per kemampuan (User::PERMISSIONS): @can di Blade, can:... di route.
         foreach (array_keys(User::PERMISSIONS) as $ability) {
