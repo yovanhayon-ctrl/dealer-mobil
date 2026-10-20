@@ -28,7 +28,17 @@
                 <div class="card-body p-4">
                     <dl class="admin-detail-list">
                         <dt>Jadwal</dt>
-                        <dd>{{ $booking->preferred_date->translatedFormat('l, d F Y') }} · {{ $booking->timeLabel() }} WIB</dd>
+                        <dd>
+                            {{ $booking->preferred_date->translatedFormat('l, d F Y') }} · {{ $booking->timeLabel() }} WIB
+                            @if ($booking->reminded_at)
+                                <div class="small text-muted">Pengingat H-1 terkirim {{ $booking->reminded_at->translatedFormat('d M Y H:i') }}</div>
+                            @endif
+                            @if (in_array($booking->status, $booking::openScheduleStatuses(), true) && ! $booking->preferred_date->isPast() && ($waUrl = $booking->whatsappReminderUrl()))
+                                <a href="{{ $waUrl }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success py-0 mt-1">
+                                    <i class="bi bi-whatsapp"></i>Ingatkan via WhatsApp
+                                </a>
+                            @endif
+                        </dd>
 
                         <dt>Layanan</dt>
                         <dd>

@@ -14,6 +14,8 @@
     $attention = array_filter([
         [$stats['awaiting_response'], 'pengajuan belum ditanggapi', 'admin.purchase-requests.index', ['tindak' => 'belum-ditanggapi'], 'purchases.status'],
         [$stats['overdue_payments'], 'pengajuan lewat tenggat bayar', 'admin.purchase-requests.index', ['pembayaran' => 'lewat-tenggat'], 'purchases.status'],
+        [$stats['unconfirmed_test_drives_tomorrow'], 'test drive besok belum dikonfirmasi', 'admin.test-drives.index', ['status' => 'pending', 'dari' => today()->addDay()->toDateString(), 'sampai' => today()->addDay()->toDateString()], 'test-drives.manage'],
+        [$stats['unconfirmed_service_bookings_tomorrow'], 'booking servis besok belum dikonfirmasi', 'admin.service-bookings.index', ['status' => 'pending', 'dari' => today()->addDay()->toDateString(), 'sampai' => today()->addDay()->toDateString()], 'service-bookings.manage'],
         [$stats['overdue_test_drives'], 'test drive lewat jadwal', 'admin.test-drives.index', ['jadwal' => 'lewat'], 'test-drives.manage'],
         [$stats['overdue_service_bookings'], 'booking servis lewat jadwal', 'admin.service-bookings.index', ['jadwal' => 'lewat'], 'service-bookings.manage'],
         [$stats['pending_refunds'], 'pengajuan batal, dana belum dikembalikan', 'admin.purchase-requests.index', ['pembayaran' => 'dana-belum-dikembalikan'], 'payments.manage'],
@@ -27,11 +29,19 @@
             <h2 class="h4 mb-1">Selamat datang, {{ auth()->user()->name }}</h2>
             <p class="text-muted mb-0">{{ now()->translatedFormat('l, d F Y') }}</p>
         </div>
-        @if ($quickActions)
+        @if ($quickActions || $panelUser->can('reminders.send'))
             <div class="d-flex flex-wrap gap-2">
                 @foreach ($quickActions as [$route, $icon, $label, $style, $ability])
                     <a href="{{ route($route) }}" class="btn {{ $style }} btn-sm"><i class="bi {{ $icon }}"></i>{{ $label }}</a>
                 @endforeach
+                {{-- Cadangan bila hosting tanpa cron; aman ditekan berulang (yang sudah diingatkan dilewati). --}}
+                @can('reminders.send')
+                    <form method="POST" action="{{ route('admin.reminders.send') }}" data-disable-on-submit
+                          data-confirm="Kirim pengingat ke customer & mekanik untuk jadwal besok yang sudah dikonfirmasi?">
+                        @csrf
+                        <button type="submit" class="btn btn-outline-primary btn-sm"><i class="bi bi-alarm"></i>Kirim Pengingat Besok</button>
+                    </form>
+                @endcan
             </div>
         @endif
     </div>

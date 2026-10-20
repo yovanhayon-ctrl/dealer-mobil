@@ -80,6 +80,7 @@ class ServiceBooking extends Model
     {
         return [
             'preferred_date' => 'date',
+            'reminded_at' => 'datetime',
             'vehicle_year' => 'integer',
             'mileage' => 'integer',
             'mechanic_chosen_by_customer' => 'boolean',

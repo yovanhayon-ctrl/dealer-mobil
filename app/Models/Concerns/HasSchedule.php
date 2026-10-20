@@ -2,6 +2,7 @@
 
 namespace App\Models\Concerns;
 
+use App\Models\TestDrive;
 use Illuminate\Database\Eloquent\Attributes\Scope;
 use Illuminate\Database\Eloquent\Builder;
 
@@ -50,6 +51,31 @@ trait HasSchedule
     {
         return 'Anda tidak hadir pada jadwal '.$this->preferred_date->translatedFormat('d M Y')." pukul {$this->timeLabel()} WIB."
             .' Silakan booking ulang bila masih berminat.';
+    }
+
+    /**
+     * Pesan WhatsApp siap kirim (wa.me) untuk mengingatkan customer secara manual; null bila nomor kosong.
+     */
+    public function whatsappReminderUrl(): ?string
+    {
+        $number = preg_replace('/^0/', '62', preg_replace('/\D/', '', (string) $this->phone));
+
+        if ($number === '') {
+            return null;
+        }
+
+        $this->loadMissing($this instanceof TestDrive ? ['user', 'car.brand'] : ['user', 'service']);
+        $dealer = config('dealer');
+        $what = $this instanceof TestDrive
+            ? "test drive {$this->car->brand->name} {$this->car->name}"
+            : "servis {$this->service->name} untuk {$this->plate_number}";
+        $text = "Halo {$this->user->name}, kami dari {$dealer['name']} mengingatkan jadwal {$what} pada "
+            .$this->preferred_date->translatedFormat('l, d M Y')." pukul {$this->timeLabel()} WIB"
+            .(filled($dealer['address']) ? " di {$dealer['address']}" : '').'.'
+            .($this instanceof TestDrive ? ' Mohon bawa SIM yang masih berlaku.' : ' Mohon datang 15 menit lebih awal.')
+            .' Terima kasih.';
+
+        return "https://wa.me/{$number}?text=".rawurlencode($text);
     }
 
     public function canBeRescheduled(): bool

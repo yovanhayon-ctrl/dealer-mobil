@@ -41,6 +41,9 @@ return [
     // membatalkan pengajuan agar unit dilepas kembali (tidak ada pembatalan otomatis).
     'payment_due_days' => (int) env('DEALER_PAYMENT_DUE_DAYS', 3),
 
+    // Jam (WIB) pengingat H-1 test drive & servis dikirim scheduler; butuh cron `php artisan schedule:run` di hosting.
+    'reminder_time' => env('DEALER_REMINDER_TIME', '16:00'),
+
     // Notifikasi (status untuk customer, booking baru untuk admin) juga dikirim lewat email.
     // Pengiriman memakai pengaturan MAIL_* (MAIL_MAILER=log = hanya dicatat di storage/logs/laravel.log).
     'mail_notifications' => (bool) env('DEALER_MAIL_NOTIFICATIONS', true),

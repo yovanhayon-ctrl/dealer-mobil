@@ -67,6 +67,9 @@ class DashboardController extends Controller
             'overdue_service_bookings' => ServiceBooking::query()->overdue()->count(),
             'pending_refunds' => PurchaseRequest::query()->refundPending()->count(),
             'awaiting_response' => PurchaseRequest::query()->awaitingResponse()->count(),
+            // Jadwal besok yang masih Menunggu: tidak dikirimi pengingat H-1 sebelum dikonfirmasi.
+            'unconfirmed_test_drives_tomorrow' => TestDrive::query()->where('status', TestDrive::STATUS_PENDING)->whereDate('preferred_date', today()->addDay())->count(),
+            'unconfirmed_service_bookings_tomorrow' => ServiceBooking::query()->where('status', ServiceBooking::STATUS_PENDING)->whereDate('preferred_date', today()->addDay())->count(),
         ];
     }
 }

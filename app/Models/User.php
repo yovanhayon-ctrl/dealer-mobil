@@ -92,6 +92,8 @@ class User extends Authenticatable
         'staff-accounts.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
         'reports.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
         'staff.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN],
+        // Tombol "Kirim Pengingat Besok" di dashboard (cadangan bila hosting tanpa cron).
+        'reminders.send' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
     ];
 
     /**

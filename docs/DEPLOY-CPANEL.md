@@ -1,6 +1,6 @@
 # Deploy ke Shared Hosting (cPanel) — JAF Dealer
 
-Panduan memasang aplikasi di shared hosting berbasis cPanel (mis. Niagahoster, Hostinger, Rumahweb, IDCloudHost). Tidak perlu queue worker maupun cron: aplikasi tidak memakai scheduler, dan notifikasi (lonceng + email) dikirim langsung tanpa queue.
+Panduan memasang aplikasi di shared hosting berbasis cPanel (mis. Niagahoster, Hostinger, Rumahweb, IDCloudHost). Tidak perlu queue worker: notifikasi (lonceng + email) dikirim langsung. **Cron disarankan** (satu baris, bagian 7) untuk pengingat H-1 test drive & servis; tanpa cron, pengingat dikirim lewat tombol *Kirim Pengingat Besok* di dashboard.
 
 Berlaku untuk rilis **v1.4.0** (notifikasi customer & admin, email, favorit, bandingkan mobil, grafik dashboard, ulasan, bukti pengajuan PDF). Untuk dipakai klien, gunakan subdomain atau domain tambahan dengan document root ke folder `public` (bagian 4, opsi A).
 
@@ -115,6 +115,8 @@ DEALER_BANK_ACCOUNT="…"
 DEALER_BANK_HOLDER="PT …"
 # Batas pembayaran pertama (hari) setelah pengajuan disetujui
 DEALER_PAYMENT_DUE_DAYS=3
+# Jam (WIB) pengingat H-1 test drive & servis
+DEALER_REMINDER_TIME=16:00
 DEALER_MAPS_EMBED_URL="https://www.google.com/maps/embed?pb=…"
 
 ADMIN_EMAIL=admin@domain-anda.com
@@ -167,6 +169,21 @@ php artisan optimize
   `ln -s ~/dealer-mobil/storage/app/public ~/public_html/storage`
 - `user:make-owner` menjadikan akun admin dari `ADMIN_EMAIL` sebagai **owner** (pemilik dealer). Owner (dan Super Admin) membuat akun staf lain di menu **Staf**: Super Admin, Admin Dealer, Sales, Customer Service, dan Mekanik. Hak tiap peran: README bagian *Peran Staf*.
 - Izin folder (bila muncul error "Permission denied"): `chmod -R 775 storage bootstrap/cache`.
+
+### Cron untuk pengingat H-1 (disarankan)
+
+Pengingat H-1 dikirim otomatis setiap hari pukul `DEALER_REMINDER_TIME` (bawaan 16:00 WIB) ke customer yang jadwal test drive/servisnya **dikonfirmasi** untuk besok, dan ke mekanik yang ditugaskan.
+
+1. cPanel → **Cron Jobs** → *Add New Cron Job* → *Common Settings*: **Once Per Minute** (`* * * * *`).
+2. Command (sesuaikan path PHP bila hosting memakai `ea-php85`):
+
+   ```bash
+   cd ~/dealer-mobil && php artisan schedule:run >> /dev/null 2>&1
+   ```
+
+3. Cek: `php artisan schedule:list` menampilkan `reminders:send`; `php artisan reminders:send --dry-run` menampilkan jadwal besok yang akan diingatkan tanpa mengirim.
+
+Tanpa cron: Owner/Super Admin/Admin Dealer menekan **Kirim Pengingat Besok** di dashboard (aman ditekan berulang; jadwal yang sudah diingatkan dilewati). Pengingat juga bisa dikirim manual per customer lewat tombol **Ingatkan via WhatsApp** di detail test drive/servis.
 
 ## 8. HTTPS
 
@@ -257,6 +274,7 @@ Cadangan berisi data pribadi customer dan bukti pembayaran: simpan di tempat yan
 | **Cetak PDF** error *Class "Dompdf\Dompdf" not found* | Folder `vendor` lama → upload paket baru (bagian 2) atau `composer install --no-dev`. |
 | **Export Excel** error *Class "PhpOffice\PhpSpreadsheet\..." not found* atau file gagal dibuat | Folder `vendor` lama → upload paket baru / `composer install --no-dev`; pastikan ekstensi PHP `zip` dan `xml` aktif. |
 | Isian harga/kilometer tidak otomatis bertitik ribuan, huruf masih bisa diketik | File `public/js/number-input.js` belum terunggah → upload paket terbaru (server tetap menolak isian berhuruf). |
+| Pengingat H-1 tidak terkirim | Cron belum dipasang / path PHP salah → bagian 7 *Cron untuk pengingat H-1*; sementara pakai tombol **Kirim Pengingat Besok** di dashboard. Hanya jadwal **Dikonfirmasi** untuk besok yang diingatkan. |
 | Menu **Staf** tidak ada, semua akun staf mendapat 403 | Belum ada owner → `php artisan user:make-owner email-admin@dealer.com`. |
 | Bukti pembayaran gagal diunggah / tidak bisa dibuka | Folder `storage/app/private` harus bisa ditulis (`chmod -R 775 storage`) dan ikut dicadangkan; batas upload sama dengan foto (≥ 8M). |
 | Upload foto gagal / halaman error saat mengunggah | Batas `upload_max_filesize` / `post_max_size` hosting terlalu kecil → naikkan (lihat bagian 1). Foto lama: jalankan `php artisan cars:optimize-images` sekali. |
