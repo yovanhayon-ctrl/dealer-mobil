@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Notifications\PaymentDueReminder;
 use Database\Factories\PurchaseRequestFactory;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 use Illuminate\Database\Eloquent\Attributes\Scope;
@@ -151,6 +152,7 @@ class PurchaseRequest extends Model
             'monthly_installment' => 'integer',
             'approved_at' => 'datetime',
             'refund_closed_at' => 'datetime',
+            'payment_reminded_at' => 'datetime',
         ];
     }
 
@@ -389,6 +391,25 @@ class PurchaseRequest extends Model
     /**
      * Lewat batas pembayaran pertama tanpa bukti yang sedang diverifikasi. Aturannya sama dengan scope paymentOverdue().
      */
+    /**
+     * Pesan WhatsApp (wa.me) untuk mengingatkan batas pembayaran pertama secara manual; null bila nomor kosong.
+     */
+    public function whatsappPaymentReminderUrl(): ?string
+    {
+        $number = preg_replace('/^0/', '62', preg_replace('/\D/', '', (string) $this->phone));
+
+        if ($number === '' || $this->paymentDueAt() === null) {
+            return null;
+        }
+
+        $this->loadMissing(['user', 'car.brand']);
+        $text = "Halo {$this->user->name}, kami dari ".config('dealer.name').' mengingatkan pembayaran pertama untuk pengajuan '
+            ."{$this->car->brand->name} {$this->car->name} {$this->car->year} ({$this->documentNumber()}) paling lambat "
+            .$this->paymentDueAt()->translatedFormat('l, d M Y').'. '.PaymentDueReminder::howToPay().' Terima kasih.';
+
+        return "https://wa.me/{$number}?text=".rawurlencode($text);
+    }
+
     public function isPaymentOverdue(): bool
     {
         return $this->awaitsFirstPayment()
@@ -408,8 +429,28 @@ class PurchaseRequest extends Model
     #[Scope]
     protected function paymentOverdue(Builder $query): void
     {
+        $query->awaitingFirstPayment()
+            ->where('purchase_requests.approved_at', '<', today()->subDays(self::paymentDueDays()));
+    }
+
+    /**
+     * Batas pembayaran pertama jatuh besok (pengingat H-1, lihat SendScheduleReminders).
+     */
+    #[Scope]
+    protected function paymentDueTomorrow(Builder $query): void
+    {
+        $query->awaitingFirstPayment()
+            ->whereDate('purchase_requests.approved_at', today()->addDay()->subDays(self::paymentDueDays())->toDateString());
+    }
+
+    /**
+     * Disetujui, ada tagihan ke dealer, belum ada pembayaran diterima, dan tidak ada bukti yang sedang diverifikasi.
+     * Dasar paymentOverdue() & paymentDueTomorrow(); sama dengan isPaymentOverdue() tanpa syarat tanggal.
+     */
+    #[Scope]
+    protected function awaitingFirstPayment(Builder $query): void
+    {
         $query->where('purchase_requests.status', self::STATUS_APPROVED)
-            ->where('purchase_requests.approved_at', '<', today()->subDays(self::paymentDueDays()))
             ->where(fn (Builder $query) => $query
                 ->where(fn (Builder $cash) => $cash->where('payment_method', self::PAYMENT_CASH)->where('car_price', '>', 0))
                 ->orWhere(fn (Builder $credit) => $credit->where('payment_method', self::PAYMENT_CREDIT)->where('down_payment', '>', 0)))

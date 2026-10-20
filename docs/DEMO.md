@@ -86,7 +86,7 @@ Mengikuti *customer journey* di proposal: Temukan → Kenali → Pertimbangkan �
 | 20 | Admin → Mekanik → Customer | **(v1.11)** Booking servis → tugaskan mekanik → konfirmasi. Login mekanik: **Pekerjaan Saya** → *Mulai Kerjakan* → centang checklist → temuan → *Selesai*. Customer memberi rating | Notifikasi pekerjaan baru ke mekanik, checklist per layanan, rating mekanik |
 | 21 | Admin | **(v1.15)** Test drive *Dikonfirmasi* yang lewat jadwal → status **Tidak datang**, atau kartu **Jadwalkan Ulang** → tanggal & jam baru | Badge *Lewat jadwal*, catatan otomatis, notifikasi *Jadwal Test Drive Diubah* |
 | 22 | Admin / Sales | **(v1.15)** Dashboard: *pengajuan belum ditanggapi* → proses pengajuan | Pengajuan *Menunggu* > 2 hari ditandai, tanda hilang setelah diproses |
-| 23 | Admin → Customer | **(v1.16)** Konfirmasi test drive untuk **besok** → Dashboard: **Kirim Pengingat Besok** → login customer, buka lonceng. Di detail test drive: **Ingatkan via WhatsApp** | Pengingat H-1 (lonceng/email), tidak terkirim dua kali, pesan WhatsApp siap kirim |
+| 23 | Admin → Customer | **(v1.16–v1.17)** Konfirmasi test drive untuk **besok** → Dashboard: **Kirim Pengingat Besok** → login customer, buka lonceng. Di detail test drive / pengajuan yang menunggu pembayaran: **Ingatkan via WhatsApp** | Pengingat H-1 jadwal & batas pembayaran (lonceng/email), tidak terkirim dua kali, pesan WhatsApp siap kirim |
 
 Tips (v1.5.0): banner beranda memutar **video latar** di laptop. Untuk menunjukkan **kartu mobil unggulan**, kosongkan `DEALER_HERO_VIDEOS=` di `.env` lalu `php artisan optimize:clear`, dan di **Admin → Mobil → Edit** centang **Jadikan unggulan di beranda** pada mobil yang punya foto (mis. Skyline R34). Di HP, *Mobil Terbaru* bisa digeser ke samping.
 
