@@ -46,9 +46,14 @@
 
     <h2 id="akses">3. Siapa yang bisa melihat data</h2>
     <p>
-        Data Anda hanya bisa dilihat oleh Anda sendiri dan staf {{ $dealer['name'] }} sesuai tugasnya: pemilik dan admin dealer
-        untuk memproses permintaan, serta mekanik untuk data servis yang ditugaskan kepadanya. Pengguna lain tidak bisa melihat data Anda.
+        Data Anda hanya bisa dilihat oleh Anda sendiri dan staf {{ $dealer['name'] }} sesuai tugasnya. Pengguna lain tidak bisa melihat data Anda.
     </p>
+    <ul>
+        <li><strong>Pemilik, super admin, dan admin dealer:</strong> seluruh data untuk memproses permintaan, pembayaran, dan laporan dealer.</li>
+        <li><strong>Sales:</strong> data test drive dan pengajuan pembelian untuk melayani pembelian Anda. Sales tidak membuka file bukti pembayaran.</li>
+        <li><strong>Customer service:</strong> data kontak, test drive, booking servis, pengajuan, dan ulasan untuk menjawab pertanyaan Anda. Customer service tidak membuka file bukti pembayaran.</li>
+        <li><strong>Mekanik:</strong> data kendaraan dan servis yang ditugaskan kepadanya.</li>
+    </ul>
     <p>
         Bila Anda mengajukan kredit, data pengajuan dapat diteruskan ke lembaga pembiayaan yang memproses kredit tersebut,
         setelah dibicarakan dengan Anda.
