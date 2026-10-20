@@ -244,14 +244,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->names('promos')
         ->middleware('can:promos.view')
         ->middlewareFor(['create', 'store', 'edit', 'update'], 'can:promos.manage')
-        ->middlewareFor('destroy', 'can:master.delete');
+        ->middlewareFor('destroy', ['can:promos.manage', 'can:master.delete']);
 
     // Test drive & pengajuan dibuat customer (halaman publik); admin hanya melihat & mengubah status.
-    Route::controller(AdminTestDriveController::class)->prefix('test-drive')->name('test-drives.')->middleware('can:test-drives.manage')->group(function () {
+    Route::controller(AdminTestDriveController::class)->prefix('test-drive')->name('test-drives.')->middleware('can:test-drives.view')->group(function () {
         Route::get('/', 'index')->name('index');
         Route::get('{testDrive}', 'show')->name('show');
-        Route::patch('{testDrive}/status', 'updateStatus')->name('update-status');
-        Route::patch('{testDrive}/jadwal', 'reschedule')->name('reschedule');
+        Route::patch('{testDrive}/status', 'updateStatus')->middleware('can:test-drives.manage')->name('update-status');
+        Route::patch('{testDrive}/jadwal', 'reschedule')->middleware('can:test-drives.manage')->name('reschedule');
     });
 
     Route::controller(AdminPurchaseRequestController::class)->prefix('pengajuan')->name('purchase-requests.')->middleware('can:purchases.view')->group(function () {

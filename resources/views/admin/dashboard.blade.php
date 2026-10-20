@@ -68,7 +68,7 @@
                 <x-stat-card label="Stok Habis" :value="$stats['out_of_stock_cars']" icon="bi-box-seam" color="dark"
                              :href="$routeOrNull('admin.cars.index', ['status' => 'aktif', 'stok' => 'habis'])" />
             @endcan
-            @can('test-drives.manage')
+            @can('test-drives.view')
                 <x-stat-card label="Test Drive Pending" :value="$stats['pending_test_drives']" icon="bi-calendar-event" color="yellow" alert
                              :href="$routeOrNull('admin.test-drives.index', ['status' => 'pending'])" />
             @endcan
@@ -147,7 +147,7 @@
         </div>
 
         <div class="row g-4">
-            @can('test-drives.manage')
+            @can('test-drives.view')
                 <div class="col-xl-6">
                     <div class="card h-100">
                         <div class="card-header dashboard-card-header">

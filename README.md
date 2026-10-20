@@ -481,11 +481,11 @@ Enam peran staf (sejak v1.14.0). Aturan aksesnya ada di satu tempat: `User::PERM
 
 | Peran | Fungsi utama | Tidak dapat |
 |---|---|---|
-| **Owner** | Pemilik dealer: semua menu, laporan bisnis, kelola semua akun staf, hapus data master. | - |
-| **Super Admin** | Semua menu operasional & sistem, kelola akun staf, hapus data master. | Mengelola akun Owner & Super Admin. |
-| **Admin Dealer** | Mobil, merek, kategori, promo, test drive, pengajuan, pembayaran & pengembalian dana, servis, ulasan, pengguna, laporan & ekspor. | Kelola staf, hapus data master. |
+| **Owner** | Pemilik dealer: semua menu, keputusan bisnis (promo, pembayaran, pengembalian dana), laporan, kelola semua akun staf, Pengaturan, hapus data master. | - |
+| **Super Admin** | Pengelola sistem: kelola akun staf, Pengaturan, hapus data master; menu lain untuk membantu bila ada masalah. | Mengelola akun Owner & Super Admin; promo, status pengajuan, verifikasi pembayaran, pengembalian dana. |
+| **Admin Dealer** | Mobil, merek, kategori, promo, test drive, pengajuan, pembayaran & pengembalian dana, servis, ulasan, pengguna, laporan & ekspor. | Kelola staf, Pengaturan, hapus data master. |
 | **Sales** | Melayani pembeli: test drive, proses status pengajuan; mobil & promo hanya lihat. | Ubah data mobil/promo, verifikasi pembayaran, pengembalian dana. |
-| **Customer Service** | Konfirmasi jadwal test drive & servis, tugaskan mekanik; pengajuan, ulasan, dan customer hanya lihat. | Ubah transaksi finansial, moderasi ulasan, lihat akun staf. |
+| **Customer Service** | Booking servis (konfirmasi, jadwal ulang, tugaskan mekanik); mobil, promo, test drive, pengajuan, ulasan, dan customer hanya lihat untuk menjawab pertanyaan. | Mengurus test drive, ubah transaksi finansial, moderasi ulasan, lihat akun staf. |
 | **Mekanik** | Panel sendiri: pekerjaan servis yang ditugaskan (checklist, temuan, selesai), layanan servis (lihat), rating. | Membuka panel admin. |
 
 Owner pertama: `php artisan user:make-owner email`. Peran lain dibuat di menu **Staf**. Rincian hak per menu: [docs/RELEASE-v1.14.0.md](docs/RELEASE-v1.14.0.md).

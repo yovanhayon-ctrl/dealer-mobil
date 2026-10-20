@@ -71,18 +71,22 @@ class User extends Authenticatable
      * @var array<string, list<string>>
      */
     public const PERMISSIONS = [
-        'cars.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES],
+        // Super Admin mengelola sistem (akun, Pengaturan) dan melihat semua menu, tanpa keputusan bisnis:
+        // tidak mengelola promo, status pengajuan, pembayaran, dan pengembalian dana (hak Owner & Admin Dealer).
+        'cars.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES, self::ROLE_CUSTOMER_SERVICE],
         'cars.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
         'catalog.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
-        'promos.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES],
-        'promos.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
+        'promos.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES, self::ROLE_CUSTOMER_SERVICE],
+        'promos.manage' => [self::ROLE_OWNER, self::ROLE_ADMIN],
         // Hapus data master (mobil, merek, kategori, promo, layanan).
         'master.delete' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN],
-        'test-drives.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES, self::ROLE_CUSTOMER_SERVICE],
+        // Test drive dipegang Sales; Customer Service hanya melihat untuk menjawab pertanyaan customer.
+        'test-drives.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES, self::ROLE_CUSTOMER_SERVICE],
+        'test-drives.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES],
         'purchases.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES, self::ROLE_CUSTOMER_SERVICE],
-        'purchases.status' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_SALES],
+        'purchases.status' => [self::ROLE_OWNER, self::ROLE_ADMIN, self::ROLE_SALES],
         // Verifikasi bukti bayar, pembayaran di showroom, file bukti, dan pengembalian dana.
-        'payments.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
+        'payments.manage' => [self::ROLE_OWNER, self::ROLE_ADMIN],
         'service-bookings.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_CUSTOMER_SERVICE],
         'services.manage' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN],
         'testimonials.view' => [self::ROLE_OWNER, self::ROLE_SUPER_ADMIN, self::ROLE_ADMIN, self::ROLE_CUSTOMER_SERVICE],
