@@ -102,6 +102,20 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Pengaturan: kolom gambar banner hanya tampil untuk latar hero "Gambar banner".
+    var heroImageField = document.getElementById('heroImageField');
+
+    if (heroImageField) {
+        var syncHeroImageField = function () {
+            var checked = document.querySelector('input[name="hero_background"]:checked');
+            heroImageField.classList.toggle('d-none', !checked || checked.value !== 'image');
+        };
+
+        document.querySelectorAll('input[name="hero_background"]').forEach(function (radio) {
+            radio.addEventListener('change', syncHeroImageField);
+        });
+    }
+
     // Baris tabel dashboard: klik di mana saja membuka detail (link di sel pertama tetap untuk keyboard).
     document.querySelectorAll('tr[data-row-link]').forEach(function (row) {
         row.addEventListener('click', function (event) {

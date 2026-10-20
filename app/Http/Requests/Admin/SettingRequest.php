@@ -23,8 +23,8 @@ class SettingRequest extends FormRequest
     public const MAX_KILOBYTES = 8192;
 
     public const HERO_BACKGROUNDS = [
-        'video' => 'Video (DEALER_HERO_VIDEOS)',
-        'image' => 'Gambar banner unggahan',
+        'video' => 'Video',
+        'image' => 'Gambar banner',
         'car' => 'Foto mobil unggulan',
     ];
 
@@ -124,7 +124,7 @@ class SettingRequest extends FormRequest
                     || (filled(Setting::values()['hero.image'] ?? null) && ! $this->boolean('remove_hero_image'));
 
                 if ($this->input('hero_background') === 'image' && ! $hasImage && ! $validator->errors()->has('hero_image')) {
-                    $validator->errors()->add('hero_image', 'Unggah gambar banner untuk latar "Gambar banner unggahan".');
+                    $validator->errors()->add('hero_image', 'Unggah gambar banner untuk latar Gambar banner.');
                 }
 
                 // Rekening dipakai bersama: isi ketiganya atau kosongkan semuanya.
