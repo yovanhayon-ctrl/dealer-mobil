@@ -4,6 +4,8 @@ Panduan memasang aplikasi di shared hosting berbasis cPanel (mis. Niagahoster, H
 
 Berlaku untuk rilis **v1.4.0** (notifikasi customer & admin, email, favorit, bandingkan mobil, grafik dashboard, ulasan, bukti pengajuan PDF). Untuk dipakai klien, gunakan subdomain atau domain tambahan dengan document root ke folder `public` (bagian 4, opsi A).
 
+Untuk go-live pertama, ikuti juga [GO-LIVE.md](GO-LIVE.md) (urutan kerja dan daftar periksa lengkap).
+
 ## 1. Syarat hosting (cek sebelum membeli/memakai)
 
 | Kebutuhan | Keterangan |
