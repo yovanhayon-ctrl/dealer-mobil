@@ -30,7 +30,7 @@
         <li><strong>Pengajuan pembelian:</strong> nomor telepon, alamat, metode pembayaran, serta rincian kredit seperti uang muka, tenor, dan cicilan.</li>
         <li><strong>Bukti pembayaran:</strong> foto atau PDF bukti transfer beserta nominal dan tanggalnya. Karena bisa memuat data rekening, file ini disimpan di penyimpanan privat yang tidak bisa dibuka publik.</li>
         <li><strong>Booking servis:</strong> model dan tahun kendaraan, nomor polisi, kilometer, dan keluhan.</li>
-        <li><strong>Ulasan dan rating mekanik:</strong> bintang dan komentar Anda. Ulasan pembelian yang disetujui tampil di beranda bersama nama Anda; rating mekanik hanya dipakai di internal.</li>
+        <li><strong>Ulasan dan rating mekanik:</strong> bintang dan komentar Anda. Ulasan pembelian yang disetujui tampil di beranda dengan nama depan dan inisial nama belakang Anda (mis. "Budi S."); rating mekanik hanya dipakai di internal.</li>
         <li><strong>Data teknis:</strong> cookie sesi agar Anda tetap masuk (berakhir setelah {{ config('session.lifetime') }} menit tidak aktif), alamat IP dan jenis browser yang tercatat bersama sesi, serta pilihan tema terang/gelap yang disimpan di browser Anda sendiri.</li>
     </ul>
 
@@ -74,6 +74,7 @@
     <p>
         Data akun disimpan selama akun Anda aktif. Data transaksi, seperti pengajuan pembelian dan bukti pembayaran,
         dapat disimpan lebih lama karena diperlukan untuk pembukuan dan kewajiban hukum dealer.
+        Cadangan data harian disimpan paling lama {{ config('dealer.backup.keep_days') }} hari untuk pemulihan bila terjadi gangguan, lalu dihapus otomatis.
     </p>
 
     <h2 id="hak">6. Hak Anda</h2>

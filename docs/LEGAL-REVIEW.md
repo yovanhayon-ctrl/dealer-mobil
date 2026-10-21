@@ -6,6 +6,8 @@ Dokumen ini untuk **dealer (Owner)** sebelum website dipakai customer. Teks yang
 - Tanggal berlaku saat ini: **20 Oktober 2026** (`PageController::LEGAL_EFFECTIVE_DATE`).
 - Kontak di bagian bawah kedua halaman diambil otomatis dari **Admin > Pengaturan** (email, WhatsApp, alamat).
 
+> **Status 22 Oktober 2026:** dealer menyetujui isi Kebijakan Privasi dan Syarat & Ketentuan apa adanya. Poin A, B, D, dan E di bagian 2 sudah ditambahkan ke halaman (B dengan kalimat netral: pengembalian dana sesuai kesepakatan dengan dealer); tanggal berlaku menjadi 22 Oktober 2026. Pertanyaan di bagian 3 tidak wajib dijawab; pakai bila dealer ingin aturan yang lebih rinci.
+
 Cara pakai: baca ringkasan di bagian 1, isi kolom **Jawaban dealer** di bagian 3, lalu kirim kembali. Teks halaman akan disesuaikan dari jawaban tersebut dan tanggal berlakunya diperbarui.
 
 > Dokumen ini membantu menyiapkan bahan, **bukan nasihat hukum**. Untuk kepastian, minta konsultan hukum atau notaris dealer membaca versi akhir, terutama terkait Undang-Undang Nomor 27 Tahun 2022 tentang Pelindungan Data Pribadi (UU PDP) dan perlindungan konsumen.

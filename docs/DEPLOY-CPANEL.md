@@ -4,7 +4,7 @@ Panduan memasang aplikasi di shared hosting berbasis cPanel (mis. Niagahoster, H
 
 Berlaku untuk rilis **v1.4.0** (notifikasi customer & admin, email, favorit, bandingkan mobil, grafik dashboard, ulasan, bukti pengajuan PDF). Untuk dipakai klien, gunakan subdomain atau domain tambahan dengan document root ke folder `public` (bagian 4, opsi A).
 
-Untuk go-live pertama, ikuti juga [GO-LIVE.md](GO-LIVE.md) (urutan kerja dan daftar periksa lengkap).
+Untuk go-live pertama, ikuti juga [GO-LIVE.md](GO-LIVE.md) (urutan kerja dan daftar periksa lengkap) dan [CATATAN-REPO-DAN-HOSTING.md](CATATAN-REPO-DAN-HOSTING.md) (langkah hosting dari awal memakai data dari folder release).
 
 ## 1. Syarat hosting (cek sebelum membeli/memakai)
 
@@ -25,10 +25,10 @@ Gunakan **folder terpisah** agar folder development (yang berisi PHPUnit, Pint, 
 cd C:/laragon/www/dealer-mobil
 git checkout main
 git pull
-git archive --format=zip --output=../dealer-mobil-release.zip HEAD
+git archive --format=zip --output=../paket-deploy.zip HEAD
 ```
 
-Ekstrak `dealer-mobil-release.zip` ke folder baru (mis. `C:/laragon/www/dealer-mobil-release`), lalu di folder itu:
+Ekstrak `paket-deploy.zip` ke folder baru (mis. `C:/laragon/www/paket-deploy`; nama `dealer-mobil-release` sudah dipakai untuk data asli, lihat [CATATAN-REPO-DAN-HOSTING.md](CATATAN-REPO-DAN-HOSTING.md)), lalu di folder itu:
 
 ```bash
 composer install --no-dev --optimize-autoloader

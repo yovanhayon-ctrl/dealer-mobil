@@ -20,6 +20,8 @@ class LegalPageTest extends TestCase
             'address' => 'Jl. Otomotif Raya No. 88, Jakarta Selatan',
             'whatsapp' => '6281200008888',
             'email' => 'info@jafdealer.test',
+            'payment_due_days' => 3,
+            'backup' => ['path' => storage_path('app/backups'), 'time' => '02:00', 'keep_days' => 30],
         ], ...$overrides]]);
     }
 
@@ -29,8 +31,8 @@ class LegalPageTest extends TestCase
     public static function pages(): array
     {
         return [
-            'kebijakan privasi' => ['privacy', 'Kebijakan Privasi', ['Data yang kami kumpulkan', 'Hak Anda', 'Undang-Undang Nomor 27 Tahun 2022', 'penyimpanan privat']],
-            'syarat ketentuan' => ['terms', 'Syarat &amp; Ketentuan', ['Pengajuan pembelian', 'Pembayaran', 'tidak pernah', 'hukum Republik Indonesia']],
+            'kebijakan privasi' => ['privacy', 'Kebijakan Privasi', ['Data yang kami kumpulkan', 'Hak Anda', 'Undang-Undang Nomor 27 Tahun 2022', 'penyimpanan privat', 'nama depan dan inisial nama belakang', 'Cadangan data harian disimpan paling lama 30 hari']],
+            'syarat ketentuan' => ['terms', 'Syarat &amp; Ketentuan', ['Pengajuan pembelian', 'Pembayaran', 'tidak pernah', 'hukum Republik Indonesia', 'paling lambat <strong>3 hari</strong> setelah pengajuan disetujui', 'pengembalian dana diproses sesuai kesepakatan dengan dealer']],
         ];
     }
 
@@ -45,7 +47,7 @@ class LegalPageTest extends TestCase
         $response = $this->get(route($route))
             ->assertOk()
             ->assertSee("<title>{$title} | JAF Dealer</title>", false)
-            ->assertSee('Berlaku sejak 20 Oktober 2026')
+            ->assertSee('Berlaku sejak 22 Oktober 2026')
             ->assertSee('Daftar isi')
             ->assertSee('mailto:info@jafdealer.test', false)
             ->assertSee('https://wa.me/6281200008888', false)
