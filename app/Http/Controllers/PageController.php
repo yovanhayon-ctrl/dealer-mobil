@@ -16,7 +16,7 @@ use Illuminate\View\View;
 class PageController extends Controller
 {
     /** Tanggal berlaku Kebijakan Privasi & Syarat Ketentuan; ubah bila isinya diubah. */
-    public const LEGAL_EFFECTIVE_DATE = '2026-10-17';
+    public const LEGAL_EFFECTIVE_DATE = '2026-10-20';
 
     public function about(): View
     {

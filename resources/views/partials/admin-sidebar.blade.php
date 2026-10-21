@@ -16,7 +16,7 @@
         ['label' => 'Merek', 'icon' => 'bi-tags', 'route' => 'admin.brands.index', 'active' => 'admin.brands.*', 'can' => 'catalog.manage'],
         ['label' => 'Kategori', 'icon' => 'bi-grid', 'route' => 'admin.categories.index', 'active' => 'admin.categories.*', 'can' => 'catalog.manage'],
         ['label' => 'Promo', 'icon' => 'bi-percent', 'route' => 'admin.promos.index', 'active' => 'admin.promos.*', 'can' => 'promos.view'],
-        ['label' => 'Test Drive', 'icon' => 'bi-calendar-check', 'route' => 'admin.test-drives.index', 'active' => 'admin.test-drives.*', 'can' => 'test-drives.manage'],
+        ['label' => 'Test Drive', 'icon' => 'bi-calendar-check', 'route' => 'admin.test-drives.index', 'active' => 'admin.test-drives.*', 'can' => 'test-drives.view'],
         ['label' => 'Pengajuan', 'icon' => 'bi-file-earmark-text', 'route' => 'admin.purchase-requests.index', 'active' => 'admin.purchase-requests.*', 'can' => 'purchases.view'],
         ['label' => 'Booking Servis', 'icon' => 'bi-wrench-adjustable', 'route' => 'admin.service-bookings.index', 'active' => 'admin.service-bookings.*', 'can' => 'service-bookings.manage'],
         ['label' => 'Layanan Servis', 'icon' => 'bi-tools', 'route' => 'admin.services.index', 'active' => 'admin.services.*', 'can' => 'services.manage'],

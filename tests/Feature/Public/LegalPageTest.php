@@ -45,7 +45,7 @@ class LegalPageTest extends TestCase
         $response = $this->get(route($route))
             ->assertOk()
             ->assertSee("<title>{$title} | JAF Dealer</title>", false)
-            ->assertSee('Berlaku sejak 17 Oktober 2026')
+            ->assertSee('Berlaku sejak 20 Oktober 2026')
             ->assertSee('Daftar isi')
             ->assertSee('mailto:info@jafdealer.test', false)
             ->assertSee('https://wa.me/6281200008888', false)

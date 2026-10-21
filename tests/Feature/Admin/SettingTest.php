@@ -138,7 +138,7 @@ class SettingTest extends TestCase
             ->assertSessionHasErrors(['bank_name' => 'Lengkapi nama bank, nomor rekening, dan atas nama (atau kosongkan ketiganya).']);
 
         $this->save(['hero_background' => 'image'])
-            ->assertSessionHasErrors(['hero_image' => 'Unggah gambar banner untuk latar "Gambar banner unggahan".']);
+            ->assertSessionHasErrors(['hero_image' => 'Unggah gambar banner untuk latar Gambar banner.']);
 
         $this->save(['hero_background' => 'image', 'hero_image' => UploadedFile::fake()->image('kecil.jpg', 800, 400)])
             ->assertSessionHasErrors('hero_image');

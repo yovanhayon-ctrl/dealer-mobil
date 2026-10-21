@@ -34,7 +34,7 @@
                             @if ($testDrive->reminded_at)
                                 <div class="small text-muted">Pengingat H-1 terkirim {{ $testDrive->reminded_at->translatedFormat('d M Y H:i') }}</div>
                             @endif
-                            @if (in_array($testDrive->status, $testDrive::openScheduleStatuses(), true) && ! $testDrive->preferred_date->isPast() && ($waUrl = $testDrive->whatsappReminderUrl()))
+                            @if (auth()->user()->can('test-drives.manage') && in_array($testDrive->status, $testDrive::openScheduleStatuses(), true) && ! $testDrive->preferred_date->isPast() && ($waUrl = $testDrive->whatsappReminderUrl()))
                                 <a href="{{ $waUrl }}" target="_blank" rel="noopener" class="btn btn-sm btn-outline-success py-0 mt-1">
                                     <i class="bi bi-whatsapp"></i>Ingatkan via WhatsApp
                                 </a>
@@ -80,6 +80,16 @@
             <div class="card admin-sticky-panel">
                 <div class="card-body p-4">
                     <h3 class="admin-card-title">Status & Catatan Admin</h3>
+                    @cannot('test-drives.manage')
+                        {{-- Customer Service hanya melihat; status & jadwal diurus Sales / Admin Dealer. --}}
+                        <dl class="admin-detail-list mb-0">
+                            <dt>Status</dt>
+                            <dd><x-status-badge :status="$testDrive->status" :label="$testDrive->statusLabel()" /></dd>
+                            <dt>Catatan admin</dt>
+                            <dd>{{ $testDrive->admin_note ?: '-' }}</dd>
+                        </dl>
+                        <p class="small text-muted mt-3 mb-0">Status dan jadwal test drive diurus oleh Sales atau Admin Dealer.</p>
+                    @else
                     @include('admin.partials.status-form', [
                         'action' => route('admin.test-drives.update-status', $testDrive),
                         'currentLabel' => $testDrive->statusLabel(),
@@ -91,9 +101,10 @@
                         'noteTemplates' => [\App\Models\TestDrive::STATUS_NO_SHOW => $testDrive->noShowNote()],
                         'noteHelp' => 'Wajib diisi saat membatalkan (alasan untuk customer). Maksimal 1000 karakter.',
                     ])
+                    @endcannot
                 </div>
             </div>
-            @if ($testDrive->canBeRescheduled())
+            @if ($testDrive->canBeRescheduled() && auth()->user()->can('test-drives.manage'))
                 @php($rescheduleErrors = $errors->getBag('reschedule'))
                 <div class="card mt-4" id="jadwal-ulang">
                     <div class="card-body p-4">
