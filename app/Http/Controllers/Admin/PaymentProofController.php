@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ShowroomPaymentRequest;
+use App\Models\ActivityLog;
 use App\Models\PaymentProof;
 use App\Models\PurchaseRequest;
 use App\Notifications\Notifier;
@@ -53,6 +54,9 @@ class PaymentProofController extends Controller
         ]);
         $purchaseRequest->load('paymentProofs');
         $this->notifyCustomer($proof, $purchaseRequest);
+        ActivityLog::record(ActivityLog::CATEGORY_FINANCE, 'payment.showroom',
+            "Mencatat pembayaran {$proof->typeLabel()} di showroom ".ActivityLog::rupiah($proof->amount).", pengajuan {$purchaseRequest->documentNumber()}",
+            $purchaseRequest, ['payment_proof_id' => $proof->id, 'amount' => $proof->amount]);
 
         return $redirect->with('success', 'Pembayaran di showroom Rp '.number_format((int) $request->validated('amount'), 0, ',', '.')
             ." dicatat. Status pembayaran: {$purchaseRequest->paymentStatusLabel()}.");
@@ -76,6 +80,9 @@ class PaymentProofController extends Controller
         $paymentProof->update(['status' => PaymentProof::STATUS_APPROVED, 'admin_note' => null, 'verified_at' => now()]);
         $purchaseRequest->load('paymentProofs');
         $this->notifyCustomer($paymentProof, $purchaseRequest);
+        ActivityLog::record(ActivityLog::CATEGORY_FINANCE, 'payment.approved',
+            "Menerima bukti {$paymentProof->typeLabel()} ".ActivityLog::rupiah($paymentProof->amount).", pengajuan {$purchaseRequest->documentNumber()}",
+            $purchaseRequest, ['payment_proof_id' => $paymentProof->id, 'amount' => $paymentProof->amount]);
 
         return $redirect->with('success', "Bukti {$paymentProof->typeLabel()} Rp ".number_format($paymentProof->amount, 0, ',', '.')
             ." diterima. Status pembayaran: {$purchaseRequest->paymentStatusLabel()}.");
@@ -102,6 +109,9 @@ class PaymentProofController extends Controller
             'verified_at' => now(),
         ]);
         $this->notifyCustomer($paymentProof, $purchaseRequest);
+        ActivityLog::record(ActivityLog::CATEGORY_FINANCE, 'payment.rejected',
+            "Menolak bukti {$paymentProof->typeLabel()} ".ActivityLog::rupiah($paymentProof->amount).", pengajuan {$purchaseRequest->documentNumber()}: {$validated['admin_note']}",
+            $purchaseRequest, ['payment_proof_id' => $paymentProof->id, 'amount' => $paymentProof->amount]);
 
         return $redirect->with('success', 'Bukti pembayaran ditolak. Customer bisa melihat alasannya dan mengirim ulang.');
     }

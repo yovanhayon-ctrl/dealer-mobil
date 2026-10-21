@@ -4,11 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\SettingRequest;
+use App\Models\ActivityLog;
 use App\Models\Setting;
 use App\Notifications\Admin\BankAccountChanged;
 use App\Support\CarImageProcessor;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\View\View;
@@ -22,6 +22,24 @@ class SettingController extends Controller
 {
     /** Lebar maksimal gambar banner hero setelah diproses (WebP). */
     public const HERO_MAX_WIDTH = 1920;
+
+    /** Nama kunci pengaturan di Riwayat Aktivitas. */
+    private const LOG_LABELS = [
+        'name' => 'nama dealer',
+        'tagline' => 'tagline',
+        'address' => 'alamat',
+        'phone' => 'telepon',
+        'whatsapp' => 'WhatsApp',
+        'email' => 'email',
+        'hours' => 'jam operasional',
+        'maps_embed_url' => 'peta',
+        'about_text' => 'teks Siapa Kami',
+        'hero.kicker' => 'teks hero',
+        'hero.title' => 'teks hero',
+        'hero.lead' => 'teks hero',
+        'hero.background' => 'latar hero',
+        'hero.image' => 'gambar banner',
+    ];
 
     public function edit(): View
     {
@@ -48,7 +66,7 @@ class SettingController extends Controller
             $values['hero.image'] = null;
         }
 
-        Setting::store($values, $request->user());
+        $changed = Setting::store($values, $request->user());
 
         if ($oldImage && array_key_exists('hero.image', $values) && $oldImage !== $values['hero.image']) {
             Storage::disk('public')->delete($oldImage);
@@ -56,10 +74,18 @@ class SettingController extends Controller
 
         $newBank = config('dealer.bank');
 
+        $labels = collect($changed)->reject(fn ($key) => in_array($key, Setting::BANK_KEYS, true))
+            ->map(fn ($key) => self::LOG_LABELS[$key] ?? $key)->unique()->values();
+
+        if ($labels->isNotEmpty()) {
+            ActivityLog::record(ActivityLog::CATEGORY_ACCOUNT, 'settings.updated',
+                'Mengubah Pengaturan: '.$labels->implode(', '), properties: ['keys' => array_values(array_diff($changed, Setting::BANK_KEYS))]);
+        }
+
         if (BankAccountChanged::describe($oldBank) !== BankAccountChanged::describe($newBank)) {
-            Log::info('Rekening pembayaran dealer diubah.', [
-                'user_id' => $request->user()->id, 'old' => BankAccountChanged::describe($oldBank), 'new' => BankAccountChanged::describe($newBank),
-            ]);
+            ActivityLog::record(ActivityLog::CATEGORY_FINANCE, 'settings.bank_changed',
+                'Mengubah rekening pembayaran: '.BankAccountChanged::describe($oldBank).' → '.BankAccountChanged::describe($newBank),
+                properties: ['old' => $oldBank, 'new' => $newBank]);
             BankAccountChanged::notifyOwners(new BankAccountChanged($request->user(), $oldBank, $newBank));
         }
 

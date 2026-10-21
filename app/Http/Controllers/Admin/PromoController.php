@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\PromoRequest;
+use App\Models\ActivityLog;
 use App\Models\Car;
 use App\Models\Promo;
 use App\Support\CarImageProcessor;
@@ -103,6 +104,8 @@ class PromoController extends Controller
         if ($promo->image) {
             Storage::disk(Promo::IMAGE_DISK)->delete($promo->image);
         }
+
+        ActivityLog::record(ActivityLog::CATEGORY_DELETE, 'promo.deleted', "Menghapus promo \"{$promo->title}\"", $promo);
 
         return redirect()->route('admin.promos.index')
             ->with('success', "Promo \"{$promo->title}\" berhasil dihapus.");

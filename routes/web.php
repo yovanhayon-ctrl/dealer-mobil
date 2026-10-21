@@ -9,6 +9,7 @@ use App\Http\Controllers\Account\PurchaseRequestController as AccountPurchaseReq
 use App\Http\Controllers\Account\ServiceBookingController as AccountServiceBookingController;
 use App\Http\Controllers\Account\TestDriveController as AccountTestDriveController;
 use App\Http\Controllers\Account\TestimonialController as AccountTestimonialController;
+use App\Http\Controllers\Admin\ActivityLogController;
 use App\Http\Controllers\Admin\BrandController;
 use App\Http\Controllers\Admin\CarController as AdminCarController;
 use App\Http\Controllers\Admin\CarImageController;
@@ -316,6 +317,9 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
         ->parameters(['pengguna' => 'user'])
         ->names('users')
         ->middleware('can:users.view');
+
+    // Riwayat aktivitas sensitif staf (bagian dari menu Staf; hanya baca).
+    Route::get('staf/aktivitas', ActivityLogController::class)->middleware('can:activity.view')->name('staff.activity');
 
     // Kelola akun staf: owner (semua) & super admin (kecuali Owner/Super Admin), lihat User::MANAGEABLE_STAFF_ROLES.
     Route::resource('staf', StaffController::class)

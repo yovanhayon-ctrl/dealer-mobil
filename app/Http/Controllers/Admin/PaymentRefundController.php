@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\PaymentRefundRequest;
+use App\Models\ActivityLog;
 use App\Models\PaymentRefund;
 use App\Models\PurchaseRequest;
 use App\Notifications\Notifier;
@@ -38,6 +39,9 @@ class PaymentRefundController extends Controller
         $purchaseRequest->load('paymentRefunds');
 
         Notifier::send($purchaseRequest->loadMissing('user')->user, PaymentRefundRecorded::refunded($refund, $purchaseRequest));
+        ActivityLog::record(ActivityLog::CATEGORY_FINANCE, 'refund.recorded',
+            'Mencatat pengembalian dana '.ActivityLog::rupiah($refund->amount).", pengajuan {$purchaseRequest->documentNumber()}",
+            $purchaseRequest, ['payment_refund_id' => $refund->id, 'amount' => $refund->amount]);
 
         return $redirect->with('success', 'Pengembalian dana Rp '.number_format($refund->amount, 0, ',', '.')
             ." dicatat. Status dana: {$purchaseRequest->paymentStatusLabel()}.");
@@ -60,6 +64,8 @@ class PaymentRefundController extends Controller
         $purchaseRequest->save();
 
         Notifier::send($purchaseRequest->loadMissing('user')->user, PaymentRefundRecorded::closed($purchaseRequest));
+        ActivityLog::record(ActivityLog::CATEGORY_FINANCE, 'refund.closed',
+            "Menutup pengembalian dana pengajuan {$purchaseRequest->documentNumber()}: {$purchaseRequest->refund_closed_note}", $purchaseRequest);
 
         return $redirect->with('success', "Pengembalian dana ditutup. Status dana: {$purchaseRequest->paymentStatusLabel()}.");
     }

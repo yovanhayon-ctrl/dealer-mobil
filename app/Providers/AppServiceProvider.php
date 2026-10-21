@@ -5,12 +5,15 @@ namespace App\Providers;
 use App\Http\Controllers\PurchaseRequestController;
 use App\Http\Controllers\ServiceBookingController;
 use App\Http\Controllers\TestDriveController;
+use App\Models\ActivityLog;
 use App\Models\Setting;
 use App\Models\User;
+use Illuminate\Auth\Events\Login;
 use Illuminate\Cache\RateLimiting\Limit;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\Request;
 use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\Route;
@@ -55,6 +58,14 @@ class AppServiceProvider extends ServiceProvider
         foreach (array_keys(User::PERMISSIONS) as $ability) {
             Gate::define($ability, fn (User $user) => $user->isActive() && $user->hasPermission($ability));
         }
+
+        // Login staf dicatat di Riwayat Aktivitas (login customer tidak).
+        Event::listen(Login::class, function (Login $event) {
+            if ($event->user instanceof User && $event->user->isStaff()) {
+                ActivityLog::record(ActivityLog::CATEGORY_LOGIN, 'auth.login',
+                    $event->remember ? 'Masuk (diingat di perangkat ini)' : 'Masuk', user: $event->user);
+            }
+        });
 
         // Registrasi: batasi per IP agar tidak dipakai membuat banyak akun otomatis.
         RateLimiter::for('register', fn (Request $request) => Limit::perMinute(self::MAX_REGISTRATIONS_PER_MINUTE)

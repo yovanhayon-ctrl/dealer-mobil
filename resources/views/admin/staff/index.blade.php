@@ -18,9 +18,16 @@
 @section('content')
     <div class="d-flex flex-column flex-sm-row gap-2 align-items-sm-center justify-content-between mb-3">
         <p class="text-muted small mb-0">{{ $summary }}. Akun staf hanya dibuat di sini, tidak lewat halaman Daftar.</p>
-        <a href="{{ route('admin.staff.create') }}" class="btn btn-accent">
-            <i class="bi bi-plus-lg"></i>Tambah Staf
-        </a>
+        <div class="d-flex flex-wrap gap-2 flex-shrink-0">
+            @can('activity.view')
+                <a href="{{ route('admin.staff.activity') }}" class="btn btn-outline-secondary">
+                    <i class="bi bi-clock-history"></i>Riwayat Aktivitas
+                </a>
+            @endcan
+            <a href="{{ route('admin.staff.create') }}" class="btn btn-accent">
+                <i class="bi bi-plus-lg"></i>Tambah Staf
+            </a>
+        </div>
     </div>
 
     <div class="card">

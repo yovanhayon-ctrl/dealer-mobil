@@ -488,7 +488,7 @@ Enam peran staf (sejak v1.14.0). Aturan aksesnya ada di satu tempat: `User::PERM
 | **Customer Service** | Booking servis (konfirmasi, jadwal ulang, tugaskan mekanik); mobil, promo, test drive, pengajuan, ulasan, dan customer hanya lihat untuk menjawab pertanyaan. | Mengurus test drive, ubah transaksi finansial, moderasi ulasan, lihat akun staf. |
 | **Mekanik** | Panel sendiri: pekerjaan servis yang ditugaskan (checklist, temuan, selesai), layanan servis (lihat), rating. | Membuka panel admin. |
 
-Owner pertama: `php artisan user:make-owner email`. Peran lain dibuat di menu **Staf**. Rincian hak per menu: [docs/RELEASE-v1.14.0.md](docs/RELEASE-v1.14.0.md).
+Owner pertama: `php artisan user:make-owner email`. Peran lain dibuat di menu **Staf**. Tindakan sensitif (login staf, akun & Pengaturan, pembayaran & pengembalian dana, status pengajuan, hapus data master) tercatat di **Staf > Riwayat Aktivitas** (Owner & Super Admin; tidak bisa diubah atau dihapus). Rincian hak per menu: [docs/RELEASE-v1.14.0.md](docs/RELEASE-v1.14.0.md).
 
 ## Keamanan
 

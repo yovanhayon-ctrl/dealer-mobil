@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CategoryRequest;
+use App\Models\ActivityLog;
 use App\Models\Category;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
@@ -76,6 +77,8 @@ class CategoryController extends Controller
             // Mobil ditambahkan bersamaan (FK restrict): tampilkan pesan ramah, bukan error SQL.
             return $this->cannotDelete($category);
         }
+
+        ActivityLog::record(ActivityLog::CATEGORY_DELETE, 'category.deleted', "Menghapus kategori \"{$category->name}\"", $category);
 
         return redirect()->route('admin.categories.index')
             ->with('success', "Kategori \"{$category->name}\" berhasil dihapus.");

@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
+use App\Models\ActivityLog;
 use App\Models\Setting;
 use App\Models\User;
 use App\Notifications\Admin\BankAccountChanged;
@@ -217,5 +218,15 @@ class SettingTest extends TestCase
             $otherOwner->notifications()->latest()->first()->data['message']
         );
         $this->assertSame('1111111111', config('dealer.bank.account'));
+
+        // Riwayat Aktivitas: Pengaturan biasa dan rekening dicatat terpisah.
+        // Simpan rekening pertama ikut mengembalikan tagline ke bawaan (form berisi tagline bawaan).
+        $this->assertSame([
+            'Mengubah Pengaturan: tagline',
+            'Mengubah Pengaturan: tagline',
+            'Mengubah rekening pembayaran: BCA 1111111111 a.n. PT JAF Dealer → BNI 9876543210 a.n. PT JAF Dealer',
+            'Mengubah rekening pembayaran: BNI 9876543210 a.n. PT JAF Dealer → BCA 1111111111 a.n. PT JAF Dealer',
+        ], ActivityLog::query()->orderBy('id')->pluck('description')->all());
+        $this->assertSame(['account', 'account', 'finance', 'finance'], ActivityLog::query()->orderBy('id')->pluck('category')->all());
     }
 }

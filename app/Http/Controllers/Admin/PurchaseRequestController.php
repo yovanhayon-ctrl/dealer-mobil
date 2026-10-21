@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Actions\ChangePurchaseRequestStatus;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\PurchaseRequestStatusRequest;
+use App\Models\ActivityLog;
 use App\Models\PurchaseRequest;
 use App\Notifications\Notifier;
 use App\Notifications\PurchaseRequestStatusChanged;
@@ -92,6 +93,7 @@ class PurchaseRequestController extends Controller
         ChangePurchaseRequestStatus $changeStatus,
     ): RedirectResponse {
         $oldLabel = $purchaseRequest->statusLabel();
+        $oldStatus = $purchaseRequest->status;
         $status = $request->validated('status');
 
         try {
@@ -116,6 +118,9 @@ class PurchaseRequestController extends Controller
 
         // Hanya perubahan status yang benar-benar tersimpan yang dikabarkan ke customer.
         Notifier::send($updated->user, new PurchaseRequestStatusChanged($updated));
+        ActivityLog::record(ActivityLog::CATEGORY_PURCHASE, 'purchase.status',
+            "Mengubah status pengajuan {$updated->documentNumber()}: {$oldLabel} → {$updated->statusLabel()}",
+            $updated, ['old' => $oldStatus, 'new' => $updated->status]);
 
         return $redirect->with('success', "Status pengajuan diubah dari {$oldLabel} menjadi {$updated->statusLabel()}.");
     }
