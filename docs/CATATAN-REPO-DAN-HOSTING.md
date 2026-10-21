@@ -1,6 +1,6 @@
 # Catatan Repo dan Hosting dari Awal
 
-Catatan per **22 Oktober 2026**. Bagian A menjelaskan kondisi repo dan folder saat ini; bagian B langkah memasang website di hosting dari nol sampai online. Rincian teknis tambahan ada di [DEPLOY-CPANEL.md](DEPLOY-CPANEL.md) dan daftar periksa di [GO-LIVE.md](GO-LIVE.md).
+Catatan per **22 Oktober 2026**. Bagian A menjelaskan kondisi repo, folder, dan `.env`; bagian B langkah memasang website di hosting dari nol sampai online; bagian C hal yang perlu diperhatikan; bagian D ringkasan urutan. Rincian teknis tambahan ada di [DEPLOY-CPANEL.md](DEPLOY-CPANEL.md) dan daftar periksa di [GO-LIVE.md](GO-LIVE.md).
 
 ---
 
@@ -43,7 +43,27 @@ Cara menghapus: GitHub > repo `dealer-mobil-lama` > **Settings** > *Danger Zone*
 | `C:\laragon\www\dealer-mobil` | Kode (branch `testing`), database `dealer_mobil` berisi data **dummy** | Tempat mengubah kode, menjalankan test, `git add/commit/push`. Situs: `http://dealer-mobil.test`. |
 | `C:\laragon\www\dealer-mobil-release` | Kode versi rilis (saat ini v1.20.0), database `dealer_mobil_release` berisi data **asli** | Tempat mengisi data asli sebelum online. **Jangan** commit di sini dan **jangan** hapus lewat File Explorer (terhubung ke git sebagai *worktree*). Situs: `http://dealer-mobil-release.test`. |
 
-Sebelum `git commit` atau `git push`, pastikan terminal berada di `C:\laragon\www\dealer-mobil` (lihat path di atas tanda `λ`).
+Sebelum `git commit` atau `git push`, pastikan terminal berada di `C:\laragon\www\dealer-mobil` (lihat path di atas tanda `λ`; di folder utama juga tampil `(testing -> origin)`).
+
+### A5. Tiga file `.env`
+
+| File | Isi | Ikut ke server? |
+|---|---|---|
+| `dealer-mobil\.env` | Pengaturan laptop untuk pengembangan; `DEALER_*` berisi data **contoh** (rekening "PT JAF Dealer (Demo)") | Tidak. Biarkan apa adanya. |
+| `dealer-mobil-release\.env` | Pengaturan laptop untuk data asli; `DEALER_*` **dikosongkan** karena data dealer ada di menu Pengaturan (database) | Tidak. |
+| `.env` di server | Dibuat **baru** dari `.env.example` saat hosting (langkah B6) | Ya, hanya di server. |
+
+File `.env` tidak pernah masuk ke git atau GitHub. Jangan dikirim lewat chat dan jangan diunggah dari laptop ke server.
+
+### A6. Dari mana kode dan data saat hosting
+
+| Yang dikirim ke server | Diambil dari | Caranya |
+|---|---|---|
+| **Kode** | Folder utama `dealer-mobil`, versi rilis (tag, mis. `v1.20.0`) | `git archive` lalu `composer install --no-dev` di folder `paket-deploy` (B2) |
+| **Data** (Pengaturan, rekening, akun owner, logo, foto) | Folder `dealer-mobil-release` | `php artisan backup:run` lalu ambil zip-nya (B3) |
+
+- **Jangan** men-zip folder `dealer-mobil-release` (atau `dealer-mobil`) lalu mengunggahnya. Folder kerja berisi `.env` laptop (kata sandi Gmail, `APP_KEY`, `APP_DEBUG=true`), paket test, log, sesi login, cadangan, dan file penghubung git.
+- **Data dummy** di database `dealer_mobil` (folder utama) **tidak pernah** dikirim ke server. Data dummy itu sengaja dipertahankan untuk mencoba fitur dan demo.
 
 ---
 
@@ -63,27 +83,20 @@ Gambaran: **kode** diambil dari rilis terbaru di repo, **data** (pengaturan deal
 
 ### B2. Siapkan paket kode di laptop
 
-Gunakan folder **`paket-deploy`** (jangan memakai nama `dealer-mobil-release`, sudah dipakai untuk data). Di terminal Laragon:
+Semua perintah di bawah dijalankan **di laptop**, lewat **Terminal Laragon** (tombol *Terminal* di Laragon), bukan di server. Folder kerja paket bernama **`paket-deploy`** (jangan memakai nama `dealer-mobil-release`, sudah dipakai untuk data).
 
-```bash
-cd /d C:\laragon\www\dealer-mobil
-git checkout main
-git pull
-git archive --format=zip --output=../paket-deploy.zip v1.20.0
-```
+| Urutan | Perintah / tindakan | Dijalankan di | Hasil |
+|---|---|---|---|
+| 1 | `cd /d C:\laragon\www\dealer-mobil` lalu `git fetch origin --tags` | folder utama `dealer-mobil` | Tag versi terbaru dari GitHub tersedia di laptop |
+| 2 | `git archive --format=zip --output=../paket-deploy.zip v1.20.0` | folder utama `dealer-mobil` | File `C:\laragon\www\paket-deploy.zip` berisi kode bersih (tanpa `.env`, tanpa data) |
+| 3 | Ekstrak `paket-deploy.zip` | File Explorer | Folder baru `C:\laragon\www\paket-deploy` |
+| 4 | `cd /d C:\laragon\www\paket-deploy` lalu `composer install --no-dev --optimize-autoloader` | folder **`paket-deploy`** | Folder `vendor` versi produksi |
+| 5 | Kompres **isi** folder `paket-deploy` menjadi `dealer-mobil.zip` | File Explorer | File yang diunggah ke hosting (B4) |
 
-Ganti `v1.20.0` dengan versi rilis terbaru saat itu. Lalu:
-
-1. Ekstrak `C:\laragon\www\paket-deploy.zip` ke folder baru `C:\laragon\www\paket-deploy`.
-2. Di folder itu jalankan:
-
-   ```bash
-   cd /d C:\laragon\www\paket-deploy
-   composer install --no-dev --optimize-autoloader
-   ```
-
-3. Kompres **isi** folder `paket-deploy` menjadi `dealer-mobil.zip`. Paket ini tidak berisi `.env` (aman).
-4. Kembali ke branch kerja: `cd /d C:\laragon\www\dealer-mobil` lalu `git checkout testing`.
+- Ganti `v1.20.0` dengan versi rilis terbaru saat itu (lihat README atau tag di GitHub).
+- `git archive` memakai tag, jadi **tidak perlu** pindah branch; folder utama tetap di branch `testing`.
+- **Jangan** menjalankan `composer install --no-dev` di folder `dealer-mobil` atau `dealer-mobil-release`: paket test (PHPUnit, Pint) akan terhapus dan pengembangan di laptop bisa berhenti berjalan.
+- Setelah upload selesai, folder `paket-deploy` dan file zip-nya boleh dihapus.
 
 ### B3. Siapkan paket data dari folder release
 
@@ -201,7 +214,38 @@ php artisan optimize
 
 ---
 
-## C. Ringkasan urutan
+## C. Yang perlu diperhatikan
+
+**Keamanan**
+- `.env` server berisi kata sandi database, email, dan `APP_KEY`: jangan dibagikan; simpan salinannya di tempat aman (cadangan otomatis **tidak** menyimpan `.env`).
+- Di server wajib `APP_ENV=production` dan `APP_DEBUG=false`; tanpa itu detail error dan konfigurasi bisa terlihat publik.
+- `SESSION_SECURE_COOKIE=true` hanya setelah HTTPS aktif; bila belum, login gagal.
+- Setelah online, pastikan `https://domain-anda.com/.env` tidak bisa dibuka (403/404).
+- Akun owner memakai kata sandi yang sama seperti di situs release: ganti di **Profil** bila pernah dibagikan ke orang lain.
+
+**Data**
+- **Jangan** menjalankan `php artisan db:seed` di server: membuat mobil/promo contoh dan data yang tidak diperlukan. Data awal sudah dari release (B7).
+- **Jangan** mengimpor database `dealer_mobil` (folder utama): isinya data dummy.
+- Rekening pembayaran dicek ulang setelah online, karena customer mentransfer ke rekening itu.
+- Folder `storage/app/private` berisi bukti pembayaran customer (data pribadi): jangan dibuat publik, jangan dibagikan.
+
+**Hosting dan pembaruan**
+- PHP di hosting minimal **8.4**; di 8.3 ke bawah aplikasi tidak berjalan.
+- Tanpa **cron** `schedule:run`, pengingat H-1 dan cadangan otomatis tidak berjalan (dashboard owner akan memperingatkan).
+- Email SMTP harus benar (uji di B9) agar *Lupa kata sandi* dan notifikasi terkirim; cek SPF dan DKIM agar tidak masuk Spam.
+- Saat memperbarui ke versi baru: cadangkan dulu, **jangan menimpa** `.env`, `storage/app/public`, dan `storage/app/private`, lalu `php artisan migrate --force` dan `php artisan optimize`.
+- Unduh file cadangan dari server secara rutin (mis. setiap Senin); cadangan di server ikut hilang bila hosting bermasalah.
+
+**Repo dan folder di laptop**
+- Commit dan push hanya dari folder utama `dealer-mobil` (branch `testing`, lalu merge ke `main`).
+- Commit dibuat tanpa atribusi Claude.
+- Jangan menghapus atau memindahkan `dealer-mobil-release` lewat File Explorer (terhubung ke git); minta dilepas dengan `git worktree remove` bila sudah tidak diperlukan.
+- Kode di `dealer-mobil-release` dikunci di versi rilis tertentu (saat ini v1.20.0); diperbarui hanya saat ada rilis baru dan data di dalamnya akan dipindahkan ke server.
+- Simpan `dealer-mobil-backup-2026-10-22.bundle` sampai repo lama dihapus (A3).
+
+---
+
+## D. Ringkasan urutan
 
 1. Hosting + domain siap (B1).
 2. Paket kode dari rilis terbaru (B2) dan paket data dari folder release (B3).
