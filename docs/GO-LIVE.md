@@ -15,7 +15,7 @@ Versi aplikasi: **v1.19.0** atau lebih baru.
 - [ ] Daftar layanan servis, harga mulai, durasi, dan checklist pekerjaannya.
 - [ ] Gambar atau video hero milik dealer sendiri (hindari materi berhak cipta pihak lain).
 - [ ] Daftar staf: nama, email, nomor WhatsApp, dan role (Owner, Super Admin, Admin Dealer, Sales, Customer Service, Mekanik).
-- [ ] **Kebijakan Privasi** dan **Syarat & Ketentuan** sudah dibaca dan disetujui dealer (teks saat ini masih umum).
+- [ ] **Kebijakan Privasi** dan **Syarat & Ketentuan** sudah dibaca dan disetujui dealer (teks saat ini masih umum). Bahan dan pertanyaan untuk dealer: [LEGAL-REVIEW.md](LEGAL-REVIEW.md).
 
 ## 2. Siapkan `.env` production
 
