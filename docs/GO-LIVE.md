@@ -109,8 +109,9 @@ Lakukan sekali di laptop dan sekali di HP. Pakai email customer uji milik sendir
 ## 6. Keamanan dan cadangan
 
 - [ ] `https://domain-anda/.env` tidak bisa dibuka (403/404); halaman error tidak menampilkan detail teknis.
-- [ ] Cadangan database otomatis harian aktif (cPanel *Backup* atau cron `mysqldump`, [DEPLOY-CPANEL.md](DEPLOY-CPANEL.md) bagian 12), termasuk folder `storage/app/public` dan `storage/app/private` (bukti pembayaran).
-- [ ] Sekali **uji restore** cadangan ke database terpisah untuk memastikan cadangannya bisa dipakai.
+- [ ] Cadangan otomatis berjalan: ekstensi PHP `zip` aktif, `php artisan backup:run` berhasil, dan keesokan harinya dashboard Owner menampilkan *Cadangan terakhir* ([DEPLOY-CPANEL.md](DEPLOY-CPANEL.md) bagian 12).
+- [ ] Sekali **uji restore**: unduh zip terbaru, impor `database.sql` ke database kosong terpisah, dan pastikan data terbaca.
+- [ ] Jadwal rutin mengunduh cadangan ke luar server (mis. setiap Senin) dan menyimpan salinan `.env` di tempat aman.
 - [ ] Hanya Owner yang memegang akses cPanel dan `.env`.
 
 ## 7. Hari pertama dan minggu pertama

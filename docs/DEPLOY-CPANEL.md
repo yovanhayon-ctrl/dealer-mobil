@@ -237,7 +237,16 @@ Yang **wajib** dicadangkan (folder lain bisa dibuat ulang dari paket aplikasi):
 | Foto | `dealer-mobil/storage/app/public` | Foto mobil, banner promo, logo merek |
 | Pengaturan | `dealer-mobil/.env` | Kunci aplikasi (`APP_KEY`), database, email, data dealer |
 
-**Kapan:** minimal **sekali seminggu**, dan **selalu** sebelum memperbarui aplikasi (bagian 11). Banyak hosting juga membuat cadangan otomatis harian; cek di cPanel → **Backup** / **JetBackup**, tetapi tetap simpan salinan sendiri.
+**Cadangan otomatis (sejak v1.20.0):** bila cron `schedule:run` (bagian 7) aktif, aplikasi membuat cadangan setiap hari pukul `DEALER_BACKUP_TIME` (bawaan 02:00) dengan `php artisan backup:run`:
+
+- Satu file `cadangan-TANGGAL-JAM.zip` di `dealer-mobil/storage/app/backups` (ubah lewat `DEALER_BACKUP_PATH`), berisi `database.sql`, `storage/app/public` (foto), dan `storage/app/private` (bukti pembayaran). File `.env` **tidak** ikut karena berisi kata sandi: simpan salinannya sendiri.
+- Cadangan yang lebih tua dari `DEALER_BACKUP_KEEP_DAYS` hari (bawaan 30) dihapus; cadangan terbaru selalu disimpan.
+- Dashboard Owner & Super Admin menampilkan *Cadangan terakhir …* dan memberi peringatan bila belum ada cadangan atau sudah lebih dari 2 hari.
+- Jalankan manual kapan saja (mis. sebelum memperbarui aplikasi): `php artisan backup:run`.
+- Butuh ekstensi PHP **zip** (cPanel → *Select PHP Version* → centang `zip`). Ekspor database memakai PHP, jadi tidak membutuhkan `mysqldump`.
+- Cadangan masih berada di server yang sama: **unduh** file zip terbaru secara berkala (mis. seminggu sekali) lewat File Manager ke komputer atau penyimpanan cloud milik dealer.
+
+**Kapan (manual):** minimal **sekali seminggu** bila cron tidak tersedia, dan **selalu** sebelum memperbarui aplikasi (bagian 11). Banyak hosting juga membuat cadangan otomatis harian; cek di cPanel → **Backup** / **JetBackup**, tetapi tetap simpan salinan sendiri.
 
 **Cara A, lewat cPanel (tanpa Terminal):**
 
@@ -257,6 +266,8 @@ find ~/backups -type f -mtime +30 -delete   # hapus cadangan yang lebih tua dari
 `mysqldump` menanyakan kata sandi database. Folder `~/backups` berada di luar `public_html` sehingga tidak bisa diunduh orang lain; tetap unduh salinannya ke komputer atau penyimpanan cloud milik dealer.
 
 **Memulihkan:**
+
+Dari cadangan otomatis: ekstrak zip, impor `database.sql` (langkah 1), lalu salin folder `storage/app/public` dan `storage/app/private` dari zip ke `dealer-mobil/storage/app` (langkah 2-3).
 
 1. Database: phpMyAdmin → pilih database → *Import* file `.sql` (atau `mysql -u namauser_dealer -p namauser_dealer < db-TANGGAL.sql`).
 2. File: ekstrak cadangan ke `dealer-mobil` sehingga `storage/app/public`, `storage/app/private`, dan `.env` kembali ke tempatnya (`tar -xzf storage-TANGGAL.tar.gz -C ~/dealer-mobil`).

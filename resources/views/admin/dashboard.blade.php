@@ -46,6 +46,23 @@
         @endif
     </div>
 
+    {{-- Cadangan otomatis (Owner & Super Admin): peringatan bila belum ada atau sudah lama. --}}
+    @if ($canSeeBackup)
+        @php($backupStale = ! $latestBackup || $latestBackup['created_at']->lt(now()->subHours(\App\Actions\CreateBackup::STALE_AFTER_HOURS)))
+        <p @class(['small mb-4', 'text-muted' => ! $backupStale, 'dashboard-backup-warning' => $backupStale]) role="status">
+            <i @class(['bi', 'bi-shield-check' => ! $backupStale, 'bi-exclamation-triangle' => $backupStale])></i>
+            @if ($latestBackup)
+                Cadangan terakhir {{ $latestBackup['created_at']->translatedFormat('d M Y H:i') }}
+                ({{ \Illuminate\Support\Number::fileSize($latestBackup['size'], 1) }}).
+            @else
+                Belum ada cadangan otomatis.
+            @endif
+            @if ($backupStale)
+                Pastikan cron <code>schedule:run</code> aktif di hosting, atau jalankan <code>php artisan backup:run</code>.
+            @endif
+        </p>
+    @endif
+
     {{-- Perlu ditindaklanjuti: hanya tampil bila ada --}}
     @if ($attention)
         <div class="dashboard-attention mb-4" role="status">

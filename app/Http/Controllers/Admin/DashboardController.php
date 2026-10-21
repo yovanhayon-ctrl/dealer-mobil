@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Admin;
 
+use App\Actions\CreateBackup;
 use App\Http\Controllers\Controller;
 use App\Models\Car;
 use App\Models\PurchaseRequest;
@@ -15,7 +16,12 @@ class DashboardController extends Controller
 {
     public function __invoke(): View
     {
+        // Status cadangan otomatis untuk Owner & Super Admin (pengelola sistem).
+        $canSeeBackup = auth()->user()->can('settings.manage');
+
         return view('admin.dashboard', [
+            'canSeeBackup' => $canSeeBackup,
+            'latestBackup' => $canSeeBackup ? CreateBackup::latest() : null,
             'stats' => $this->stats(),
             'trend' => (new DashboardTrend)->months(),
             'latestPurchases' => PurchaseRequest::query()
