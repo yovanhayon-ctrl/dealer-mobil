@@ -54,6 +54,8 @@
         <li>Pembayaran hanya dilakukan ke rekening resmi atas nama dealer yang tampil di akun Anda setelah pengajuan disetujui, atau langsung di showroom.</li>
         <li>Kami <strong>tidak pernah</strong> meminta transfer ke rekening pribadi staf. Pembayaran ke rekening lain di luar tanggung jawab kami.</li>
         <li>Pembayaran dianggap diterima setelah bukti diverifikasi admin. Status pembayaran dapat dilihat di menu <strong>Pengajuan Saya</strong>.</li>
+        <li>Pembayaran pertama (tanda jadi, DP, atau pelunasan) dilakukan paling lambat <strong>{{ config('dealer.payment_due_days') }} hari</strong> setelah pengajuan disetujui. Lewat batas tersebut, dealer dapat membatalkan pengajuan dan unit ditawarkan kembali.</li>
+        <li>Bila pengajuan dibatalkan atau ditolak setelah ada pembayaran, pengembalian dana diproses sesuai kesepakatan dengan dealer. Setiap pengembalian dicatat dan dapat dilihat di menu <strong>Pengajuan Saya</strong>.</li>
     </ul>
 
     <h2 id="jadwal">6. Test drive dan servis</h2>
