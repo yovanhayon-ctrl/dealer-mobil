@@ -44,6 +44,14 @@ return [
     // Jam (WIB) pengingat H-1 test drive & servis dikirim scheduler; butuh cron `php artisan schedule:run` di hosting.
     'reminder_time' => env('DEALER_REMINDER_TIME', '16:00'),
 
+    // Cadangan otomatis harian (php artisan backup:run lewat scheduler): database, foto, dan bukti pembayaran dalam satu zip.
+    // Folder bawaan storage/app/backups tidak bisa dibuka dari browser; unduh salinannya secara berkala ke tempat lain.
+    'backup' => [
+        'path' => env('DEALER_BACKUP_PATH') ?: storage_path('app/backups'),
+        'time' => env('DEALER_BACKUP_TIME', '02:00'),
+        'keep_days' => (int) env('DEALER_BACKUP_KEEP_DAYS', 30),
+    ],
+
     // Notifikasi (status untuk customer, booking baru untuk admin) juga dikirim lewat email.
     // Pengiriman memakai pengaturan MAIL_* (MAIL_MAILER=log = hanya dicatat di storage/logs/laravel.log).
     'mail_notifications' => (bool) env('DEALER_MAIL_NOTIFICATIONS', true),

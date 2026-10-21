@@ -1238,6 +1238,11 @@ img.promo-card-img {
     border-radius: 0 0 var(--bs-card-inner-border-radius) var(--bs-card-inner-border-radius);
 }
 
+/* Dashboard: peringatan cadangan otomatis belum ada / sudah lama. */
+.dashboard-backup-warning {
+    color: var(--bs-warning-text-emphasis);
+}
+
 /* Halaman Pengaturan: judul bagian biasa (bukan label kapital), pilihan latar hero berupa kartu radio. */
 .settings-form .admin-form-section + .admin-form-section {
     margin-top: 1.75rem;
