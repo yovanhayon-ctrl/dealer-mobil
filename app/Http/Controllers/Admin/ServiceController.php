@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\ServiceRequest;
+use App\Models\ActivityLog;
 use App\Models\Service;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
@@ -89,6 +90,8 @@ class ServiceController extends Controller
             // Booking masuk bersamaan (FK restrict): tampilkan pesan ramah, bukan error SQL.
             return $this->cannotDelete($service);
         }
+
+        ActivityLog::record(ActivityLog::CATEGORY_DELETE, 'service.deleted', "Menghapus layanan servis \"{$service->name}\"", $service);
 
         return redirect()->route('admin.services.index')
             ->with('success', "Layanan \"{$service->name}\" berhasil dihapus.");

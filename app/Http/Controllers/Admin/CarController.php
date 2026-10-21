@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\CarRequest;
+use App\Models\ActivityLog;
 use App\Models\Brand;
 use App\Models\Car;
 use App\Models\CarImage;
@@ -125,6 +126,8 @@ class CarController extends Controller
 
         // Folder file gambar dihapus hanya setelah data mobil berhasil dihapus.
         Storage::disk(CarImage::DISK)->deleteDirectory(CarImage::directory($car->id));
+
+        ActivityLog::record(ActivityLog::CATEGORY_DELETE, 'car.deleted', "Menghapus mobil \"{$car->name} {$car->year}\"", $car);
 
         return redirect()->route('admin.cars.index')
             ->with('success', "Mobil \"{$car->name}\" berhasil dihapus.");

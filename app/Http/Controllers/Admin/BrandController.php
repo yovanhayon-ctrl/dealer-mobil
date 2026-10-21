@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\BrandRequest;
+use App\Models\ActivityLog;
 use App\Models\Brand;
 use Illuminate\Database\QueryException;
 use Illuminate\Http\RedirectResponse;
@@ -96,6 +97,8 @@ class BrandController extends Controller
         if ($brand->logo) {
             Storage::disk(Brand::LOGO_DISK)->delete($brand->logo);
         }
+
+        ActivityLog::record(ActivityLog::CATEGORY_DELETE, 'brand.deleted', "Menghapus merek \"{$brand->name}\"", $brand);
 
         return redirect()->route('admin.brands.index')
             ->with('success', "Merek \"{$brand->name}\" berhasil dihapus.");
